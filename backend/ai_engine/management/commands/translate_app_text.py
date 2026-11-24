@@ -11,8 +11,10 @@ whose models are trained on Ugandan languages. Existing entries are kept unless
 --overwrite is given. Machine translations are drafts: have a native speaker
 review them before release.
 
-A translation that drops a number (a section, a fee, a number of days) or a
-name such as "Markets Act" is not saved; the app shows the English instead.
+Act names are sent in quotation marks so the model keeps them in English. A
+translation that still drops a number (a section, a fee, a number of days) or
+a name such as "Markets Act" is retried, and if it keeps failing it is not
+saved; the app shows the English instead.
 
   python manage.py translate_app_text --check
   python manage.py translate_app_text --language lgg --limit 5 --dry-run
@@ -35,11 +37,16 @@ PROTECTED_TERMS = (
     'LegalBridge', 'USSD', 'UNBS', 'KCCA', 'JPG', 'PNG', 'PDF', 'UGX', 'MB', 'Class M',
     'Markets Act', 'Traffic and Road Safety', 'Uganda National Bureau of Standards',
 )
+# Multi-word names are sent in quotation marks, which the model leaves untranslated.
+QUOTED_NAMES = ('Traffic and Road Safety', 'Markets Act', 'Uganda National Bureau of Standards')
+QUOTE_MARKS = ('"{}"', '“{}”', '«{}»', "'{}'")
 NUMBER = re.compile(r'\d+')
 # English/Luganda pairs in mobile/constants/LegalRights.ts.
 GUIDE_TEXT = re.compile(r"\ben:\s*'((?:[^'\\]|\\.)*)',\s*lg:\s*'((?:[^'\\]|\\.)*)'", re.S)
 RETRY_STATUSES = {429, 502, 503}
 MAX_ATTEMPTS = 4
+# The model's output varies, so a translation that fails the checks is retried.
+TRANSLATION_ATTEMPTS = 3
 SAVE_EVERY = 20
 
 
@@ -98,6 +105,33 @@ def load_catalogs(mobile_dir: Path):
         Catalog('screens', ui, locales, keys=tuple(english)),
         Catalog('rights guides', guides, mobile_dir / 'i18n' / 'content'),
     ]
+
+
+def quote_names(text):
+    for name in QUOTED_NAMES:
+        text = text.replace(name, f'"{name}"')
+    return text
+
+
+def unquote_names(text):
+    for name in QUOTED_NAMES:
+        for marks in QUOTE_MARKS:
+            text = text.replace(marks.format(name), name)
+    return text
+
+
+def hide_names(text):
+    """Replace names with codes (X1, X2) the model leaves alone; returns (text, names)."""
+    names = [name for name in QUOTED_NAMES if name in text]
+    for number, name in enumerate(names, 1):
+        text = text.replace(name, f'X{number}')
+    return text, names
+
+
+def restore_names(text, names):
+    for number, name in enumerate(names, 1):
+        text = re.sub(rf'\bX{number}\b', name, text)
+    return text
 
 
 def translation_problem(source, translated):
@@ -192,8 +226,17 @@ class Command(BaseCommand):
 
             pending = 0
             for key, text in todo:
-                translated = self._translate(text, language)
-                problem = translation_problem(text, translated)
+                for attempt in range(1, TRANSLATION_ATTEMPTS + 1):
+                    if attempt < TRANSLATION_ATTEMPTS:
+                        translated = unquote_names(self._translate(quote_names(text), language))
+                    else:  # last try: hide the names behind codes
+                        hidden, names = hide_names(text)
+                        translated = restore_names(self._translate(hidden, language), names)
+                    problem = translation_problem(text, translated)
+                    if not problem:
+                        break
+                    if self.delay:
+                        time.sleep(self.delay)
                 if problem:
                     rejected += 1
                     self.stdout.write(self.style.WARNING(f'    skipped {key[:60]!r}: {problem}'))

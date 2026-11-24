@@ -113,6 +113,46 @@ def test_translation_dropping_numbers_or_names_is_not_saved(mobile):
     assert 'numbers missing: 4, 18, 2023' in output
 
 
+def test_act_names_are_quoted_and_a_bad_translation_is_retried(mobile):
+    law = 'Section 18(4) of the Markets Act, 2023 says registration is free.'
+    attempts = []
+
+    def flaky(url, json=None, **kwargs):
+        if '18(4)' not in json['text']:
+            return sunbird_reply(f"[x] {json['text']}")
+        attempts.append(json['text'])
+        if len(attempts) == 1:
+            return sunbird_reply('Esele 18(4), 2023 ri ota suku ni')  # Act name translated away
+        return sunbird_reply('Esele 18(4) “Markets Act”, 2023 ri')
+
+    with patch('requests.post', side_effect=flaky):
+        run(mobile, '--language', 'lgg')
+
+    assert attempts == [law.replace('Markets Act', '"Markets Act"')] * 2
+    guides = read_json(mobile / 'i18n' / 'content' / 'lgg.json')
+    assert guides[law] == 'Esele 18(4) Markets Act, 2023 ri'
+
+
+def test_names_are_hidden_behind_codes_on_the_last_try(mobile):
+    law = 'Section 18(4) of the Markets Act, 2023 says registration is free.'
+    sent = []
+
+    def name_dropper(url, json=None, **kwargs):
+        if '18(4)' not in json['text']:
+            return sunbird_reply(f"[x] {json['text']}")
+        sent.append(json['text'])
+        if 'X1' in json['text']:
+            return sunbird_reply('Esele 18(4) X1, 2023 ri')
+        return sunbird_reply('Esele 18(4) azita cuu, 2023 ri')  # always translates the name
+
+    with patch('requests.post', side_effect=name_dropper):
+        run(mobile, '--language', 'lgg')
+
+    assert sent[-1] == law.replace('Markets Act', 'X1')
+    guides = read_json(mobile / 'i18n' / 'content' / 'lgg.json')
+    assert guides[law] == 'Esele 18(4) Markets Act, 2023 ri'
+
+
 def test_translation_problem_rules():
     assert translation_problem('Pay UGX 50,000 within 14 days', 'Sasula UGX 50,000 omu biro 14') is None
     assert translation_problem('Call LegalBridge', 'Teera') == 'names missing: LegalBridge'
