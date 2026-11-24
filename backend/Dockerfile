@@ -24,8 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
-# Create media directory
-RUN mkdir -p /app/media /app/chroma_db /app/staticfiles
+# Create media directory and make the boot script executable
+RUN mkdir -p /app/media /app/chroma_db /app/staticfiles && chmod +x /app/start.sh /app/start_prod.sh
 
 EXPOSE 8000
 
