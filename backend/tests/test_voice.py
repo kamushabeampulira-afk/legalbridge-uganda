@@ -96,6 +96,8 @@ def test_whisper_luganda_has_no_language_hint(settings):
     """Whisper has no Luganda code; lg must not be forced to English."""
     settings.STT_PROVIDER = 'openai_whisper'
     settings.VOICE_OPENAI_API_KEY = 'sk-test-voice-key-123456'
+    settings.VOICE_OPENAI_BASE_URL = ''
+    settings.STT_WHISPER_MODEL = 'whisper-1'
     mock_client = MagicMock()
     mock_client.audio.transcriptions.create.return_value = MagicMock(text=' kintu ')
     with patch('openai.OpenAI', return_value=mock_client):
@@ -210,3 +212,49 @@ def test_sunbird_synthesis_error_returns_none(sunbird, tmp_path):
     with patch.object(tts, 'AUDIO_DIR', tmp_path), patch('requests.post', return_value=reply):
         assert tts.synthesize_text('Hello', language='en') is None
     assert not any(tmp_path.iterdir())
+
+
+# ── OpenAI-compatible TTS (e.g. Groq Orpheus) and speech clean-up ────────────
+
+@pytest.fixture
+def groq_tts(settings):
+    settings.TTS_PROVIDER = 'openai'
+    settings.VOICE_OPENAI_API_KEY = 'gsk_test_voice_key_123456'
+    settings.VOICE_OPENAI_BASE_URL = 'https://api.groq.com/openai/v1'
+    settings.TTS_OPENAI_MODEL = 'canopylabs/orpheus-v1-english'
+    settings.TTS_OPENAI_VOICE = 'hannah'
+    settings.TTS_OPENAI_FORMAT = 'wav'
+    settings.TTS_OPENAI_LANGUAGES = 'en'
+    settings.TTS_MAX_CHARS = 1100
+    return settings
+
+
+def test_speakable_text_strips_markdown_and_cuts_at_sentence():
+    from voice.tts import speakable_text
+    text = '**1. Answer**\n- **Section 146(1)** says carry a copy. ' + 'Keep a copy of your licence. ' * 10
+    spoken = speakable_text(text, 120)
+    assert '*' not in spoken and not spoken.startswith('-')
+    assert len(spoken) <= 120 and spoken.endswith('.')
+    assert speakable_text('Short answer.', 120) == 'Short answer.'
+
+
+def test_openai_compatible_tts_uses_configured_provider(groq_tts, tmp_path):
+    from voice import tts
+    client = MagicMock()
+    client.audio.speech.create.return_value.write_to_file.side_effect = \
+        lambda path: open(path, 'wb').write(b'RIFF-fake')
+    with patch.object(tts, 'AUDIO_DIR', tmp_path), patch('openai.OpenAI', return_value=client) as client_cls:
+        path = tts.synthesize_text('**Hello** there.', language='en')
+
+    assert path.startswith('audio/tts_') and path.endswith('.wav')
+    assert client_cls.call_args.kwargs['base_url'] == 'https://api.groq.com/openai/v1'
+    kwargs = client.audio.speech.create.call_args.kwargs
+    assert kwargs == {'model': 'canopylabs/orpheus-v1-english', 'voice': 'hannah',
+                      'input': 'Hello there.', 'response_format': 'wav'}
+
+
+def test_openai_compatible_tts_skips_languages_the_voice_cannot_speak(groq_tts, tmp_path):
+    from voice import tts
+    with patch.object(tts, 'AUDIO_DIR', tmp_path), patch('openai.OpenAI') as client_cls:
+        assert tts.synthesize_text('Oli otya', language='lg') is None
+    client_cls.assert_not_called()

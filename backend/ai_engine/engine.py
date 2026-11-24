@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 import re
 
+from config.languages import SUPPORTED_LANGUAGES
 from legal_data.vector_store import retrieve_relevant_chunks, MAX_RELEVANT_DISTANCE
 from .openai_service import AIServiceUnavailable, chat_completion  # noqa: F401 (re-exported)
 from .prompts import (
@@ -353,8 +354,9 @@ def answer_legal_question(question: str, user_category: str, language: str, user
     """
     from legal_data.models import LegalQuery
 
-    subject = _infer_subject_from_question(question, user_category)
-    chunks = retrieve_relevant_chunks(question, subject_filter=subject, n_results=5)
+    search_query = _english_search_query(question, language)
+    subject = _infer_subject_from_question(search_query, user_category)
+    chunks = retrieve_relevant_chunks(search_query, subject_filter=subject, n_results=5)
     retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
     has_current = _has_current_verified(sources)
 
@@ -369,7 +371,8 @@ def answer_legal_question(question: str, user_category: str, language: str, user
             question=question,
             retrieved_context=retrieved_context,
         )
-        response_text = chat_completion(system, prompt, purpose='legal_question')
+        response_text = _localise_uncertainty(chat_completion(system, prompt, purpose='legal_question'),
+                                              language)
 
     # Store the query (anonymised if no user)
     LegalQuery.objects.create(
@@ -456,6 +459,38 @@ def answer_eviction_guidance(data: dict, language: str = 'en', user=None) -> dic
         'uncertainty_flag': not has_current,
         'disclaimer': 'This is legal information only. Consult a qualified lawyer for specific legal advice.',
     }
+
+
+def _localise_uncertainty(response_text: str, language: str) -> str:
+    """The prompt gives the uncertainty message in English and models often copy it
+    verbatim; replace it with the version in the user's language."""
+    if language != 'en' and UNCERTAINTY_SENTENCE[:40] in (response_text or ''):
+        return uncertainty_response(language)
+    return response_text
+
+
+def _english_search_query(question: str, language: str) -> str:
+    """
+    The legal index (and its embedding model) is English-only, so a question in Luganda,
+    Runyankore, Acholi or Lugbara matches nothing. Translate it to English for retrieval
+    only; the answer is still written in the user's language. Falls back to the original
+    question if translation fails.
+    """
+    if language == 'en' or not (question or '').strip():
+        return question
+    try:
+        translated = chat_completion(
+            'You translate questions into English. Reply with the English translation only, '
+            'without quotes, notes or explanations. Keep Ugandan terms unchanged, e.g. '
+            '"boda boda" (motorcycle taxi), "LC1", "KCCA", and names of places and people.',
+            f'Translate this {SUPPORTED_LANGUAGES.get(language, language)} question into English:\n\n'
+            f'{question[:2000]}',
+            purpose='query_translation', max_tokens=300, temperature=0,
+        ).strip()
+    except AIServiceUnavailable as exc:
+        logger.warning(f'Question translation for search failed ({exc.category}); searching untranslated.')
+        return question
+    return translated or question
 
 
 def _infer_subject_from_question(question: str, user_category: str) -> str | None:

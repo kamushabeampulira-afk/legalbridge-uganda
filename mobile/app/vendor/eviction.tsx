@@ -121,7 +121,7 @@ export default function VendorEvictionScreen() {
           <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
         </TouchableOpacity>
 
-        <DisclaimerBanner message={result.disclaimer} />
+        <DisclaimerBanner />
         <Button label={t('guidance_startAgain', language)} onPress={() => setResult(null)} variant="outline" />
       </ScrollView>
     );

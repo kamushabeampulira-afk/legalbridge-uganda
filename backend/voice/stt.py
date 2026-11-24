@@ -70,7 +70,7 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
 
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url=getattr(settings, 'VOICE_OPENAI_BASE_URL', '') or None)
 
         # The OpenAI SDK needs bytes/path, not a Django UploadedFile object.
         if hasattr(audio_file, 'read'):
@@ -82,7 +82,7 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
             file_arg = audio_file
 
         kwargs = {
-            'model': 'whisper-1',
+            'model': getattr(settings, 'STT_WHISPER_MODEL', '') or 'whisper-1',
             'file': file_arg,
         }
         if whisper_lang:

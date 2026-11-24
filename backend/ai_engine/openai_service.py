@@ -82,7 +82,8 @@ def _completion_options(max_tokens: int) -> dict:
     options = {'max_tokens': max_tokens + max(0, int(_setting('OPENAI_EXTRA_MAX_TOKENS', 0) or 0))}
     effort = _setting('OPENAI_REASONING_EFFORT', '')
     if effort:
-        options['reasoning_effort'] = effort
+        # Sent as a raw body field: the pinned openai SDK predates the reasoning_effort argument.
+        options['extra_body'] = {'reasoning_effort': effort}
     return options
 
 

@@ -232,8 +232,8 @@ def test_thinking_model_options_are_sent(ai_settings):
         chat_kwargs = client.chat.completions.create.call_args.kwargs
         run_connection_check()
         check_kwargs = client.chat.completions.create.call_args.kwargs
-    assert chat_kwargs['max_tokens'] == 3500 and chat_kwargs['reasoning_effort'] == 'low'
-    assert check_kwargs['max_tokens'] == 2005 and check_kwargs['reasoning_effort'] == 'low'
+    assert chat_kwargs['max_tokens'] == 3500 and chat_kwargs['extra_body'] == {'reasoning_effort': 'low'}
+    assert check_kwargs['max_tokens'] == 2005 and check_kwargs['extra_body'] == {'reasoning_effort': 'low'}
 
 
 @pytest.mark.django_db
@@ -243,7 +243,7 @@ def test_no_thinking_options_by_default(ai_settings):
     with patch('ai_engine.openai_service.get_client', return_value=client):
         chat_completion('sys', 'user', purpose='legal_question')
     kwargs = client.chat.completions.create.call_args.kwargs
-    assert kwargs['max_tokens'] == 1500 and 'reasoning_effort' not in kwargs
+    assert kwargs['max_tokens'] == 1500 and 'extra_body' not in kwargs
 
 
 def test_list_models_command(ai_settings):

@@ -6,6 +6,7 @@ Modular: swap provider (TTS_PROVIDER) without breaking the app.
 from __future__ import annotations
 import logging
 import os
+import re
 import uuid
 from pathlib import Path
 from django.conf import settings
@@ -23,6 +24,9 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
     """
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     provider = settings.TTS_PROVIDER
+    text = speakable_text(text, getattr(settings, 'TTS_MAX_CHARS', 4096) or 4096)
+    if not text:
+        return None
 
     if provider == 'elevenlabs':
         return _synthesize_elevenlabs(text, language)
@@ -35,26 +39,44 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
         return None
 
 
+def speakable_text(text: str, max_chars: int) -> str:
+    """Remove Markdown symbols a voice would read aloud, and cut long text at a sentence end."""
+    text = re.sub(r'^\s*(?:[-•]|\d+\.)\s+', '', text or '', flags=re.M)  # list markers
+    text = re.sub(r'[*_`#>|]+', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    if len(text) <= max_chars:
+        return text
+    cut = text[:max_chars]
+    end = max(cut.rfind('. '), cut.rfind('? '), cut.rfind('! '))
+    return cut[:end + 1] if end >= max_chars // 2 else cut.rsplit(' ', 1)[0]
+
+
 def _synthesize_openai(text: str, language: str) -> str | None:
-    """Use OpenAI TTS (supports English well; Luganda limited)."""
+    """OpenAI TTS, or an OpenAI-compatible provider (e.g. Groq) via VOICE_OPENAI_BASE_URL."""
     api_key = getattr(settings, 'VOICE_OPENAI_API_KEY', '')
     if not api_key:
         logger.warning('OpenAI voice key (VOICE_OPENAI_API_KEY) not configured. Skipping TTS.')
         return None
+    languages = [code.strip() for code in (getattr(settings, 'TTS_OPENAI_LANGUAGES', '') or '').split(',')
+                 if code.strip()]
+    if languages and language not in languages:
+        logger.info(f'TTS voice does not support language {language!r}. Voice synthesis skipped.')
+        return None
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url=getattr(settings, 'VOICE_OPENAI_BASE_URL', '') or None)
 
-        voice = 'alloy'  # Neutral voice; can be configured per language
-        filename = f'tts_{uuid.uuid4()}.mp3'
+        audio_format = getattr(settings, 'TTS_OPENAI_FORMAT', '') or 'mp3'
+        filename = f'tts_{uuid.uuid4()}.{audio_format}'
         filepath = AUDIO_DIR / filename
 
         response = client.audio.speech.create(
-            model='tts-1',
-            voice=voice,
-            input=text[:4096],  # OpenAI TTS limit
+            model=getattr(settings, 'TTS_OPENAI_MODEL', '') or 'tts-1',
+            voice=getattr(settings, 'TTS_OPENAI_VOICE', '') or 'alloy',
+            input=text,
+            response_format=audio_format,
         )
-        response.stream_to_file(str(filepath))
+        response.write_to_file(str(filepath))
         return f'audio/{filename}'
     except Exception as e:
         logger.error(f'OpenAI TTS failed: {e}')

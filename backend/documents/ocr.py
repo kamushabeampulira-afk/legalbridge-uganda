@@ -8,11 +8,33 @@ Supports:
 """
 import io
 import logging
+import os
 import re
+import shutil
 from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger('legalbridge')
+
+WINDOWS_TESSERACT = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+
+def _configure_tesseract():
+    """Point pytesseract at TESSERACT_CMD, or at the standard Windows install when
+    tesseract is not on PATH (the Windows installer does not add it)."""
+    from django.conf import settings
+    cmd = getattr(settings, 'TESSERACT_CMD', '')
+    if not cmd and not shutil.which('tesseract') and os.name == 'nt' and os.path.exists(WINDOWS_TESSERACT):
+        cmd = WINDOWS_TESSERACT
+    if cmd:
+        try:
+            import pytesseract
+            pytesseract.pytesseract.tesseract_cmd = cmd
+        except ImportError:
+            pass
+
+
+_configure_tesseract()
 
 
 def extract_text_from_file(file_path: str) -> dict:
