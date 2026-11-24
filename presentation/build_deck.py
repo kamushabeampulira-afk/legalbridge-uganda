@@ -197,19 +197,30 @@ def build():
     add_header(s, "The roadside becomes the first court.", "01 · The rider's problem")
     add_rect(s, 0.7, 1.45, 6.15, 4.9, WHITE, LINE, rounded=True)
     add_rect(s, 0.7, 1.45, 0.10, 4.9, PURPLE)
-    add_text(s, 1.05, 1.75, 5.5, 0.35, "THE 5:40PM TEST", 12, PURPLE, True)
+    add_text(s, 1.05, 1.7, 5.5, 0.3, "THE 5:40PM TEST", 12, PURPLE, True)
+    add_image(s, "10-police-operation.jpg", 0.95, 2.05, 5.65, 2.75, border=False)
+    add_text(
+        s,
+        0.95,
+        4.82,
+        5.65,
+        0.3,
+        "Police stop riders during a Kampala operation, 8 Nov 2022. PHOTO/ISAAC KASAMANI · DAILY MONITOR",
+        8.5,
+        MUTED,
+    )
     add_text(
         s,
         1.05,
-        2.2,
+        5.2,
         5.45,
-        3.3,
-        "A rider is waved down. The bike goes onto a police pickup. No receipt. No court date. No idea whether it comes back.\n\nArticle 23 says he must be produced in court within 48 hours. For thousands, that never happens.",
-        17,
+        1.0,
+        "No receipt. No court date.\nArticle 23 says 48 hours. For thousands, that never happens.",
+        15,
         INK,
-        spacing=1.16,
+        True,
+        spacing=1.12,
     )
-    add_text(s, 1.05, 5.9, 5.45, 0.3, "When the bike is the livelihood, losing it is the sentence.", 12.5, TEAL, True)
 
     stats = [
         ("12,217", "motorcycles impounded nationwide in six days (7–12 Nov 2022); 10,167 penalty tickets and 2,050 still at stations."),
@@ -229,7 +240,7 @@ def build():
     )
     set_notes(
         s,
-        "1:30 — Land the scale. Police reported 12,217 motorcycles impounded in six days in Nov 2022, with 2,050 still at stations; 787 riders were stopped in one week in Jul 2024. No official national daily arrest count is published, so we use these documented operations rather than invent one. World Prison Brief shows 37,188 people on remand in Aug 2026 (44.9%), and the ASF study found 10.3% of interviewed detainees were boda riders, with 65% over six months on remand.",
+        "1:30 — Start with the photograph: it shows police stopping riders in Kampala in Nov 2022, not an illustration. Police reported 12,217 motorcycles impounded in six days, with 2,050 still at stations; 787 riders were stopped in one week in Jul 2024. No official national daily arrest count is published, so we use these documented operations rather than invent one. World Prison Brief shows 37,188 people on remand in Aug 2026 (44.9%), and the ASF study found 10.3% of interviewed detainees were boda riders, with 65% over six months on remand.",
     )
 
     # 3 — Gap
@@ -258,7 +269,22 @@ def build():
         add_rect(s, x, 1.5, 3.78, 3.9, WHITE, LINE, rounded=True)
         add_rect(s, x, 1.5, 3.78, 0.10, color)
         add_text(s, x + 0.25, 1.8, 3.3, 0.5, title, 16, NAVY, True)
-        add_text(s, x + 0.25, 2.45, 3.3, 2.6, body, 12.2, INK, spacing=1.1)
+        if i == 1:
+            add_image(s, "11-impounded-motorcycles.jpg", x + 0.25, 2.38, 3.3, 2.2, border=False)
+            add_text(
+                s,
+                x + 0.25,
+                4.62,
+                3.3,
+                0.42,
+                "Impounded motorcycles at Kampala Central Police Station, Jul 2024. PHOTO | STEPHEN OTAGE · DAILY MONITOR",
+                8.2,
+                MUTED,
+                spacing=1.0,
+            )
+            add_text(s, x + 0.25, 5.06, 3.3, 0.3, "Police say: proof of ownership required.", 10.5, INK, True)
+        else:
+            add_text(s, x + 0.25, 2.45, 3.3, 2.6, body, 12.2, INK, spacing=1.1)
     add_rect(s, 0.7, 5.7, 11.93, 0.85, NAVY, rounded=True)
     add_text(
         s,
@@ -279,7 +305,7 @@ def build():
     )
     set_notes(
         s,
-        "1:00 — This is the demand for LegalBridge. The Constitution and courts are clear, but the practical pathway is not: ownership proof, no receipt, no date, bail procedures unknown. We are not accusing any individual of theft or replacing lawyers. We are closing the knowledge gap in the first 48 hours.",
+        "1:00 — The photo is real: motorcycles parked at Kampala Central Police Station in Jul 2024, with no case under inquiry, waiting for owners with proof. The High Court once awarded UGX 225m over an unlawful impoundment. The Constitution and courts are clear, but the practical pathway is not: ownership proof, no receipt, no date, bail procedures unknown. We are not accusing any rider of theft or replacing lawyers — we are closing the knowledge gap in the first 48 hours.",
     )
 
     # 4 — Solution

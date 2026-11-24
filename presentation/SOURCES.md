@@ -25,6 +25,17 @@ invented. Checked 25 Nov 2026.
 | SDG target **16.3** (equal access to justice) and indicator **16.3.3**; metadata lists lack of knowledge, advice, distance and cost as barriers | UN Statistics Division — SDG 16.3.3 metadata | https://unstats.un.org/sdgs/metadata/files/Metadata-16-03-03.pdf |
 | USSD works on basic and feature phones, needs no smartphone app or mobile data, and works across GSM networks | GSMA Mobile for Development — “Low Tech, High Impact: USSD in the time of COVID-19” | https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/uncategorized/low-tech-high-impact-ussd-in-the-time-of-covid-19/ |
 
+## Photographs used (real, published, credited on-slide)
+
+| Slide | Image used | Caption / credit | Source URL |
+|---|---|---|---|
+| 2 | `assets/10-police-operation.jpg` | “Police officers engage boda boda riders during the ongoing operation in Kampala on November 8, 2022.” PHOTO/ISAAC KASAMANI · DAILY MONITOR | https://www.monitor.co.ug/uganda/news/national/police-impound-more-than-12-000-boda-motorcycles-4020670 |
+| 3 | `assets/11-impounded-motorcycles.jpg` | “Some of the impounded motorcycles parked at the Central Police Station Kampala recently.” PHOTO \| STEPHEN OTAGE · DAILY MONITOR, 18 Jul 2024 | https://monitor.co.ug/uganda/news/national/police-ask-owners-of-rotting-motorcycles-to-pick-them-4694052 |
+
+These are downloaded published press photographs, credited visibly on the slides.
+If the deck will be distributed publicly rather than shown to judges, clear
+reuse rights with Daily Monitor / Nation Media Group first.
+
 ## Product evidence (not external research)
 
 - Live app: https://legalbridge-app-free.onrender.com
