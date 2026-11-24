@@ -31,7 +31,7 @@ services:
       sh -c "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers 3 --timeout 120"
     # One-time seed of verified extracts and referrals after the first deploy.
     # RAG indexing is deliberately manual; see docs/RENDER.md.
-    initialDeployHook: python manage.py seed_legal_data
+    initialDeployHook: python manage.py seed_legal_data --if-empty
     disk:
       name: legalbridge-app-data
       mountPath: /app/data

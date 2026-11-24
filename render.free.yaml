@@ -1,0 +1,130 @@
+# LegalBridge — Free Render Blueprint (demo only)
+#
+# Create this as a separate Blueprint in Render. It uses only free resources:
+#   - free Docker web service (0.1 CPU / 512 MB, sleeps after 15 idle minutes)
+#   - free Postgres (1 GB, expires 30 days after creation)
+#   - free Key Value (25 MB, no persistence)
+#
+# There is no persistent disk: uploaded media and ChromaDB data are lost when
+# the service sleeps, restarts, or redeploys. Good for judging/demos, not for
+# real users. See docs/RENDER.md → "Free demo deployment".
+
+version: '1'
+
+services:
+  - type: keyvalue
+    name: legalbridge-cache-free
+    region: frankfurt
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
+  - type: web
+    name: legalbridge-api-free
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /healthz
+    # Free services have no preDeployCommand, initialDeployHook, disk or Shell.
+    # Run everything at boot. --if-empty prevents re-seeding on every wake.
+    dockerCommand: >-
+      sh -c "python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput &&
+      python manage.py seed_legal_data --if-empty &&
+      python manage.py ensure_legal_index &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers 1 --timeout 120"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings_production
+      - key: DJANGO_DEBUG
+        value: 'False'
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: legalbridgeug.org,api.legalbridgeug.org
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: https://legalbridgeug.org,https://api.legalbridgeug.org
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://legalbridgeug.org,http://localhost:8081,http://localhost:19006
+
+      - key: DB_ENGINE
+        value: postgresql
+      - key: DB_NAME
+        fromDatabase:
+          name: legalbridge-db-free
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: legalbridge-db-free
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: legalbridge-db-free
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: legalbridge-db-free
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: legalbridge-db-free
+          property: port
+
+      - key: REDIS_URL
+        fromService:
+          name: legalbridge-cache-free
+          type: keyvalue
+          property: connectionString
+
+      # Gemini's free OpenAI-compatible endpoint keeps AI costs at zero.
+      # Use a current Flash model name from https://aistudio.google.com/apikey
+      # (or run `python manage.py check_ai_services` locally to find one).
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: OPENAI_MODEL
+        sync: false
+      - key: OPENAI_REASONING_EFFORT
+        value: low
+      - key: OPENAI_EXTRA_MAX_TOKENS
+        value: '2000'
+      - key: AI_DEMO_MODE
+        value: 'False'
+
+      # Sunbird offers free Luganda speech. Register at https://api.sunbird.ai/register
+      - key: TTS_PROVIDER
+        value: sunbird
+      - key: STT_PROVIDER
+        value: sunbird
+      - key: SUNBIRD_API_TOKEN
+        sync: false
+
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: AT_SHORTCODE
+        value: '*384*0#'
+      - key: AT_ENVIRONMENT
+        value: sandbox
+
+      # Local image paths — ephemeral on free services.
+      - key: CHROMA_PERSIST_DIR
+        value: /app/chroma_db
+      - key: CHROMA_COLLECTION_NAME
+        value: legalbridge_sources
+      - key: MEDIA_ROOT
+        value: /app/media
+      - key: MAX_UPLOAD_SIZE_MB
+        value: '10'
+
+databases:
+  - name: legalbridge-db-free
+    region: frankfurt
+    plan: free
+    databaseName: legalbridge_db
+    user: legalbridge_user
+    ipAllowList: []

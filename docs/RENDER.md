@@ -17,7 +17,52 @@ pipeline needs `tesseract-ocr`, `poppler-utils` and `libgl`, which are installed
 in `backend/Dockerfile`.
 
 > **Before deploying:** rotate the OpenAI key that was previously pasted into
-> chat. Do not put any API key in `render.yaml`, `mobile/.env`, or Git.
+> chat. Do not put any API key in `render.yaml`, `render.free.yaml`,
+> `mobile/.env`, or Git.
+
+## Free demo deployment
+
+`render.free.yaml` is a second Blueprint for a **zero-cost demo**. Use it for
+judging and walkthroughs, not real users. It creates only free resources:
+
+| Resource | Free behaviour |
+|----------|----------------|
+| `legalbridge-api-free` | Docker web service, 0.1 CPU / 512 MB, sleeps after 15 idle minutes (~1 min wake-up) |
+| `legalbridge-db-free` | Free Postgres, 1 GB, **expires 30 days** after creation |
+| `legalbridge-cache-free` | Free Key Value, 25 MB, no persistence |
+
+Limitations to accept for a free demo:
+
+- No persistent disk: uploads in `/app/media` and ChromaDB data in
+  `/app/chroma_db` disappear on sleep, restart or redeploy.
+- No Shell access. Seeding and indexing run automatically at boot via
+  `seed_legal_data --if-empty` and `ensure_legal_index`.
+- Free Key Value is memory-only, so USSD sessions are lost on restart.
+- Free web services cannot attach disks or run one-off jobs, and Render may
+  restart them at any time.
+- One free Postgres per workspace. Upgrade it before the 30-day expiry if you
+  want to keep the data.
+
+To deploy the free demo:
+
+1. Create a **Blueprint** and select `render.free.yaml` when prompted for the
+   Blueprint file (or rename it to `render.yaml` in a separate branch).
+2. Fill the prompted secrets:
+
+   | Prompted key | Suggested free value |
+   |--------------|----------------------|
+   | `OPENAI_API_KEY` | Gemini API key from <https://aistudio.google.com/apikey> |
+   | `OPENAI_MODEL` | A current Gemini Flash model name (check locally with `python manage.py check_ai_services`) |
+   | `SUNBIRD_API_TOKEN` | Free Sunbird token from <https://api.sunbird.ai/register> |
+   | `AT_USERNAME` / `AT_API_KEY` | Sandbox Africa's Talking credentials |
+
+3. Wait for the first boot. It runs migrations, `collectstatic`, seeds verified
+   extracts once, rebuilds the ChromaDB index if empty, then starts Gunicorn.
+4. Verify `https://<your-free-host>/healthz` returns `ok`.
+
+The free Blueprint uses Gemini's OpenAI-compatible endpoint for chat and
+Sunbird for Luganda speech, so it does not need a paid OpenAI or ElevenLabs
+account. Actual model availability is still controlled by those providers.
 
 ## 1. Prepare the repository
 
@@ -84,9 +129,16 @@ answers, index them into ChromaDB from **Render Shell** (web service → Shell):
 python manage.py seed_legal_data --index
 ```
 
-Run this only when you intend to refresh the verified corpus. It re-seeds every
-source and updates `last_verified_at`; review the source PDFs in
-`legal_sources/official/` before relying on indexed answers.
+If sources are already seeded and only the vector index is missing (for example
+after replacing the disk), rebuild it without re-seeding:
+
+```bash
+python manage.py ensure_legal_index
+```
+
+`seed_legal_data --index` re-seeds every source and updates `last_verified_at`;
+review the source PDFs in `legal_sources/official/` before relying on indexed
+answers.
 
 Do **not** use `AI_DEMO_MODE=True` in production. Missing keys should surface as
 errors, not placeholder explanations.

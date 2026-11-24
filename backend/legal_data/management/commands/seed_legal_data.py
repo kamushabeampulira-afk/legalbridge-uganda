@@ -508,8 +508,17 @@ class Command(BaseCommand):
             action='store_true',
             help='Also index sources into ChromaDB after seeding.',
         )
+        parser.add_argument(
+            '--if-empty',
+            action='store_true',
+            help='Seed only when no legal sources exist (safe for every boot on ephemeral hosting).',
+        )
 
     def handle(self, *args, **options):
+        if options['if_empty'] and LegalSource.objects.exists():
+            self.stdout.write('Legal sources already present — skipping seed.')
+            return
+
         self.stdout.write(self.style.WARNING(
             '\nVerified extracts: these are plain-language summaries of published '
             'Ugandan law, not verbatim Acts. Check the linked official PDF before '
