@@ -190,6 +190,17 @@ USE_TZ = True
 # ---------------------------------------------------------
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4o')
+OPENAI_TIMEOUT_SECONDS = env.float('OPENAI_TIMEOUT_SECONDS', default=60)
+OPENAI_MAX_RETRIES = env.int('OPENAI_MAX_RETRIES', default=1)
+OPENAI_HEALTHCHECK_TIMEOUT_SECONDS = env.float('OPENAI_HEALTHCHECK_TIMEOUT_SECONDS', default=20)
+# A health-check response slower than this is reported as "working with warnings"
+OPENAI_HEALTHCHECK_SLOW_MS = env.int('OPENAI_HEALTHCHECK_SLOW_MS', default=10000)
+# Development only: return clearly-labelled placeholder text when no API key is set.
+# Off by default so a missing key is reported as an error, never as an explanation.
+AI_DEMO_MODE = env.bool('AI_DEMO_MODE', default=False)
+
+# Legal sources verified longer ago than this are flagged as needing re-checking
+LEGAL_SOURCE_MAX_AGE_DAYS = env.int('LEGAL_SOURCE_MAX_AGE_DAYS', default=365)
 
 # ---------------------------------------------------------
 # ChromaDB (RAG vector store)
@@ -208,14 +219,19 @@ AT_ENVIRONMENT = env('AT_ENVIRONMENT', default='sandbox')
 # ---------------------------------------------------------
 # Voice / TTS / STT
 # ---------------------------------------------------------
-TTS_PROVIDER = env('TTS_PROVIDER', default='openai')
-ELEVENLABS_API_KEY = env('ELEVENLABS_API_KEY', default='')
-ELEVENLABS_VOICE_EN = env('ELEVENLABS_VOICE_EN', default='')
-ELEVENLABS_VOICE_LG = env('ELEVENLABS_VOICE_LG', default='')
-ELEVENLABS_VOICE_NYN = env('ELEVENLABS_VOICE_NYN', default='')
-ELEVENLABS_VOICE_ACH = env('ELEVENLABS_VOICE_ACH', default='')
-ELEVENLABS_VOICE_LGG = env('ELEVENLABS_VOICE_LGG', default='')
-STT_PROVIDER = env('STT_PROVIDER', default='openai_whisper')
+# django-environ does not strip inline comments in .env values, so strip them here.
+def _clean_env(name, default=''):
+    return env(name, default=default).split('#', 1)[0].strip()
+
+
+TTS_PROVIDER = _clean_env('TTS_PROVIDER', 'openai')
+ELEVENLABS_API_KEY = _clean_env('ELEVENLABS_API_KEY')
+ELEVENLABS_VOICE_EN = _clean_env('ELEVENLABS_VOICE_EN')
+ELEVENLABS_VOICE_LG = _clean_env('ELEVENLABS_VOICE_LG')
+ELEVENLABS_VOICE_NYN = _clean_env('ELEVENLABS_VOICE_NYN')
+ELEVENLABS_VOICE_ACH = _clean_env('ELEVENLABS_VOICE_ACH')
+ELEVENLABS_VOICE_LGG = _clean_env('ELEVENLABS_VOICE_LGG')
+STT_PROVIDER = _clean_env('STT_PROVIDER', 'openai_whisper')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

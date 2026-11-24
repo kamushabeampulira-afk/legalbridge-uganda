@@ -4,18 +4,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
+import { useAppStore } from '@/store/useAppStore';
+import { t } from '@/i18n/translations';
 
 interface Props {
   message?: string;
 }
 
 export default function DisclaimerBanner({ message }: Props) {
+  const language = useAppStore((s) => s.language);
   return (
     <View style={styles.container}>
-      <Ionicons name="information-circle" size={18} color={Colors.accentSoftBlueDark} style={styles.icon} />
+      <Ionicons name="information-circle" size={18} color={Colors.info} style={styles.icon} />
       <Text style={styles.text}>
-        {message ??
-          'This is legal information, not legal advice. For matters with serious consequences, consult a qualified lawyer.'}
+        {message ?? t('disclaimer', language)}
       </Text>
     </View>
   );
@@ -24,7 +26,7 @@ export default function DisclaimerBanner({ message }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#E8F4FA',
+    backgroundColor: Colors.infoBg,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginVertical: Spacing.sm,
@@ -35,7 +37,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.accentSoftBlueDark,
+    color: Colors.info,
     lineHeight: FontSize.xs * 1.6,
   },
 });

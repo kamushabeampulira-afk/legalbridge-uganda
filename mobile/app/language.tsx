@@ -47,7 +47,7 @@ export default function LanguageScreen() {
                 <Text style={styles.optionSub}>{item.label}</Text>
               </View>
               {item.code === language ? (
-                <Ionicons name="checkmark-circle" size={22} color={Colors.primaryDeepTeal} />
+                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
               ) : (
                 <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
               )}
@@ -66,7 +66,7 @@ export default function LanguageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
   },
   content: {
     padding: Spacing.xl,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.md,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     marginTop: Spacing.xs,
     textAlign: 'center',
   },
@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing.md,
     gap: Spacing.base,
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  optionSelected: { borderColor: Colors.secondaryGold },
+  optionSelected: { borderColor: Colors.accent },
   flag: { fontSize: 28 },
   optionText: { flex: 1 },
   optionTitle: {
@@ -116,10 +116,9 @@ const styles = StyleSheet.create({
   note: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     textAlign: 'center',
     marginTop: Spacing['2xl'],
     lineHeight: FontSize.xs * 1.8,
-    opacity: 0.8,
   },
 });

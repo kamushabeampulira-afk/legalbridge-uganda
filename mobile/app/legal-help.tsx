@@ -10,10 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { referralsApi } from '@/services/api';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
-import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
+import LegalAidConnectCard from '@/components/ui/LegalAidConnectCard';
 
 export default function LegalHelpScreen() {
   const { language } = useAppStore();
@@ -37,7 +37,7 @@ export default function LegalHelpScreen() {
     <View style={styles.orgCard}>
       <View style={styles.orgHeader}>
         <View style={styles.orgIconBox}>
-          <Ionicons name="business" size={24} color={Colors.primaryDeepTeal} />
+          <Ionicons name="business" size={24} color={Colors.primary} />
         </View>
         <View style={styles.orgHeaderText}>
           <Text style={styles.orgName}>{item.name}</Text>
@@ -71,12 +71,12 @@ export default function LegalHelpScreen() {
       <View style={styles.contactRow}>
         {item.phone_number ? (
           <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#E8F4F7' }]}
+            style={[styles.contactBtn, { backgroundColor: Colors.primaryTint }]}
             onPress={() => Linking.openURL(`tel:${item.phone_number}`)}
-            accessibilityLabel={`Call ${item.name}`}
+            accessibilityLabel={`${t('legalHelp_call', language)} ${item.name}`}
           >
-            <Ionicons name="call" size={16} color={Colors.primaryDeepTeal} />
-            <Text style={[styles.contactBtnText, { color: Colors.primaryDeepTeal }]}>
+            <Ionicons name="call" size={16} color={Colors.primary} />
+            <Text style={[styles.contactBtnText, { color: Colors.primary }]}>
               {t('legalHelp_contact', language)}
             </Text>
           </TouchableOpacity>
@@ -84,12 +84,12 @@ export default function LegalHelpScreen() {
 
         {item.website ? (
           <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#FEF0E8' }]}
+            style={[styles.contactBtn, { backgroundColor: Colors.secondaryTint }]}
             onPress={() => Linking.openURL(item.website)}
-            accessibilityLabel={`Visit ${item.name} website`}
+            accessibilityLabel={`${t('legalHelp_visitWebsite', language)} ${item.name}`}
           >
-            <Ionicons name="globe" size={16} color={Colors.secondaryBurntOrange} />
-            <Text style={[styles.contactBtnText, { color: Colors.secondaryBurntOrange }]}>
+            <Ionicons name="globe" size={16} color={Colors.secondary} />
+            <Text style={[styles.contactBtnText, { color: Colors.secondaryText }]}>
               {t('legalHelp_website', language)}
             </Text>
           </TouchableOpacity>
@@ -104,38 +104,56 @@ export default function LegalHelpScreen() {
       id: 'uls',
       name: 'Uganda Law Society',
       district: 'Kampala',
-      description: 'Professional body for lawyers in Uganda. Referrals to qualified advocates.',
+      description: t('legalHelp_uls_description', language),
       phone_number: '+256414259808',
       website: 'https://www.uls.or.ug',
       is_free: false,
-      eligibility: 'Open to all — provides referrals to member advocates.',
-      consultation_info: 'Contact for referral to a qualified advocate in your area.',
+      eligibility: t('legalHelp_uls_eligibility', language),
+      consultation_info: t('legalHelp_uls_consult', language),
     },
     {
       id: 'fida',
       name: 'FIDA Uganda',
       district: 'Kampala',
-      description: 'Federation of Women Lawyers in Uganda. Free legal aid for women and families.',
+      description: t('legalHelp_fida_description', language),
       phone_number: '+256414530848',
       website: 'https://www.fidauganda.org',
       is_free: true,
-      eligibility: 'Primarily women and families. Low-income individuals prioritised.',
-      consultation_info: 'Walk-in and phone consultations available.',
+      eligibility: t('legalHelp_fida_eligibility', language),
+      consultation_info: t('legalHelp_fida_consult', language),
     },
     {
       id: 'laspnet',
       name: 'Legal Aid Service Providers Network',
-      district: 'National',
-      description: 'Network of legal aid providers across Uganda.',
+      district: t('legalHelp_district_national', language),
+      description: t('legalHelp_laspnet_description', language),
       phone_number: '',
       website: 'https://www.laspnet.org',
       is_free: true,
-      eligibility: 'Low-income individuals. Eligibility varies by member organisation.',
-      consultation_info: 'Contact to find the nearest legal aid provider in your district.',
+      eligibility: t('legalHelp_laspnet_eligibility', language),
+      consultation_info: t('legalHelp_laspnet_consult', language),
     },
   ];
 
   const displayOrgs = filtered.length > 0 ? filtered : (loading ? [] : fallbackOrgs);
+
+  const renderListHeader = () => (
+    <>
+      <LegalAidConnectCard />
+
+      {/* Directory search */}
+      <View style={styles.searchBox}>
+        <Ionicons name="search" size={18} color={Colors.textMuted} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
+          placeholder={t('legalHelp_searchHint', language)}
+          placeholderTextColor={Colors.textMuted}
+        />
+      </View>
+    </>
+  );
 
   return (
     <View style={styles.container}>
@@ -145,22 +163,11 @@ export default function LegalHelpScreen() {
         <Text style={styles.headerSub}>{t('legalHelp_subtitle', language)}</Text>
       </View>
 
-      {/* Search */}
-      <View style={styles.searchBox}>
-        <Ionicons name="search" size={18} color={Colors.textMuted} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          value={search}
-          onChangeText={setSearch}
-          placeholder={`${t('search', language)} by name or district...`}
-          placeholderTextColor={Colors.textMuted}
-        />
-      </View>
-
       <FlatList
         data={displayOrgs}
         keyExtractor={(item) => item.id}
         renderItem={renderOrg}
+        ListHeaderComponent={renderListHeader}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
@@ -175,27 +182,27 @@ export default function LegalHelpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     padding: Spacing.xl,
     paddingTop: Spacing.base,
     gap: 4,
   },
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.xl, color: Colors.textOnPrimary },
-  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.accentSoftPeach },
+  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.textOnPrimaryMuted },
 
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceWhite,
-    marginHorizontal: Spacing.base,
-    marginVertical: Spacing.base,
+    backgroundColor: Colors.surface,
+    marginTop: Spacing.base,
+    marginBottom: Spacing.md,
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.base,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     minHeight: 48,
   },
   searchIcon: { marginRight: Spacing.sm },
@@ -210,7 +217,7 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: Spacing.base, paddingBottom: Spacing['3xl'] },
 
   orgCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing.base,
     gap: Spacing.sm,
@@ -218,24 +225,24 @@ const styles = StyleSheet.create({
   orgHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm },
   orgIconBox: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: '#E8F4F7', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.primaryTint, alignItems: 'center', justifyContent: 'center',
   },
   orgHeaderText: { flex: 1 },
   orgName: { fontFamily: FontFamily.bold, fontSize: FontSize.base, color: Colors.textPrimary },
   orgDistrict: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   freeBadge: {
-    backgroundColor: Colors.successLight,
+    backgroundColor: Colors.successBg,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 3,
     borderRadius: BorderRadius.full,
   },
-  freeText: { fontFamily: FontFamily.medium, fontSize: 11, color: Colors.successLeafGreen },
+  freeText: { fontFamily: FontFamily.medium, fontSize: 11, color: Colors.success },
 
   orgDesc: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: FontSize.sm * 1.6 },
 
   eligibilityBox: {
     flexDirection: 'row', gap: Spacing.xs, alignItems: 'flex-start',
-    backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.sm, padding: Spacing.sm,
+    backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.sm, padding: Spacing.sm,
   },
   eligibilityText: { flex: 1, fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted, lineHeight: FontSize.xs * 1.5 },
 

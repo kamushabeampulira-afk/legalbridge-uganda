@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
+import { useAppStore } from '@/store/useAppStore';
+import { t } from '@/i18n/translations';
 
 interface LBTextInputProps extends TextInputProps {
   label?: string;
@@ -31,6 +33,7 @@ export default function TextInput({
   isRequired = false,
   ...props
 }: LBTextInputProps) {
+  const language = useAppStore((s) => s.language);
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -56,7 +59,7 @@ export default function TextInput({
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeButton}
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            accessibilityLabel={t(showPassword ? 'password_hide' : 'password_show', language)}
           >
             <Ionicons
               name={showPassword ? 'eye-off' : 'eye'}
@@ -80,19 +83,19 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
-  required: { color: Colors.errorRed },
+  required: { color: Colors.error },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     minHeight: 52,
     paddingHorizontal: Spacing.base,
   },
-  focused: { borderColor: Colors.primaryDeepPurple, backgroundColor: Colors.surfaceWhite },
-  errorBorder: { borderColor: Colors.errorRed },
+  focused: { borderColor: Colors.primary, backgroundColor: Colors.surface },
+  errorBorder: { borderColor: Colors.error },
   input: {
     flex: 1,
     fontFamily: FontFamily.regular,
@@ -104,7 +107,7 @@ const styles = StyleSheet.create({
   error: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.errorRed,
+    color: Colors.error,
     marginTop: Spacing.xs,
   },
   hint: {

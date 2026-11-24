@@ -44,7 +44,7 @@ export default function UploadScreen() {
   const pickFromCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'LegalBridge needs camera access to photograph documents.');
+      Alert.alert(t('alert_permissionNeeded', language), t('upload_cameraPermission', language));
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -66,7 +66,7 @@ export default function UploadScreen() {
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'LegalBridge needs photo library access.');
+      Alert.alert(t('alert_permissionNeeded', language), t('upload_photoPermission', language));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -111,14 +111,17 @@ export default function UploadScreen() {
       const uploadResult = await documentsApi.upload(
         file.uri, file.name, file.mimeType, userCategory, language
       );
-      const docId = uploadResult.id;
-
-      setLoadingMsg(t('analyzing', language));
-      await documentsApi.analyze(docId, language);
-
-      router.replace(`/document/${docId}` as any);
+      // The result screen runs the analysis, so the document's details stay
+      // visible (with a clear error and retry) even if the AI service fails.
+      router.replace(`/document/${uploadResult.id}` as any);
     } catch (err: any) {
-      Alert.alert('Upload failed', err.message ?? t('error_generic', language));
+      const message = err.message ?? t('error_generic', language);
+      // Alert.alert is a no-op on react-native-web, so the error would be invisible
+      if (Platform.OS === 'web') {
+        window.alert(`${t('alert_uploadFailed', language)}\n\n${message}`);
+      } else {
+        Alert.alert(t('alert_uploadFailed', language), message);
+      }
     } finally {
       setUploading(false);
       setLoadingMsg('');
@@ -136,47 +139,47 @@ export default function UploadScreen() {
       <Text style={styles.title}>{t('uploadDocument', language)}</Text>
       <Text style={styles.subtitle}>
         {userCategory === 'boda_boda'
-          ? 'Upload a traffic notice, penalty slip or any official road document'
+          ? t('upload_hint_boda', language)
           : userCategory === 'market_vendor'
-          ? 'Upload an allocation slip, eviction notice, receipt or market document'
-          : 'Upload any official legal document for analysis'}
+          ? t('upload_hint_vendor', language)
+          : t('upload_hint_general', language)}
       </Text>
 
       {/* Pick options */}
       {!file && (
         <View style={styles.pickOptions}>
           <TouchableOpacity
-            style={[styles.pickCard, { backgroundColor: '#EDE8F5' }, webShadow.sm]}
+            style={[styles.pickCard, { backgroundColor: Colors.primaryTint }, webShadow.sm]}
             onPress={pickFromCamera}
             activeOpacity={0.8}
             accessibilityLabel={t('takePhoto', language)}
           >
-            <Ionicons name="camera" size={36} color={Colors.primaryDeepPurple} />
-            <Text style={[styles.pickLabel, { color: Colors.primaryDeepPurple }]}>
+            <Ionicons name="camera" size={36} color={Colors.primary} />
+            <Text style={[styles.pickLabel, { color: Colors.primary }]}>
               {t('takePhoto', language)}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.pickCard, { backgroundColor: '#FDF3DC' }, webShadow.sm]}
+            style={[styles.pickCard, { backgroundColor: Colors.secondaryTint }, webShadow.sm]}
             onPress={pickFromGallery}
             activeOpacity={0.8}
             accessibilityLabel={t('chooseGallery', language)}
           >
-            <Ionicons name="images" size={36} color={Colors.secondaryGold} />
-            <Text style={[styles.pickLabel, { color: Colors.secondaryGold }]}>
+            <Ionicons name="images" size={36} color={Colors.secondary} />
+            <Text style={[styles.pickLabel, { color: Colors.secondaryText }]}>
               {t('chooseGallery', language)}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.pickCard, { backgroundColor: '#E8F4FA', flex: undefined, width: '100%' }, webShadow.sm]}
+            style={[styles.pickCard, { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, flex: undefined, width: '100%' }, webShadow.sm]}
             onPress={pickFromFiles}
             activeOpacity={0.8}
             accessibilityLabel={t('chooseFile', language)}
           >
-            <Ionicons name="document" size={36} color={Colors.accentSoftBlueDark} />
-            <Text style={[styles.pickLabel, { color: Colors.accentSoftBlueDark }]}>
+            <Ionicons name="document" size={36} color={Colors.textSecondary} />
+            <Text style={[styles.pickLabel, { color: Colors.textPrimary }]}>
               {t('chooseFile', language)} (PDF)
             </Text>
           </TouchableOpacity>
@@ -190,7 +193,7 @@ export default function UploadScreen() {
             <Image source={{ uri: file.uri }} style={styles.previewImage} resizeMode="contain" />
           ) : (
             <View style={styles.pdfPreview}>
-              <Ionicons name="document-text" size={56} color={Colors.primaryDeepTeal} />
+              <Ionicons name="document-text" size={56} color={Colors.primary} />
               <Text style={styles.pdfName}>{file.name}</Text>
             </View>
           )}
@@ -199,7 +202,7 @@ export default function UploadScreen() {
             onPress={() => setFile(null)}
             accessibilityLabel={t('removeDocument', language)}
           >
-            <Ionicons name="close-circle" size={28} color={Colors.errorRed} />
+            <Ionicons name="close-circle" size={28} color={Colors.error} />
             <Text style={styles.removeText}>{t('removeDocument', language)}</Text>
           </TouchableOpacity>
 
@@ -223,7 +226,7 @@ export default function UploadScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   title: {
@@ -262,10 +265,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 260,
     borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
   },
   pdfPreview: {
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.lg,
     padding: Spacing['2xl'],
     alignItems: 'center',
@@ -287,7 +290,7 @@ const styles = StyleSheet.create({
   removeText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
 
   formatsBox: {

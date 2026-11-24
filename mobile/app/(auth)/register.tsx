@@ -15,9 +15,9 @@ import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 
 const USER_TYPES = [
-  { value: 'boda_boda', label: 'Boda Boda Rider', icon: '🏍️' },
-  { value: 'market_vendor', label: 'Market Vendor', icon: '🏪' },
-  { value: 'general', label: 'General User', icon: '👤' },
+  { value: 'boda_boda', labelKey: 'home_boda' as const, icon: '🏍️' },
+  { value: 'market_vendor', labelKey: 'home_vendor' as const, icon: '🏪' },
+  { value: 'general', labelKey: 'user_general' as const, icon: '👤' },
 ];
 
 export default function RegisterScreen() {
@@ -34,10 +34,10 @@ export default function RegisterScreen() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!phone.trim()) e.phone = 'Phone number is required.';
-    if (password.length < 6) e.password = 'Password must be at least 6 characters.';
-    if (password !== confirm) e.confirm = 'Passwords do not match.';
-    if (!consented) e.consent = 'You must agree to data processing to continue.';
+    if (!phone.trim()) e.phone = t('validation_phoneRequired', language);
+    if (password.length < 6) e.password = t('validation_passwordShort', language);
+    if (password !== confirm) e.confirm = t('validation_passwordsMismatch', language);
+    if (!consented) e.consent = t('validation_consentRequired', language);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -73,7 +73,7 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.title}>{t('register', language)}</Text>
-        <Text style={styles.subtitle}>Create your LegalBridge account</Text>
+        <Text style={styles.subtitle}>{t('register_subtitle', language)}</Text>
 
         {errors.general && (
           <View style={styles.errorBanner}>
@@ -94,7 +94,7 @@ export default function RegisterScreen() {
           label={`${t('fullName', language)}`}
           value={name}
           onChangeText={setName}
-          placeholder="Your name"
+          placeholder={t('register_namePlaceholder', language)}
         />
 
         <TextInput
@@ -125,7 +125,7 @@ export default function RegisterScreen() {
             >
               <Text style={styles.typeIcon}>{ut.icon}</Text>
               <Text style={[styles.typeLabel, userType === ut.value && styles.typeLabelSelected]}>
-                {ut.label}
+                {t(ut.labelKey, language)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -163,7 +163,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.backgroundOffWhite,
+    backgroundColor: Colors.background,
     padding: Spacing.xl,
     gap: Spacing.sm,
   },
@@ -180,14 +180,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   errorBanner: {
-    backgroundColor: Colors.errorLight,
+    backgroundColor: Colors.errorBg,
     borderRadius: 10,
     padding: Spacing.md,
   },
   errorText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
   sectionLabel: {
     fontFamily: FontFamily.medium,
@@ -202,13 +202,13 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.surfaceWhite,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     gap: 4,
   },
   typeSelected: {
-    borderColor: Colors.primaryDeepPurple,
-    backgroundColor: '#EDE8F5',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryTint,
   },
   typeIcon: { fontSize: 24 },
   typeLabel: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
   },
-  typeLabelSelected: { color: Colors.primaryDeepPurple },
+  typeLabelSelected: { color: Colors.primary },
   consentRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
@@ -229,14 +229,14 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: Colors.borderMedium,
+    borderColor: Colors.borderStrong,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   checkboxChecked: {
-    backgroundColor: Colors.primaryDeepPurple,
-    borderColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   consentText: {
     flex: 1,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   errorSmall: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
   link: { alignItems: 'center', padding: Spacing.md },
   linkText: {
@@ -256,5 +256,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
   },
-  linkBold: { fontFamily: FontFamily.bold, color: Colors.primaryDeepPurple },
+  linkBold: { fontFamily: FontFamily.bold, color: Colors.primary },
 });

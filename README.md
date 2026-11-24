@@ -187,7 +187,7 @@ Africa's Talking simulator → `*384*0#` → five-language menus → both user c
 | Phone number auth (not email) | Most informal workers have a phone, not email |
 | RAG with ChromaDB | Prevents hallucination — AI only uses verified sources |
 | USSD as a separate channel | Feature phones, no internet — same backend services |
-| Five selectable languages; limited local-language STT | Whisper is reliable in English only — users see a warning and confirm the transcription |
+| Five selectable languages; limited local-language STT | Whisper is reliable in English only — the transcript stays editable and web answers use browser TTS; new-language drafts need native-speaker review |
 | Soft-delete documents | Users control their data; audit trail preserved |
 | Admin approval before RAG indexing | No unverified legal text reaches production AI |
 | UGX currency, admin-configurable prices | No hardcoded business logic |

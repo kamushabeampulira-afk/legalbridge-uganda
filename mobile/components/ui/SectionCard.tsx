@@ -19,7 +19,7 @@ export default function SectionCard({
   title,
   content,
   iconName,
-  iconColor = Colors.primaryDeepTeal,
+  iconColor = Colors.primary,
   collapsible = false,
   defaultOpen = true,
 }: Props) {
@@ -62,7 +62,7 @@ export default function SectionCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     marginBottom: Spacing.md,
     overflow: 'hidden',
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: Spacing.base,
-    backgroundColor: '#EDE8F5',
+    backgroundColor: Colors.primaryTint,
   },
   icon: { marginRight: Spacing.sm },
   title: {
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   bullet: {
     fontFamily: FontFamily.semiBold,
     fontSize: FontSize.base,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
     marginRight: Spacing.sm,
     minWidth: 20,
   },

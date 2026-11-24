@@ -5,7 +5,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
@@ -18,7 +18,7 @@ const ACTIONS = [
     id: 'upload',
     route: '/document/upload?category=market_vendor',
     icon: 'cloud-upload' as const,
-    color: Colors.secondaryBurntOrange,
+    color: Colors.primary,
     titleKey: 'vendor_upload' as const,
     descKey: 'vendor_upload_desc' as const,
   },
@@ -26,7 +26,7 @@ const ACTIONS = [
     id: 'eviction',
     route: '/vendor/eviction',
     icon: 'exit' as const,
-    color: Colors.warningMutedCoral,
+    color: Colors.secondary,
     titleKey: 'vendor_eviction' as const,
     descKey: 'vendor_eviction_desc' as const,
   },
@@ -34,7 +34,7 @@ const ACTIONS = [
     id: 'history',
     route: '/(tabs)/history',
     icon: 'folder-open' as const,
-    color: Colors.successLeafGreen,
+    color: Colors.textPrimary,
     titleKey: 'vendor_history' as const,
     descKey: 'vendor_history_desc' as const,
   },
@@ -42,7 +42,7 @@ const ACTIONS = [
     id: 'rights',
     route: '/ask?category=market_vendor&preset=rights',
     icon: 'shield-checkmark' as const,
-    color: Colors.primaryDeepTeal,
+    color: Colors.accentStrong,
     titleKey: 'vendor_rights' as const,
     descKey: 'vendor_rights_desc' as const,
   },
@@ -75,7 +75,7 @@ export default function VendorScreen() {
           accessibilityRole="button"
           accessibilityLabel={t(action.titleKey, language)}
         >
-          <View style={[styles.iconBox, { backgroundColor: action.color + '18' }]}>
+          <View style={[styles.iconBox, { backgroundColor: withAlpha(action.color, 0.1) }]}>
             <Ionicons name={action.icon} size={28} color={action.color} />
           </View>
           <View style={styles.actionText}>
@@ -87,7 +87,7 @@ export default function VendorScreen() {
       ))}
 
       <View style={styles.infoBanner}>
-        <Ionicons name="document-text" size={20} color={Colors.secondaryBurntOrange} />
+        <Ionicons name="document-text" size={20} color={Colors.accentStrong} />
         <Text style={styles.infoText}>{t('vendor_info', language)}</Text>
       </View>
 
@@ -97,10 +97,11 @@ export default function VendorScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.md },
   headerCard: {
-    backgroundColor: Colors.secondaryGold,
+    // Berry, matching the vendor card on Home. White text: 4.6:1.
+    backgroundColor: Colors.secondary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -117,11 +118,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: 'rgba(255,255,255,0.85)',
+    color: Colors.textOnPrimary,
     marginTop: 4,
   },
   actionCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.xs * 1.5,
   },
   infoBanner: {
-    backgroundColor: '#FDF3DC',
+    backgroundColor: Colors.accentTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.secondaryGoldDark,
+    color: Colors.accentText,
     lineHeight: FontSize.sm * 1.6,
   },
 });

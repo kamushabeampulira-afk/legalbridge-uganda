@@ -9,28 +9,30 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { documentsApi } from '@/services/api';
-import { Colors } from '@/constants/Colors';
+import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 
-const DOC_TYPE_ICONS: Record<string, { icon: string; color: string }> = {
-  traffic_notice: { icon: '🚦', color: Colors.warningMutedCoral },
-  police_charge: { icon: '👮', color: Colors.errorRed },
-  eviction_notice: { icon: '🏚️', color: Colors.warningMutedCoral },
-  allocation_slip: { icon: '📋', color: Colors.successLeafGreen },
-  payment_receipt: { icon: '🧾', color: Colors.primaryDeepTeal },
-  court_summons: { icon: '⚖️', color: Colors.secondaryBurntOrange },
-  unknown: { icon: '📄', color: Colors.textMuted },
+const DOC_TYPE_ICONS: Record<string, { icon: string }> = {
+  traffic_notice: { icon: '🚦' },
+  police_charge: { icon: '👮' },
+  eviction_notice: { icon: '🏚️' },
+  allocation_slip: { icon: '📋' },
+  payment_receipt: { icon: '🧾' },
+  court_summons: { icon: '⚖️' },
+  unknown: { icon: '📄' },
 };
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  completed: { label: 'Ready', color: Colors.successLeafGreen },
-  processing: { label: 'Processing', color: Colors.primaryDeepTeal },
-  failed: { label: 'Failed', color: Colors.errorRed },
-  uploaded: { label: 'Uploaded', color: Colors.infoBlue },
+type StatusKey = 'status_ready' | 'status_processing' | 'status_failed' | 'status_uploaded' | 'status_unknown';
+
+const STATUS_LABELS: Record<string, { labelKey: StatusKey; color: string }> = {
+  completed: { labelKey: 'status_ready', color: Colors.success },
+  processing: { labelKey: 'status_processing', color: Colors.primary },
+  failed: { labelKey: 'status_failed', color: Colors.error },
+  uploaded: { labelKey: 'status_uploaded', color: Colors.info },
 };
 
 export default function HistoryScreen() {
@@ -68,7 +70,7 @@ export default function HistoryScreen() {
               await documentsApi.delete(docId);
               setDocuments((prev) => prev.filter((d) => d.id !== docId));
             } catch {
-              Alert.alert('Error', t('error_generic', language));
+              Alert.alert(t('alert_error', language), t('error_generic', language));
             }
           },
         },
@@ -78,7 +80,7 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }: { item: any }) => {
     const typeInfo = DOC_TYPE_ICONS[item.doc_type] ?? DOC_TYPE_ICONS.unknown;
-    const statusInfo = STATUS_LABELS[item.status] ?? { label: item.status, color: Colors.textMuted };
+    const statusInfo = STATUS_LABELS[item.status] ?? { labelKey: 'status_unknown' as StatusKey, color: Colors.textMuted };
     const date = new Date(item.created_at).toLocaleDateString('en-UG', {
       day: 'numeric', month: 'short', year: 'numeric',
     });
@@ -94,23 +96,23 @@ export default function HistoryScreen() {
         </View>
         <View style={styles.docInfo}>
           <Text style={styles.docName} numberOfLines={1}>
-            {item.original_filename || 'Document'}
+            {item.original_filename || t('document_defaultTitle', language)}
           </Text>
           <Text style={styles.docType}>
-            {item.doc_type?.replace(/_/g, ' ') ?? 'Unknown type'}
+            {item.doc_type?.replace(/_/g, ' ') ?? t('history_unknownType', language)}
           </Text>
           <Text style={styles.docDate}>{date}</Text>
         </View>
         <View style={styles.docRight}>
-          <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
+          <View style={[styles.statusBadge, { backgroundColor: withAlpha(statusInfo.color, 0.12) }]}>
             <Text style={[styles.statusText, { color: statusInfo.color }]}>
-              {statusInfo.label}
+              {t(statusInfo.labelKey, language)}
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
             style={styles.deleteBtn}
-            accessibilityLabel="Delete document"
+            accessibilityLabel={t('history_delete', language)}
           >
             <Ionicons name="trash-outline" size={18} color={Colors.textMuted} />
           </TouchableOpacity>
@@ -147,7 +149,7 @@ export default function HistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => { setRefreshing(true); loadDocuments(); }}
-            tintColor={Colors.primaryDeepTeal}
+            tintColor={Colors.primary}
           />
         }
         ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
@@ -157,11 +159,11 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
   list: { padding: Spacing.base, paddingBottom: Spacing['3xl'] },
 
   docCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -172,7 +174,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: Spacing['3xl'],
-    backgroundColor: Colors.backgroundOffWhite,
+    backgroundColor: Colors.background,
     gap: Spacing.base,
   },
   emptyIcon: { fontSize: 64 },
@@ -225,7 +227,7 @@ const styles = StyleSheet.create({
   },
   uploadBtn: {
     flexDirection: 'row',
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,

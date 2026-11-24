@@ -118,6 +118,30 @@ Show the system:
 
 ---
 
+## Demo 2b: Free Legal Aid Connection
+
+**Available from**: Home → **Free Legal Aid**, the voice screen → **Connect to Legal Aid**, and inside **Find Legal Help**.
+
+### Steps
+
+1. Open Free Legal Aid (or Find Legal Help)
+2. Choose a district, e.g. **Kampala** or **Buikwe**
+3. Show the published area office:
+   - Kampala → Mmengo Justice Centre (`0800 100 210`, `0800 100 225`, `0759 500 440`)
+   - Buikwe → Mukono Justice Centre (`0800 100 218`, `0707 500 448`)
+4. Try a district without a published centre number, e.g. **Gulu** — the app says no verified area office is listed yet
+5. Show **Extra help**: Counsel Doug (`+256784122995`, Legal Officer) and the toll-free line (`+256323303969`)
+
+**Key talking points**:
+- Area office numbers come from the published Justice Centres Uganda contacts list
+- Districts with no published office number are not given a fake fallback
+- Doug and the toll-free line are clearly labelled extra help, not the district office
+- Every static label works in English and Luganda
+
+**Source**: https://justicecentres.go.ug/contacts/
+
+---
+
 ## Demo 3: USSD (feature phone / no internet)
 
 **Setup**: Africa's Talking simulator at simulator.africastalking.com
@@ -163,7 +187,7 @@ Show the system:
 ## Handling Demo Questions
 
 **"Can it really understand Luganda, Runyankore, Acholi or Lugbara?"**
-> Voice recognition for local languages has known limitations. For this version, local-language support covers UI text and USSD menus. Voice STT uses Whisper, which is reliable in English only — the app shows a warning and asks users to confirm the transcription. We recommend recorded human prompts as fallback. New-language translations are first-pass drafts pending native-speaker review.
+> Voice recognition for local languages has known limitations. Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is limited for all local languages, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a device voice is used when available, otherwise the closest available voice. Local-language support currently covers UI text and USSD menus; Runyankore, Acholi and Lugbara strings are first-pass drafts pending native-speaker review. For a guaranteed local-language voice, use a pre-recorded human prompt as fallback.
 
 **"What if the AI makes up a law?"**
 > The system uses RAG — it only cites provisions from documents we have manually approved and indexed. If no relevant source is found, it displays: "I cannot verify the applicable legal provision..." rather than inventing an answer.

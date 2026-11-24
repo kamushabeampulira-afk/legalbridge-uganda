@@ -10,43 +10,48 @@ import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import Button from '@/components/ui/Button';
+import { useAppStore } from '@/store/useAppStore';
+import { t, type Language } from '@/i18n/translations';
 
 const { width } = Dimensions.get('window');
 const ONBOARDING_KEY = 'lb_onboarding_done';
 
-const slides = [
+const getSlides = (language: Language) => [
   {
     id: '1',
     icon: 'document-text' as const,
-    title: 'Understand Your Documents',
-    body: 'Photograph or upload any official document — traffic notices, eviction letters, market slips — and get a plain-language explanation.',
-    color: Colors.primaryDeepPurple,
+    title: t('onboarding_title_1', language),
+    body: t('onboarding_body_1', language),
+    color: Colors.primary,
   },
   {
     id: '2',
     icon: 'shield-checkmark' as const,
-    title: 'Know Your Rights',
-    body: 'Find out what Ugandan law says about your situation. LegalBridge references verified legal sources — no guessing.',
-    color: Colors.secondaryGold,
+    title: t('onboarding_title_2', language),
+    body: t('onboarding_body_2', language),
+    color: Colors.accent,
+    iconColor: Colors.textPrimary,
   },
   {
     id: '3',
     icon: 'footsteps' as const,
-    title: 'Find Your Next Step',
-    body: 'Get a practical checklist of things you can do, and connect with legal aid organisations and qualified lawyers.',
-    color: Colors.accentSoftBlueDark,
+    title: t('onboarding_title_3', language),
+    body: t('onboarding_body_3', language),
+    color: Colors.primaryPressed,
   },
   {
     id: '4',
     icon: 'mic' as const,
-    title: 'Speak or Type',
-    body: 'Ask questions by voice or text in your chosen language. No internet? Dial our USSD service from any phone.',
-    color: Colors.primaryDeepPurpleLight,
+    title: t('onboarding_title_4', language),
+    body: t('onboarding_body_4', language),
+    color: Colors.secondary,
   },
 ];
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const language = useAppStore((s) => s.language);
+  const slides = getSlides(language);
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
@@ -80,7 +85,7 @@ export default function OnboardingScreen() {
       {/* Skip button */}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('onboarding_skip', language)}</Text>
         </TouchableOpacity>
       </View>
 
@@ -96,7 +101,7 @@ export default function OnboardingScreen() {
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
             <View style={[styles.iconCircle, { backgroundColor: item.color }]}>
-              <Ionicons name={item.icon} size={56} color={Colors.textOnPrimary} />
+              <Ionicons name={item.icon} size={56} color={'iconColor' in item ? item.iconColor : Colors.textOnPrimary} />
             </View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.body}>{item.body}</Text>
@@ -117,13 +122,13 @@ export default function OnboardingScreen() {
       {/* CTA */}
       <View style={styles.buttonArea}>
         <Button
-          label={isLast ? 'Get Started' : 'Next'}
+          label={isLast ? t('onboarding_getStarted', language) : t('onboarding_next', language)}
           onPress={handleNext}
           variant="primary"
         />
         {isLast && (
           <TouchableOpacity onPress={() => router.replace('/(auth)/login')} style={styles.loginLink}>
-            <Text style={styles.loginText}>Already have an account? Log in</Text>
+            <Text style={styles.loginText}>{t('onboarding_loginLink', language)}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -132,7 +137,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -183,10 +188,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.borderMedium,
+    backgroundColor: Colors.borderStrong,
   },
   dotActive: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     width: 24,
   },
   buttonArea: {
@@ -198,6 +203,6 @@ const styles = StyleSheet.create({
   loginText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
   },
 });

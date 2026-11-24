@@ -53,6 +53,7 @@ def ask_legal(request):
         return Response({'error': 'Question is too long. Please keep it under 2000 characters.'}, status=400)
 
     from ai_engine.engine import answer_legal_question
+    from ai_engine.openai_service import AIServiceUnavailable
     try:
         result = answer_legal_question(
             question=question,
@@ -61,6 +62,8 @@ def ask_legal(request):
             user=request.user,
         )
         return Response(result, status=200)
+    except AIServiceUnavailable as e:
+        return Response({'error': e.user_message, 'error_category': e.category}, status=503)
     except Exception as e:
         import logging
         logging.getLogger('legalbridge').error(f'Ask legal failed: {e}')

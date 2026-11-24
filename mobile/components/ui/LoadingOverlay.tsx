@@ -15,7 +15,7 @@ export default function LoadingOverlay({ visible, message }: Props) {
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.backdrop}>
         <View style={styles.box}>
-          <ActivityIndicator size="large" color={Colors.primaryDeepTeal} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           {message && <Text style={styles.message}>{message}</Text>}
         </View>
       </View>
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   box: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing['2xl'],
     alignItems: 'center',

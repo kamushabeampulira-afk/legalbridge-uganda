@@ -51,6 +51,40 @@ function isBrowserSpeaking(): boolean {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DETAIL_FIELDS = [
+  ['document_type', 'detail_document_type'],
+  ['issuing_institution', 'detail_issuing_institution'],
+  ['issuing_office', 'detail_issuing_office'],
+  ['reference_numbers', 'detail_reference_numbers'],
+  ['date_of_issue', 'detail_date_of_issue'],
+  ['recipient', 'detail_recipient'],
+  ['subject_or_offence', 'detail_subject_or_offence'],
+  ['deadlines', 'detail_deadlines'],
+  ['amounts', 'detail_amounts'],
+  ['instructions', 'detail_instructions'],
+  ['signature_or_stamp', 'detail_signature_or_stamp'],
+  ['contact_information', 'detail_contact_information'],
+  ['legal_provisions_mentioned', 'detail_legal_provisions_mentioned'],
+] as const;
+
+function docIcon(docType?: string): string {
+  if (!docType) return '📄';
+  if (docType.startsWith('traffic') || docType.startsWith('vehicle')) return '🚦';
+  if (docType.startsWith('police') || docType === 'complaint_to_police') return '👮';
+  if (docType === 'court_summons') return '⚖️';
+  if (['eviction_notice', 'trading_space_vacate_notice', 'landlord_correspondence'].includes(docType)) return '🏚️';
+  if (['allocation_slip', 'trading_licence', 'market_notice', 'local_authority_notice'].includes(docType)) return '📋';
+  if (['payment_receipt', 'rent_record'].includes(docType)) return '🧾';
+  return '📄';
+}
+
+function verificationStyle(status?: string) {
+  if (status === 'verified_official') return styles.statusVerified;
+  if (status === 'verification_incomplete') return styles.statusNeutral;
+  if (status === 'type_identified') return styles.statusInfo;
+  return styles.statusCaution;
+}
+
 export default function DocumentDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { language } = useAppStore();
@@ -60,6 +94,8 @@ export default function DocumentDetailScreen() {
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [playingAudio, setPlayingAudio] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
 
@@ -70,7 +106,7 @@ export default function DocumentDetailScreen() {
       if (data.analysis) setAnalysis(data.analysis);
       else if (data.status === 'completed') triggerAnalysis();
     } catch {
-      Alert.alert('Error', t('error_generic', language));
+      setLoadError(t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -78,11 +114,13 @@ export default function DocumentDetailScreen() {
 
   const triggerAnalysis = async () => {
     setAnalyzing(true);
+    setAnalysisError(null);
     try {
       const result = await documentsApi.analyze(id!, language);
       setAnalysis(result);
-    } catch {
-      Alert.alert('Analysis failed', t('error_generic', language));
+    } catch (err: any) {
+      // Shown on screen (Alert.alert does nothing on web)
+      setAnalysisError(err?.message || t('error_generic', language));
     } finally {
       setAnalyzing(false);
     }
@@ -146,8 +184,8 @@ export default function DocumentDetailScreen() {
       } else {
         setPlayingAudio(false);
         Alert.alert(
-          'Voice unavailable',
-          result.warning ?? 'Voice synthesis is not available. Please read the text version.'
+          t('alert_voiceUnavailable', language),
+          result.warning ?? t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
@@ -172,16 +210,11 @@ export default function DocumentDetailScreen() {
     >
       {/* Doc header */}
       <View style={[styles.header, webShadow.md]}>
-        <Text style={styles.headerIcon}>
-          {doc?.doc_type === 'traffic_notice' ? '🚦' :
-           doc?.doc_type === 'eviction_notice' ? '🏚️' :
-           doc?.doc_type === 'allocation_slip' ? '📋' :
-           doc?.doc_type === 'payment_receipt' ? '🧾' : '📄'}
-        </Text>
+        <Text style={styles.headerIcon}>{docIcon(doc?.doc_type)}</Text>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{t('analysisTitle', language)}</Text>
           <Text style={styles.headerSub}>
-            {doc?.doc_type?.replace(/_/g, ' ') ?? 'Document'}
+            {doc?.doc_type_label ?? doc?.doc_type?.replace(/_/g, ' ') ?? t('document_defaultTitle', language)}
           </Text>
         </View>
         {/* Audio button in header */}
@@ -194,7 +227,7 @@ export default function DocumentDetailScreen() {
           <Ionicons
             name={playingAudio ? 'stop-circle' : 'volume-high'}
             size={26}
-            color={Colors.textOnPrimary}
+            color={playingAudio ? Colors.primary : Colors.textOnPrimary}
           />
         </TouchableOpacity>
       </View>
@@ -209,19 +242,77 @@ export default function DocumentDetailScreen() {
           <Ionicons
             name={playingAudio ? 'stop-circle' : 'play-circle'}
             size={22}
-            color={playingAudio ? Colors.warningMutedCoral : Colors.secondaryBurntOrange}
+            color={playingAudio ? Colors.primary : Colors.secondary}
           />
           <Text style={[styles.listenText, playingAudio && styles.listenTextActive]}>
             {playingAudio
-              ? t('voice_stop', language)
+              ? t('document_stopAudio', language)
               : t('listenToExplanation', language)}
           </Text>
           {Platform.OS === 'web' && !playingAudio && (
             <View style={styles.freeBadge}>
-              <Text style={styles.freeBadgeText}>Free</Text>
+              <Text style={styles.freeBadgeText}>{t('document_free', language)}</Text>
             </View>
           )}
         </TouchableOpacity>
+      )}
+
+      {loadError && (
+        <View style={[styles.statusCard, styles.statusError]}>
+          <Text style={styles.statusTitle}>{loadError}</Text>
+        </View>
+      )}
+
+      {/* Authenticity: recognising a document is not the same as verifying it */}
+      {doc?.verification_status_label ? (
+        <View style={[styles.statusCard, verificationStyle(doc.verification_status)]}>
+          <View style={styles.statusRow}>
+            <Ionicons
+              name={doc.verification_status === 'verified_official' ? 'shield-checkmark' : 'shield-half'}
+              size={18}
+              color={Colors.textSecondary}
+            />
+            <Text style={styles.statusTitle}>{doc.verification_status_label}</Text>
+          </View>
+          {doc.verification_guidance ? (
+            <Text style={styles.statusBody}>{doc.verification_guidance}</Text>
+          ) : null}
+        </View>
+      ) : null}
+
+      {/* What LegalBridge read from the document */}
+      {doc?.document_details && Object.keys(doc.document_details).length > 0 && (
+        <View style={styles.detailsBox}>
+          <Text style={styles.sourcesTitle}>{t('detail_title', language)}</Text>
+          {DETAIL_FIELDS.map(([key, labelKey]) => {
+            const field = doc.document_details[key];
+            if (!field || !['found', 'unclear'].includes(field.status) || !field.value) return null;
+            const value = Array.isArray(field.value) ? field.value.join(' · ') : String(field.value);
+            return (
+              <View key={key} style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t(labelKey, language)}</Text>
+                <Text style={styles.detailValue}>{value}</Text>
+                {field.status === 'unclear' && (
+                  <Text style={styles.detailUnclear}>{t('detail_unclear', language)}: {field.note}</Text>
+                )}
+              </View>
+            );
+          })}
+          <Text style={styles.detailFootnote}>
+            {t('detail_footnote', language)}
+          </Text>
+        </View>
+      )}
+
+      {/* Analysis could not be generated: say why, keep the details above, allow retry */}
+      {analysisError && !analysis && (
+        <View style={[styles.statusCard, styles.statusError]}>
+          <Text style={styles.statusTitle}>{t('analysis_unavailable', language)}</Text>
+          <Text style={styles.statusBody}>{analysisError}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={triggerAnalysis}>
+            <Text style={styles.retryText}>{t('retry', language)}</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* Uncertainty flag */}
@@ -235,7 +326,7 @@ export default function DocumentDetailScreen() {
               title={t('section_summary', language)}
               content={analysis.summary}
               iconName="document-text"
-              iconColor={Colors.primaryDeepTeal}
+              iconColor={Colors.primary}
             />
           ) : null}
 
@@ -244,7 +335,7 @@ export default function DocumentDetailScreen() {
               title={t('section_meaning', language)}
               content={analysis.what_it_means}
               iconName="bulb"
-              iconColor={Colors.secondaryBurntOrange}
+              iconColor={Colors.secondary}
               collapsible
             />
           ) : null}
@@ -254,7 +345,7 @@ export default function DocumentDetailScreen() {
               title={t('section_law', language)}
               content={analysis.relevant_law}
               iconName="library"
-              iconColor={Colors.successLeafGreen}
+              iconColor={Colors.success}
               collapsible
             />
           ) : null}
@@ -264,7 +355,7 @@ export default function DocumentDetailScreen() {
               title={t('section_check', language)}
               content={analysis.details_to_check}
               iconName="checkmark-circle"
-              iconColor={Colors.warningMutedCoral}
+              iconColor={Colors.warning}
               collapsible
             />
           ) : null}
@@ -274,7 +365,7 @@ export default function DocumentDetailScreen() {
               title={t('section_missing', language)}
               content={analysis.missing_information}
               iconName="alert-circle"
-              iconColor={Colors.warningMutedCoral}
+              iconColor={Colors.warning}
               collapsible
             />
           ) : null}
@@ -284,7 +375,7 @@ export default function DocumentDetailScreen() {
               title={t('section_steps', language)}
               content={analysis.next_steps}
               iconName="footsteps"
-              iconColor={Colors.primaryDeepTeal}
+              iconColor={Colors.primary}
             />
           ) : null}
 
@@ -293,7 +384,7 @@ export default function DocumentDetailScreen() {
               title={t('section_help', language)}
               content={analysis.where_to_get_help}
               iconName="people"
-              iconColor={Colors.successLeafGreen}
+              iconColor={Colors.success}
               collapsible
             />
           ) : null}
@@ -303,24 +394,42 @@ export default function DocumentDetailScreen() {
             <View style={styles.sourcesBox}>
               <Text style={styles.sourcesTitle}>{t('section_sources', language)}</Text>
               {analysis.legal_sources_used.map((src: any, i: number) => (
-                <Text key={i} style={styles.sourceItem}>
-                  • {src.short_title || src.title}
-                  {src.issuing_authority ? ` — ${src.issuing_authority}` : ''}
-                </Text>
+                <View key={i} style={styles.sourceEntry}>
+                  <Text style={styles.sourceItem}>
+                    • {src.title || src.short_title}
+                    {src.instrument_number ? ` (${src.instrument_number})` : ''}
+                    {src.section_number ? `, section ${src.section_number}` : ''}
+                    {src.section_title ? `: ${src.section_title}` : ''}
+                  </Text>
+                  <Text style={styles.sourceMeta}>
+                    {[
+                      src.issuing_authority,
+                      src.legal_status ? `Status: ${src.legal_status}` : null,
+                      src.last_verified_at ? `Last verified ${src.last_verified_at}` : null,
+                    ].filter(Boolean).join(' · ')}
+                  </Text>
+                  {src.source_url ? <Text style={styles.sourceMeta}>{src.source_url}</Text> : null}
+                  {src.is_current_verified === false && (
+                    <Text style={styles.detailUnclear}>
+                      Not verified as current law
+                      {src.currency_warnings?.length ? `: ${src.currency_warnings.join(' ')}` : ''}
+                    </Text>
+                  )}
+                </View>
               ))}
             </View>
           )}
         </>
-      ) : (
+      ) : analysisError ? null : (
         <View style={styles.noAnalysis}>
           <Text style={styles.noAnalysisText}>
             {doc?.status === 'processing'
-              ? 'Your document is still being processed. Please wait.'
-              : 'Analysis not yet available.'}
+              ? t('document_processingWait', language)
+              : t('document_notAvailable', language)}
           </Text>
           {doc?.status === 'completed' && (
             <TouchableOpacity style={styles.retryBtn} onPress={triggerAnalysis}>
-              <Text style={styles.retryText}>Analyse Now</Text>
+              <Text style={styles.retryText}>{t('document_analyseNow', language)}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -332,9 +441,9 @@ export default function DocumentDetailScreen() {
         onPress={() => router.push('/ask' as any)}
         activeOpacity={0.85}
       >
-        <Ionicons name="chatbubble-ellipses" size={20} color={Colors.primaryDeepPurple} />
+        <Ionicons name="chatbubble-ellipses" size={20} color={Colors.primary} />
         <Text style={styles.followUpText}>{t('askFollowUp', language)}</Text>
-        <Ionicons name="arrow-forward" size={16} color={Colors.primaryDeepPurple} />
+        <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
       </TouchableOpacity>
 
       {/* Find legal help */}
@@ -343,9 +452,9 @@ export default function DocumentDetailScreen() {
         onPress={() => router.push('/legal-help')}
         activeOpacity={0.85}
       >
-        <Ionicons name="people" size={20} color={Colors.secondaryGold} />
+        <Ionicons name="people" size={20} color={Colors.accentStrong} />
         <Text style={styles.helpBtnText}>{t('legalHelp_title', language)}</Text>
-        <Ionicons name="arrow-forward" size={16} color={Colors.secondaryBurntOrange} />
+        <Ionicons name="arrow-forward" size={16} color={Colors.accentStrong} />
       </TouchableOpacity>
 
       <DisclaimerBanner />
@@ -354,11 +463,11 @@ export default function DocumentDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.sm },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -371,16 +480,16 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.md, color: Colors.textOnPrimary },
   headerSub: {
     fontFamily: FontFamily.regular, fontSize: FontSize.xs,
-    color: Colors.accentSoftPeach, textTransform: 'capitalize', marginTop: 2,
+    color: Colors.textOnPrimaryMuted, textTransform: 'capitalize', marginTop: 2,
   },
   audioBtn: {
     padding: Spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: Colors.onPrimarySubtle,
     borderRadius: BorderRadius.full,
     width: 44, height: 44,
     alignItems: 'center', justifyContent: 'center',
   },
-  audioBtnActive: { backgroundColor: Colors.warningMutedCoral },
+  audioBtnActive: { backgroundColor: Colors.surface },
 
   listenRow: {
     flexDirection: 'row',
@@ -388,14 +497,14 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.base,
-    backgroundColor: Colors.accentSoftPeach + '60',
+    backgroundColor: Colors.secondaryTint,
     borderRadius: BorderRadius.md,
   },
-  listenRowActive: { backgroundColor: Colors.warningLight },
-  listenText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
-  listenTextActive: { color: Colors.warningMutedCoral },
+  listenRowActive: { backgroundColor: Colors.primaryTint },
+  listenText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryText },
+  listenTextActive: { color: Colors.primary },
   freeBadge: {
-    backgroundColor: Colors.successLeafGreen,
+    backgroundColor: Colors.success,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
     borderRadius: BorderRadius.full,
@@ -403,7 +512,7 @@ const styles = StyleSheet.create({
   freeBadgeText: { fontFamily: FontFamily.semiBold, fontSize: 10, color: Colors.textOnPrimary },
 
   sourcesBox: {
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     gap: Spacing.xs,
@@ -413,21 +522,40 @@ const styles = StyleSheet.create({
     color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: Spacing.xs,
   },
   sourceItem: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: FontSize.xs * 1.6 },
+  sourceEntry: { marginBottom: Spacing.xs },
+  sourceMeta: { fontFamily: FontFamily.regular, fontSize: 11, color: Colors.textMuted, marginLeft: Spacing.sm },
+
+  statusCard: { borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs, borderWidth: 1 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  statusTitle: { flex: 1, fontFamily: FontFamily.semiBold, fontSize: FontSize.sm, color: Colors.textPrimary },
+  statusBody: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: FontSize.xs * 1.6 },
+  statusCaution: { backgroundColor: Colors.warningBg, borderColor: Colors.warningBorder },
+  statusInfo: { backgroundColor: Colors.infoBg, borderColor: Colors.infoBorder },
+  statusNeutral: { backgroundColor: Colors.surfaceMuted, borderColor: Colors.border },
+  statusVerified: { backgroundColor: Colors.successBg, borderColor: Colors.successBorder },
+  statusError: { backgroundColor: Colors.errorBg, borderColor: Colors.errorBorder },
+
+  detailsBox: { backgroundColor: Colors.surface, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.sm, borderWidth: 1, borderColor: Colors.border },
+  detailRow: { gap: 2 },
+  detailLabel: { fontFamily: FontFamily.semiBold, fontSize: 11, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },
+  detailValue: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.textPrimary },
+  detailUnclear: { fontFamily: FontFamily.regular, fontSize: 11, color: Colors.warning },
+  detailFootnote: { fontFamily: FontFamily.regular, fontSize: 11, color: Colors.textMuted, fontStyle: 'italic' },
 
   noAnalysis: { padding: Spacing.xl, alignItems: 'center', gap: Spacing.base },
   noAnalysisText: { fontFamily: FontFamily.regular, fontSize: FontSize.base, color: Colors.textMuted, textAlign: 'center' },
-  retryBtn: { backgroundColor: Colors.primaryDeepTeal, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md, borderRadius: BorderRadius.lg },
+  retryBtn: { backgroundColor: Colors.primary, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md, borderRadius: BorderRadius.lg },
   retryText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textOnPrimary },
 
   followUpBtn: {
-    backgroundColor: '#EDE8F5', borderRadius: BorderRadius.lg, padding: Spacing.base,
+    backgroundColor: Colors.primaryTint, borderRadius: BorderRadius.lg, padding: Spacing.base,
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
   },
-  followUpText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.primaryDeepPurple },
+  followUpText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.primary },
 
   helpBtn: {
-    backgroundColor: '#FDF3DC', borderRadius: BorderRadius.lg, padding: Spacing.base,
+    backgroundColor: Colors.accentTint, borderRadius: BorderRadius.lg, padding: Spacing.base,
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
   },
-  helpBtnText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryGoldDark },
+  helpBtnText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.accentText },
 });

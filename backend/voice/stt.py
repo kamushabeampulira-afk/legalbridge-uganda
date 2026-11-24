@@ -59,13 +59,25 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
         from openai import OpenAI
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-        # audio_file may be a Django InMemoryUploadedFile
+        # The OpenAI SDK needs bytes/path, not a Django UploadedFile object.
+        if hasattr(audio_file, 'read'):
+            audio_file.seek(0)
+            filename = getattr(audio_file, 'name', 'audio.webm')
+            content_type = getattr(audio_file, 'content_type', '') or 'audio/webm'
+            file_arg = (filename, audio_file.read(), content_type)
+        else:
+            file_arg = audio_file
+
         kwargs = {
             'model': 'whisper-1',
-            'file': audio_file,
+            'file': file_arg,
         }
         if whisper_lang:
             kwargs['language'] = whisper_lang
+        elif language == 'lg':
+            # Whisper has no ISO code for Luganda (the API rejects 'lg').
+            # A prompt biases it toward Luganda instead of hallucinating English.
+            kwargs['prompt'] = 'Yogera mu Luganda: '
 
         transcript = client.audio.transcriptions.create(**kwargs)
         return {

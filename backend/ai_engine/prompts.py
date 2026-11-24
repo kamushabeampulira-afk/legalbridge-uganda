@@ -17,6 +17,13 @@ STRICT RULES — you MUST follow these at all times:
 9. NEVER declare an eviction legal or illegal without full context.
 10. ALWAYS recommend seeking a qualified legal professional for complex matters.
 11. You provide legal INFORMATION, not legal ADVICE. State this clearly.
+12. NEVER state or imply that a document is genuine, authentic, legitimate, fake or forged. Logos, stamps,
+    signatures, reference numbers and official wording do not prove authenticity. Say instead that the
+    document "appears to be" a certain type and that its authenticity has not been verified.
+13. ONLY describe details that actually appear in the document text. If something is unclear or missing,
+    say it is unclear or missing. NEVER invent names, police stations, officers, phone numbers, dates,
+    amounts, deadlines, offences, penalties, procedures or court requirements.
+14. Sources marked "SAMPLE" or "NOT CONFIRMED AS CURRENT LAW" must not be presented as current law.
 
 UNCERTAINTY MESSAGE (use when no verified source is retrieved):
 "I cannot verify the applicable legal provision from the information currently available. 
@@ -29,38 +36,54 @@ with limited written material, and never mix languages in one answer.
 """
 
 DOCUMENT_EXPLANATION_PROMPT = """
-You are analysing an official document received by {user_category_label}.
+You are explaining a document uploaded by a {user_category_label}.
 
-DOCUMENT TEXT (extracted by OCR — may contain errors):
+DOCUMENT TEXT (extracted by OCR, may contain reading errors):
 {document_text}
 
-DOCUMENT TYPE DETECTED: {doc_type}
+WHAT LEGALBRIDGE DETECTED (rule-based, may be wrong):
+- Document type: {doc_type} (confidence: {classification_confidence})
+- Issued by: {issuer}
+- Who produced it: {origin}
+- Details read from the text:
+{extracted_details}
 
-RELEVANT UGANDAN LEGAL CONTEXT (retrieved from verified sources):
+AUTHENTICITY STATUS: {verification_status}
+The document's authenticity has NOT been independently verified. Do not say it is genuine or fake.
+
+RELEVANT UGANDAN LEGAL CONTEXT:
+{legal_context_note}
 {retrieved_context}
 
-Please provide a structured explanation with these exact sections:
+Write a structured explanation with these exact sections:
 
 ## What Your Document Says
-(Plain language summary of what the document appears to be and what it states)
+(Plain-language summary of what the document appears to be and what it states. If it was written by a
+member of the public rather than issued by the police or an authority, say so.)
 
 ## What This May Mean
-(What the document may mean for the person — use "may" and "appears to" — do not state conclusions as facts)
+(What the document may mean for the person. Use "may" and "appears to". Treat any alleged offence as an
+allegation, not a fact.)
 
 ## Relevant Ugandan Law
-(Only cite laws that appear in the RETRIEVED LEGAL CONTEXT above. If no relevant law was retrieved, say so and use the uncertainty message.)
+(Only cite law that appears in the legal context above and is not marked SAMPLE or NOT CONFIRMED. Give the
+title, number and section exactly as shown there. If none applies, write exactly: "I cannot verify the
+applicable legal provision from the information currently available.")
 
 ## Important Details to Check
-(List specific things the user should verify — missing information, unclear fields, dates, amounts)
+(Specific things to check against the original: names, dates, amounts, reference numbers, and anything
+the detected details mark as unclear or not found. Remind them to confirm the document with the office
+that issued it, using contact details found independently, before paying money or acting on it.)
 
 ## Missing Information
-(What information appears to be absent from the document that would normally be expected)
+(Information that appears to be absent and would normally be expected. Do not guess what it should be.)
 
 ## Recommended Next Steps
-(Practical numbered steps the user can take — be specific and actionable)
+(Practical numbered steps. Do not state legal deadlines or procedures that are not in the document or the
+legal context.)
 
 ## Where to Seek Help
-(Refer to legal aid, relevant government offices, or suggest finding a qualified lawyer)
+(Legal aid providers, the issuing office, or a qualified lawyer.)
 
 IMPORTANT: This is legal information only. It does not constitute legal advice.
 """

@@ -8,12 +8,13 @@ import { useAppStore } from '@/store/useAppStore';
 import { Colors } from '@/constants/Colors';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { t } from '@/i18n/translations';
 
 const ONBOARDING_KEY = 'lb_onboarding_done';
 
 export default function IndexScreen() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAppStore();
+  const { isAuthenticated, isLoading, language } = useAppStore();
 
   useEffect(() => {
     if (isLoading) return;
@@ -35,8 +36,8 @@ export default function IndexScreen() {
     <View style={styles.container}>
       <View style={styles.logoArea}>
         <Text style={styles.logo}>⚖️</Text>
-        <Text style={styles.name}>LegalBridge</Text>
-        <Text style={styles.tagline}>Justice Within Reach</Text>
+        <Text style={styles.name}>{t('appName', language)}</Text>
+        <Text style={styles.tagline}>{t('tagline', language)}</Text>
       </View>
     </View>
   );
@@ -45,7 +46,7 @@ export default function IndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   tagline: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.md,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     letterSpacing: 1,
   },
 });

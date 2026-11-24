@@ -9,7 +9,8 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '@/store/useAppStore';
-import { Colors } from '@/constants/Colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, Gradients, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
@@ -20,7 +21,7 @@ const PRIMARY_PATHS = [
     id: 'boda',
     route: '/(tabs)/boda' as const,
     icon: 'bicycle' as const,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
     emoji: '🏍️',
     titleKey: 'home_boda' as const,
     descKey: 'home_boda_desc' as const,
@@ -29,7 +30,7 @@ const PRIMARY_PATHS = [
     id: 'vendor',
     route: '/(tabs)/vendor' as const,
     icon: 'storefront' as const,
-    color: Colors.secondaryGold,
+    color: Colors.secondary,
     emoji: '🏪',
     titleKey: 'home_vendor' as const,
     descKey: 'home_vendor_desc' as const,
@@ -41,29 +42,36 @@ const QUICK_ACTIONS = [
     id: 'ask',
     route: '/ask' as const,
     icon: 'chatbubble-ellipses' as const,
-    color: Colors.accentSoftBlueDark,
+    color: Colors.secondary,
     titleKey: 'home_askLegal' as const,
   },
   {
     id: 'upload',
     route: '/document/upload' as const,
     icon: 'cloud-upload' as const,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
     titleKey: 'home_upload' as const,
   },
   {
     id: 'voice',
     route: '/voice' as const,
     icon: 'mic' as const,
-    color: Colors.secondaryGold,
+    color: Colors.accentStrong,
     titleKey: 'home_voice' as const,
   },
   {
     id: 'help',
     route: '/legal-help' as const,
     icon: 'people' as const,
-    color: Colors.primaryDeepPurpleLight,
+    color: Colors.textPrimary,
     titleKey: 'home_findHelp' as const,
+  },
+  {
+    id: 'legal-aid',
+    route: '/legal-aid' as const,
+    icon: 'shield-checkmark' as const,
+    color: Colors.secondary,
+    titleKey: 'home_freeLegalAid' as const,
   },
 ];
 
@@ -72,7 +80,7 @@ export default function HomeScreen() {
   const { user, language } = useAppStore();
 
   const greeting = user?.full_name
-    ? `Hello, ${user.full_name.split(' ')[0]}`
+    ? `${t('home_hello', language)} ${user.full_name.split(' ')[0]}`
     : t('home_greeting', language);
 
   return (
@@ -82,10 +90,15 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Hero */}
-      <View style={styles.hero}>
+      <LinearGradient
+        colors={Gradients.brand}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
         <Text style={styles.greeting}>{greeting}</Text>
         <Text style={styles.heroSub}>{t('home_greeting', language)}</Text>
-      </View>
+      </LinearGradient>
 
       {/* Primary pathways */}
       <Text style={styles.sectionLabel}>{t('home_chooseSituation', language)}</Text>
@@ -103,7 +116,7 @@ export default function HomeScreen() {
             <Text style={styles.primaryTitle}>{t(p.titleKey, language)}</Text>
             <Text style={styles.primaryDesc}>{t(p.descKey, language)}</Text>
             <View style={styles.primaryArrow}>
-              <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.8)" />
+              <Ionicons name="arrow-forward" size={18} color={Colors.textOnPrimary} />
             </View>
           </TouchableOpacity>
         ))}
@@ -116,12 +129,12 @@ export default function HomeScreen() {
           <TouchableOpacity
             key={a.id}
             style={[styles.actionCard, webShadow.sm]}
-            onPress={() => router.push(a.route)}
+            onPress={() => router.push(a.route as any)}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={t(a.titleKey, language)}
           >
-            <View style={[styles.actionIcon, { backgroundColor: a.color + '18' }]}>
+            <View style={[styles.actionIcon, { backgroundColor: withAlpha(a.color, 0.1) }]}>
               <Ionicons name={a.icon} size={24} color={a.color} />
             </View>
             <Text style={styles.actionLabel}>{t(a.titleKey, language)}</Text>
@@ -134,7 +147,7 @@ export default function HomeScreen() {
         style={[styles.ussdBanner, webShadow.sm]}
         onPress={() => Linking.openURL('tel:*384*0#')}
         activeOpacity={0.85}
-        accessibilityLabel="Dial USSD code for no-internet access"
+        accessibilityLabel={t('home_ussd_accessibility', language)}
       >
         <View style={styles.ussdLeft}>
           <Text style={styles.ussdIcon}>📱</Text>
@@ -149,17 +162,16 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Disclaimer */}
-      <Text style={styles.disclaimer}>{t('disclaimer_short', language)}</Text>
+      <Text style={styles.disclaimer}>{t('disclaimer', language)}</Text>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'] },
 
   hero: {
-    backgroundColor: Colors.primaryDeepPurple,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     marginBottom: Spacing.xl,
@@ -172,7 +184,8 @@ const styles = StyleSheet.create({
   heroSub: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.accentSoftPeach,
+    // White: the muted tint would fall below 4.5:1 at the berry end of the gradient
+    color: Colors.textOnPrimary,
     marginTop: 4,
   },
 
@@ -204,7 +217,7 @@ const styles = StyleSheet.create({
   primaryDesc: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: 'rgba(255,255,255,0.8)',
+    color: Colors.textOnPrimary,
     lineHeight: FontSize.xs * 1.6,
     marginTop: 4,
   },
@@ -221,7 +234,7 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     width: '47%',
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     alignItems: 'center',
@@ -242,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   ussdBanner: {
-    backgroundColor: Colors.primaryDeepPurpleDark,
+    backgroundColor: Colors.primaryPressed,
     borderRadius: BorderRadius.xl,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -260,11 +273,14 @@ const styles = StyleSheet.create({
   ussdBody: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     marginTop: 2,
   },
   ussdCode: {
-    backgroundColor: Colors.secondaryGold,
+    // White chip with a gold edge: gold as a sparing accent, magenta text for contrast
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.accent,
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -272,7 +288,7 @@ const styles = StyleSheet.create({
   ussdCodeText: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize.md,
-    color: Colors.textOnPrimary,
+    color: Colors.primary,
     letterSpacing: 1,
   },
 

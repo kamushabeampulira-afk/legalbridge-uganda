@@ -5,6 +5,7 @@ import { LANGUAGES, getLanguageMeta } from '@/i18n/languages';
 import { Colors } from '@/constants/Colors';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
+import { t } from '@/i18n/translations';
 
 /**
  * Compact language switcher — tap to cycle through supported languages.
@@ -25,7 +26,7 @@ export default function LanguageSwitcher() {
       style={styles.container}
       onPress={cycle}
       activeOpacity={0.8}
-      accessibilityLabel={`Current language: ${meta.label}. Tap to change language.`}
+      accessibilityLabel={t('language_switcher_a11y', language)}
       accessibilityRole="button"
     >
       <Text style={styles.flag}>{meta.emoji}</Text>
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: Colors.onPrimarySubtle,
     borderRadius: BorderRadius.full,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,

@@ -48,17 +48,17 @@ const yesNoStyles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.surfaceWhite,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
   },
-  selected: { borderColor: Colors.primaryDeepTeal, backgroundColor: '#E8F4F7' },
+  selected: { borderColor: Colors.primary, backgroundColor: Colors.primaryTint },
   label: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
     color: Colors.textMuted,
   },
-  labelSelected: { color: Colors.primaryDeepTeal },
+  labelSelected: { color: Colors.primary },
 });
 
 export default function BodaStoppedScreen() {
@@ -75,7 +75,7 @@ export default function BodaStoppedScreen() {
 
   const handleSubmit = async () => {
     if (!toldAbout.trim()) {
-      Alert.alert('Required', 'Please describe what the officer told you.');
+      Alert.alert(t('alert_required', language), t('boda_requiredDetail', language));
       return;
     }
     setLoading(true);
@@ -90,7 +90,7 @@ export default function BodaStoppedScreen() {
       });
       setResult(res);
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -105,16 +105,16 @@ export default function BodaStoppedScreen() {
       >
         <View style={styles.resultHeader}>
           <Text style={styles.resultEmoji}>🏍️</Text>
-          <Text style={styles.resultTitle}>Your Guidance</Text>
+          <Text style={styles.resultTitle}>{t('guidance_resultTitle', language)}</Text>
         </View>
 
         {result.uncertainty_flag && <UncertaintyBanner />}
 
         <SectionCard
-          title="Guidance for Your Situation"
+          title={t('guidance_title', language)}
           content={result.guidance}
           iconName="shield-checkmark"
-          iconColor={Colors.primaryDeepTeal}
+          iconColor={Colors.primary}
         />
 
         {result.legal_sources?.length > 0 && (
@@ -132,14 +132,14 @@ export default function BodaStoppedScreen() {
           style={styles.helpBtn}
           onPress={() => router.push('/legal-help')}
         >
-          <Ionicons name="people" size={18} color={Colors.secondaryBurntOrange} />
+          <Ionicons name="people" size={18} color={Colors.accentStrong} />
           <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
         </TouchableOpacity>
 
         <DisclaimerBanner message={result.disclaimer} />
 
         <Button
-          label="Start Again"
+          label={t('guidance_startAgain', language)}
           onPress={() => setResult(null)}
           variant="outline"
         />
@@ -158,9 +158,7 @@ export default function BodaStoppedScreen() {
       <View style={styles.headerCard}>
         <Text style={styles.headerEmoji}>✋</Text>
         <Text style={styles.headerTitle}>{t('boda_stopped', language)}</Text>
-        <Text style={styles.headerSub}>
-          Answer a few questions so LegalBridge can give you relevant information.
-        </Text>
+        <Text style={styles.headerSub}>{t('guidance_intro_boda', language)}</Text>
       </View>
 
       {/* Q1 */}
@@ -172,7 +170,7 @@ export default function BodaStoppedScreen() {
           onChangeText={setToldAbout}
           multiline
           numberOfLines={3}
-          placeholder="e.g. The officer said I was riding without a helmet / I had expired insurance..."
+          placeholder={t('boda_q1_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -191,7 +189,7 @@ export default function BodaStoppedScreen() {
           style={styles.textInput}
           value={penaltyMentioned}
           onChangeText={setPenaltyMentioned}
-          placeholder="e.g. UGX 50,000 / Not mentioned"
+          placeholder={t('boda_q4_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
@@ -205,7 +203,7 @@ export default function BodaStoppedScreen() {
       {/* Additional */}
       <View style={styles.questionBlock}>
         <Text style={styles.questionLabel}>
-          {t('optional', language)}: Any other details?
+          {t('optional', language)}: {t('guidance_otherDetails', language)}
         </Text>
         <TextInput
           style={styles.textArea}
@@ -213,7 +211,7 @@ export default function BodaStoppedScreen() {
           onChangeText={setAdditionalDetails}
           multiline
           numberOfLines={3}
-          placeholder="Any other information that may be relevant..."
+          placeholder={t('boda_other_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -231,11 +229,11 @@ export default function BodaStoppedScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   headerCard: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     gap: Spacing.sm,
@@ -249,7 +247,7 @@ const styles = StyleSheet.create({
   headerSub: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     lineHeight: FontSize.sm * 1.6,
   },
 
@@ -260,10 +258,10 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   textInput: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular,
@@ -272,10 +270,10 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   textArea: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular,
@@ -297,7 +295,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   sourcesBox: {
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     gap: Spacing.xs,
@@ -317,13 +315,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: '#FEF0E8',
+    backgroundColor: Colors.accentTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
   },
   helpText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.secondaryBurntOrange,
+    color: Colors.accentText,
   },
 });

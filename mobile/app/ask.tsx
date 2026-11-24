@@ -54,11 +54,11 @@ export default function AskScreen() {
   const handleAsk = async (q?: string) => {
     const finalQuestion = (q ?? question).trim();
     if (!finalQuestion) {
-      Alert.alert(t('required', language), t('ask_required', language));
+      Alert.alert(t('alert_required', language), t('ask_required', language));
       return;
     }
     if (finalQuestion.length > 2000) {
-      Alert.alert(t('required', language), t('ask_tooLong', language));
+      Alert.alert(t('alert_tooLong', language), t('ask_tooLong', language));
       return;
     }
     setLoading(true);
@@ -67,7 +67,7 @@ export default function AskScreen() {
       const res = await legalApi.ask(finalQuestion, userCategory, language);
       setResult({ ...res, question: finalQuestion });
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ export default function AskScreen() {
             style={styles.textArea}
             value={question}
             onChangeText={setQuestion}
-            placeholder={t('ask_inputPlaceholder', language)}
+            placeholder={t('ask_placeholder', language)}
             placeholderTextColor={Colors.textMuted}
             multiline
             numberOfLines={4}
@@ -114,7 +114,7 @@ export default function AskScreen() {
               style={[styles.sendBtn, !question.trim() && styles.sendBtnDisabled]}
               onPress={() => handleAsk()}
               disabled={!question.trim() || loading}
-              accessibilityLabel="Submit question"
+              accessibilityLabel={t('ask_submitAccessibility', language)}
             >
               <Ionicons name="send" size={20} color={Colors.textOnPrimary} />
             </TouchableOpacity>
@@ -127,8 +127,10 @@ export default function AskScreen() {
           onPress={() => router.push('/voice')}
           activeOpacity={0.8}
         >
-          <Ionicons name="mic" size={18} color={Colors.secondaryBurntOrange} />
-          <Text style={styles.voiceText}>{t('ask_voiceShortcut', language)}</Text>
+          <Ionicons name="mic" size={18} color={Colors.secondary} />
+          <Text style={styles.voiceText}>
+            {t('ask_voiceShortcut', language)}
+          </Text>
           <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
         </TouchableOpacity>
 
@@ -136,17 +138,17 @@ export default function AskScreen() {
         {result && (
           <View style={styles.resultSection}>
             <View style={styles.questionBubble}>
-              <Ionicons name="person-circle" size={18} color={Colors.primaryDeepTeal} />
+              <Ionicons name="person-circle" size={18} color={Colors.primary} />
               <Text style={styles.questionText}>{result.question}</Text>
             </View>
 
             {result.uncertainty_flag && <UncertaintyBanner />}
 
             <SectionCard
-              title={t('ask_answerTitle', language)}
+              title={t('voice_answer', language)}
               content={result.answer}
               iconName="shield-checkmark"
-              iconColor={Colors.primaryDeepTeal}
+              iconColor={Colors.primary}
             />
 
             {result.legal_sources?.length > 0 && (
@@ -161,14 +163,14 @@ export default function AskScreen() {
             )}
 
             <TouchableOpacity style={styles.helpBtn} onPress={() => router.push('/legal-help')}>
-              <Ionicons name="people" size={18} color={Colors.secondaryBurntOrange} />
+              <Ionicons name="people" size={18} color={Colors.accentStrong} />
               <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
             </TouchableOpacity>
 
             <DisclaimerBanner message={result.disclaimer} />
 
             <Button
-              label={t('ask_another', language)}
+              label={t('voice_askAnother', language)}
               onPress={() => { setResult(null); setQuestion(''); }}
               variant="outline"
             />
@@ -191,7 +193,7 @@ export default function AskScreen() {
                 activeOpacity={0.8}
               >
                 <Text style={styles.presetText}>{presetText(p)}</Text>
-                <Ionicons name="arrow-forward-circle" size={20} color={Colors.primaryDeepTeal} />
+                <Ionicons name="arrow-forward-circle" size={20} color={Colors.primary} />
               </TouchableOpacity>
             ))}
           </View>
@@ -204,11 +206,11 @@ export default function AskScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -216,10 +218,10 @@ const styles = StyleSheet.create({
     gap: Spacing.base,
   },
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.lg, color: Colors.textOnPrimary },
-  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.accentSoftPeach, marginTop: 2 },
+  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textOnPrimaryMuted, marginTop: 2 },
 
   inputCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing.base,
   },
@@ -237,12 +239,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: Spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.sm,
   },
   charCount: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted },
   sendBtn: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     width: 42,
     height: 42,
     borderRadius: 21,
@@ -255,18 +257,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: '#FEF0E8',
+    backgroundColor: Colors.secondaryTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
   },
-  voiceText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
+  voiceText: { flex: 1, fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryText },
 
   resultSection: { gap: Spacing.sm },
   questionBubble: {
     flexDirection: 'row',
     gap: Spacing.sm,
     alignItems: 'flex-start',
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
   },
@@ -278,15 +280,15 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.sm * 1.6,
   },
 
-  sourcesBox: { backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
+  sourcesBox: { backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
   sourcesTitle: { fontFamily: FontFamily.semiBold, fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase' },
   sourceItem: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary },
 
   helpBtn: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: '#FEF0E8', borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.accentTint, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
-  helpText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
+  helpText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.accentText },
 
   presetsSection: { gap: Spacing.sm },
   presetsTitle: {
@@ -294,7 +296,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5,
   },
   presetCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',

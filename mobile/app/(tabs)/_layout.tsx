@@ -12,11 +12,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primaryDeepPurple,
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarStyle: {
-          backgroundColor: Colors.surfaceWhite,
-          borderTopColor: Colors.borderLight,
+          backgroundColor: Colors.surface,
+          borderTopColor: Colors.border,
           borderTopWidth: 1,
           height: 64,
           paddingBottom: 8,
@@ -26,7 +26,7 @@ export default function TabLayout() {
           fontFamily: FontFamily.medium,
           fontSize: 11,
         },
-        headerStyle: { backgroundColor: Colors.primaryDeepPurple },
+        headerStyle: { backgroundColor: Colors.primary },
         headerTintColor: Colors.textOnPrimary,
         headerTitleStyle: { fontFamily: FontFamily.semiBold, fontSize: 17 },
         headerRight: () => <LanguageSwitcher />,
@@ -36,8 +36,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          headerTitle: 'LegalBridge',
+          title: t('tab_home', language),
+          headerTitle: t('appName', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -46,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="boda"
         options={{
-          title: 'Boda Boda',
+          title: t('tab_boda', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="bicycle" size={size} color={color} />
           ),
@@ -55,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="vendor"
         options={{
-          title: 'Market',
+          title: t('tab_market', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="storefront" size={size} color={color} />
           ),
@@ -64,7 +64,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: 'Documents',
+          title: t('tab_documents', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="folder" size={size} color={color} />
           ),
@@ -73,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: t('tab_profile', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

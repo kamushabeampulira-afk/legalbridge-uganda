@@ -4,6 +4,7 @@
  */
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type { Language } from '@/i18n/translations';
+import { Platform } from 'react-native';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 // Change to your backend URL for device testing (use your machine's LAN IP)
@@ -159,11 +160,28 @@ export const userApi = {
   },
 };
 
+// ── File uploads ──────────────────────────────────────────────────────────────
+// React Native's FormData accepts a { uri, name, type } object, but a browser's
+// FormData would stringify it to "[object Object]". On web, read the picked
+// file's blob:/data: URI into a real Blob instead.
+async function appendFile(formData: FormData, field: string, uri: string, name: string, type: string) {
+  if (isWeb) {
+    const blob = await (await fetch(uri)).blob();
+    formData.append(field, new File([blob], name, { type: blob.type || type }));
+  } else {
+    formData.append(field, { uri, name, type } as any);
+  }
+}
+
 // ── Documents ─────────────────────────────────────────────────────────────────
 export const documentsApi = {
   upload: async (fileUri: string, fileName: string, mimeType: string, userCategory: string, language: Language) => {
     const formData = new FormData();
-    formData.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
+    try {
+      await appendFile(formData, 'file', fileUri, fileName, mimeType);
+    } catch {
+      throw new Error('Could not read the selected file. Please choose it again.');
+    }
     formData.append('user_category', userCategory);
     formData.append('language', language);
     try {
@@ -244,7 +262,20 @@ export const aiApi = {
 export const voiceApi = {
   transcribe: async (audioUri: string, language: Language) => {
     const formData = new FormData();
-    formData.append('audio', { uri: audioUri, name: 'recording.m4a', type: 'audio/m4a' } as any);
+    // Expo AV records WebM on web and M4A on native — tell the backend the truth.
+    const isWeb = Platform.OS === 'web';
+    try {
+      // appendFile sends a real File on web (a { uri } object would arrive as "[object Object]")
+      await appendFile(
+        formData,
+        'audio',
+        audioUri,
+        isWeb ? 'recording.webm' : 'recording.m4a',
+        isWeb ? 'audio/webm' : 'audio/m4a',
+      );
+    } catch {
+      throw new Error('Could not read the recording. Please try again.');
+    }
     formData.append('language', language);
     try {
       const res = await apiClient.post('/voice/transcribe/', formData, {

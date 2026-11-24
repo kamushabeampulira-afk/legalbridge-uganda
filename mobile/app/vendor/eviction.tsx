@@ -48,13 +48,13 @@ const yn = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.surfaceWhite,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
   },
-  selected: { borderColor: Colors.secondaryBurntOrange, backgroundColor: '#FEF0E8' },
+  selected: { borderColor: Colors.primary, backgroundColor: Colors.primaryTint },
   label: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
-  labelSelected: { color: Colors.secondaryBurntOrange },
+  labelSelected: { color: Colors.primary },
 });
 
 export default function VendorEvictionScreen() {
@@ -84,7 +84,7 @@ export default function VendorEvictionScreen() {
       });
       setResult(res);
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -95,16 +95,16 @@ export default function VendorEvictionScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.resultHeader}>
           <Text style={styles.resultEmoji}>🏪</Text>
-          <Text style={styles.resultTitle}>Your Guidance</Text>
+          <Text style={styles.resultTitle}>{t('guidance_resultTitle', language)}</Text>
         </View>
 
         {result.uncertainty_flag && <UncertaintyBanner />}
 
         <SectionCard
-          title="Guidance for Your Situation"
+          title={t('guidance_title', language)}
           content={result.guidance}
           iconName="shield-checkmark"
-          iconColor={Colors.secondaryBurntOrange}
+          iconColor={Colors.secondary}
         />
 
         {result.legal_sources?.length > 0 && (
@@ -117,12 +117,12 @@ export default function VendorEvictionScreen() {
         )}
 
         <TouchableOpacity style={styles.helpBtn} onPress={() => router.push('/legal-help')}>
-          <Ionicons name="people" size={18} color={Colors.secondaryBurntOrange} />
+          <Ionicons name="people" size={18} color={Colors.accentStrong} />
           <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
         </TouchableOpacity>
 
         <DisclaimerBanner message={result.disclaimer} />
-        <Button label="Start Again" onPress={() => setResult(null)} variant="outline" />
+        <Button label={t('guidance_startAgain', language)} onPress={() => setResult(null)} variant="outline" />
       </ScrollView>
     );
   }
@@ -134,9 +134,7 @@ export default function VendorEvictionScreen() {
       <View style={styles.headerCard}>
         <Text style={styles.headerEmoji}>🏚️</Text>
         <Text style={styles.headerTitle}>{t('vendor_eviction', language)}</Text>
-        <Text style={styles.headerSub}>
-          Answer the questions below so LegalBridge can give you relevant information about your situation.
-        </Text>
+        <Text style={styles.headerSub}>{t('guidance_intro_vendor', language)}</Text>
       </View>
 
       <View style={styles.questionBlock}>
@@ -155,7 +153,7 @@ export default function VendorEvictionScreen() {
           style={styles.textInput}
           value={noticeIssuer}
           onChangeText={setNoticeIssuer}
-          placeholder="e.g. Market manager / Local council / Unknown"
+          placeholder={t('vendor_q3_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
@@ -168,7 +166,7 @@ export default function VendorEvictionScreen() {
           onChangeText={setReasonGiven}
           multiline
           numberOfLines={3}
-          placeholder="e.g. Unpaid fees / Market redevelopment / No reason given"
+          placeholder={t('vendor_q4_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -180,20 +178,20 @@ export default function VendorEvictionScreen() {
           style={styles.textInput}
           value={deadline}
           onChangeText={setDeadline}
-          placeholder="e.g. 30 June 2024 / No deadline given"
+          placeholder={t('vendor_q5_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
 
       <View style={styles.questionBlock}>
-        <Text style={styles.questionLabel}>{t('optional', language)}: Any other details?</Text>
+        <Text style={styles.questionLabel}>{t('optional', language)}: {t('guidance_otherDetails', language)}</Text>
         <TextInput
           style={styles.textArea}
           value={additionalDetails}
           onChangeText={setAdditionalDetails}
           multiline
           numberOfLines={3}
-          placeholder="Any other information that may be relevant..."
+          placeholder={t('vendor_other_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -206,10 +204,11 @@ export default function VendorEvictionScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
   headerCard: {
-    backgroundColor: Colors.secondaryGold,
+    // Berry, as on the vendor dashboard (white on gold failed contrast)
+    backgroundColor: Colors.secondary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     gap: Spacing.sm,
@@ -218,19 +217,19 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.xl, color: Colors.textOnPrimary },
   headerSub: {
     fontFamily: FontFamily.regular, fontSize: FontSize.sm,
-    color: 'rgba(255,255,255,0.85)', lineHeight: FontSize.sm * 1.6,
+    color: Colors.textOnPrimary, lineHeight: FontSize.sm * 1.6,
   },
   questionBlock: { gap: Spacing.sm },
   questionLabel: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textPrimary },
   textInput: {
-    backgroundColor: Colors.surfaceWhite, borderRadius: BorderRadius.md,
-    borderWidth: 1.5, borderColor: Colors.borderLight,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
+    borderWidth: 1.5, borderColor: Colors.border,
     paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular, fontSize: FontSize.base, color: Colors.textPrimary, minHeight: 52,
   },
   textArea: {
-    backgroundColor: Colors.surfaceWhite, borderRadius: BorderRadius.md,
-    borderWidth: 1.5, borderColor: Colors.borderLight,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
+    borderWidth: 1.5, borderColor: Colors.border,
     paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular, fontSize: FontSize.base, color: Colors.textPrimary, minHeight: 90,
   },
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
   resultEmoji: { fontSize: 36 },
   resultTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.xl, color: Colors.textPrimary },
   sourcesBox: {
-    backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs,
+    backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs,
   },
   sourcesTitle: {
     fontFamily: FontFamily.semiBold, fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase',
@@ -246,7 +245,7 @@ const styles = StyleSheet.create({
   sourceItem: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary },
   helpBtn: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: '#FEF0E8', borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.accentTint, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
-  helpText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
+  helpText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.accentText },
 });

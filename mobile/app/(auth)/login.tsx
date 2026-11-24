@@ -22,8 +22,8 @@ export default function LoginScreen() {
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!phone.trim()) e.phone = 'Phone number is required.';
-    if (!password) e.password = 'Password is required.';
+    if (!phone.trim()) e.phone = t('validation_phoneRequired', language);
+    if (!password) e.password = t('validation_passwordRequired', language);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -54,7 +54,7 @@ export default function LoginScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>⚖️</Text>
-          <Text style={styles.appName}>LegalBridge</Text>
+          <Text style={styles.appName}>{t('appName', language)}</Text>
           <Text style={styles.tagline}>{t('tagline', language)}</Text>
         </View>
 
@@ -110,7 +110,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.backgroundOffWhite,
+    backgroundColor: Colors.background,
     padding: Spacing.xl,
     justifyContent: 'center',
   },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   appName: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize['2xl'],
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
     marginTop: Spacing.sm,
   },
   tagline: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   form: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: 20,
     padding: Spacing.xl,
     gap: Spacing.sm,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   errorBanner: {
-    backgroundColor: Colors.errorLight,
+    backgroundColor: Colors.errorBg,
     borderRadius: 10,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   errorBannerText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
   link: { alignItems: 'center', padding: Spacing.md },
   linkText: {
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
   },
-  linkBold: { fontFamily: FontFamily.bold, color: Colors.primaryDeepTeal },
+  linkBold: { fontFamily: FontFamily.bold, color: Colors.primary },
   disclaimer: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,

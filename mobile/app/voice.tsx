@@ -1,10 +1,10 @@
 /**
  * Voice interaction screen — record question, receive spoken answer.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Alert, Animated,
+  View, Text, TextInput, StyleSheet, ScrollView,
+  TouchableOpacity, Alert, Animated, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Audio } from 'expo-av';
@@ -15,12 +15,46 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { t, type Language } from '@/i18n/translations';
 import { getLanguageMeta } from '@/i18n/languages';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import SectionCard from '@/components/ui/SectionCard';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
+
+// ── Browser-native TTS (web only, no API key or voice ID required) ───────────
+function speakWithBrowser(text: string, lang: Language): boolean {
+  if (Platform.OS !== 'web') return false;
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+  window.speechSynthesis.cancel();
+  const utter = new (window as any).SpeechSynthesisUtterance(text);
+  const voices = window.speechSynthesis.getVoices();
+  const meta = getLanguageMeta(lang);
+  const prefix = meta.bcp47.split('-')[0].toLowerCase();
+  // Prefer the selected language; fall back to English when no voice exists.
+  const preferred = voices.find((v: any) => v.lang.toLowerCase().startsWith(prefix))
+    ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
+  if (preferred) utter.voice = preferred;
+  utter.lang = meta.bcp47;
+  utter.rate = 0.88;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+  return true;
+}
+
+function stopBrowserSpeech() {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function isBrowserSpeaking(): boolean {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    return window.speechSynthesis.speaking;
+  }
+  return false;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 type State = 'idle' | 'recording' | 'processing' | 'transcribed' | 'answered';
 
@@ -36,6 +70,7 @@ export default function VoiceScreen() {
   const [playingAudio, setPlayingAudio] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const speechPoll = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Recording ─────────────────────────────────────────────────────────────
 
@@ -43,7 +78,7 @@ export default function VoiceScreen() {
     try {
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Microphone access is required for voice questions.');
+        Alert.alert(t('alert_permissionNeeded', language), t('voice_microphonePermission', language));
         return;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -54,7 +89,7 @@ export default function VoiceScreen() {
       setState('recording');
       startPulse();
     } catch (e) {
-      Alert.alert('Recording failed', 'Could not start recording. Please try typing your question.');
+      Alert.alert(t('alert_recordingFailed', language), t('voice_recordingRetry', language));
     }
   };
 
@@ -88,9 +123,70 @@ export default function VoiceScreen() {
     }
   };
 
+  // ── Answer playback ────────────────────────────────────────────────────────
+  const clearSpeechPoll = () => {
+    if (speechPoll.current) {
+      clearInterval(speechPoll.current);
+      speechPoll.current = null;
+    }
+  };
+
+  const stopAudio = async () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
+    await sound?.stopAsync();
+    setPlayingAudio(false);
+  };
+
+  const playAnswer = async (answerText?: string) => {
+    const text = (answerText ?? result?.answer ?? '').slice(0, 800);
+    if (!text) return;
+
+    await stopAudio();
+
+    // Web: browser speech synthesis works without any API key or Luganda voice ID.
+    if (Platform.OS === 'web' && speakWithBrowser(text, language)) {
+      setPlayingAudio(true);
+      speechPoll.current = setInterval(() => {
+        if (!isBrowserSpeaking()) {
+          clearSpeechPoll();
+          setPlayingAudio(false);
+        }
+      }, 500);
+      return;
+    }
+
+    // Native: backend TTS (needs a configured provider and key).
+    try {
+      const audioRes = await voiceApi.synthesize(text, language);
+      if (audioRes.audio_url) {
+        const { sound: s } = await Audio.Sound.createAsync({ uri: audioRes.audio_url });
+        setSound(s);
+        setPlayingAudio(true);
+        await s.playAsync();
+        s.setOnPlaybackStatusUpdate((status) => {
+          if (!status.isLoaded || (status as any).didJustFinish) setPlayingAudio(false);
+        });
+      } else {
+        Alert.alert(
+          t('alert_voiceUnavailable', language),
+          audioRes.warning ?? t('voice_synthesisUnavailable', language)
+        );
+      }
+    } catch {
+      Alert.alert(t('alert_voiceUnavailable', language), t('voice_synthesisUnavailable', language));
+    }
+  };
+
+  useEffect(() => () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
+    sound?.unloadAsync();
+  }, []);
+
   const submitTranscription = async () => {
     if (!transcription.trim()) {
-      Alert.alert('No text', t('voice_fallback', language));
+      Alert.alert(t('alert_noText', language), t('voice_fallback', language));
       return;
     }
     setState('processing');
@@ -103,26 +199,19 @@ export default function VoiceScreen() {
       setResult(res);
       setState('answered');
 
-      // Auto-synthesize audio response
+      // Speak the answer (browser TTS on web, backend TTS on native)
       if (res.answer && !res.uncertainty_flag) {
-        const audioRes = await voiceApi.synthesize(res.answer.slice(0, 800), language);
-        if (audioRes.audio_url) {
-          const { sound: s } = await Audio.Sound.createAsync({ uri: audioRes.audio_url });
-          setSound(s);
-          setPlayingAudio(true);
-          await s.playAsync();
-          s.setOnPlaybackStatusUpdate((status) => {
-            if (!status.isLoaded || (status as any).didJustFinish) setPlayingAudio(false);
-          });
-        }
+        await playAnswer(res.answer);
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
       setState('transcribed');
     }
   };
 
   const reset = () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
     sound?.unloadAsync();
     setSound(null);
     setPlayingAudio(false);
@@ -148,11 +237,6 @@ export default function VoiceScreen() {
     pulseAnim.setValue(1);
   };
 
-  const stopAudio = async () => {
-    await sound?.stopAsync();
-    setPlayingAudio(false);
-  };
-
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -173,7 +257,7 @@ export default function VoiceScreen() {
       {/* Speech accuracy warning for languages without reliable STT support */}
       {!getLanguageMeta(language).voiceReliable && (
         <View style={styles.warningBox}>
-          <Ionicons name="warning" size={16} color={Colors.warningMutedCoral} />
+          <Ionicons name="warning" size={16} color={Colors.warning} />
           <Text style={styles.warningText}>{t('voice_accuracy_warning', language)}</Text>
         </View>
       )}
@@ -192,7 +276,9 @@ export default function VoiceScreen() {
               style={[styles.micBtn, state === 'recording' && styles.micBtnRecording, webShadow.lg]}
               onPress={state === 'recording' ? stopRecording : startRecording}
               activeOpacity={0.8}
-              accessibilityLabel={state === 'recording' ? 'Stop recording' : 'Start recording'}
+              accessibilityLabel={state === 'recording'
+                ? t('voice_stopRecording', language)
+                : t('voice_startRecording', language)}
             >
               <Ionicons
                 name={state === 'recording' ? 'stop' : 'mic'}
@@ -203,7 +289,9 @@ export default function VoiceScreen() {
           </Animated.View>
 
           <Text style={styles.micLabel}>
-            {state === 'recording' ? 'Tap to stop' : 'Tap to record'}
+            {state === 'recording'
+              ? t('voice_tapStop', language)
+              : t('voice_tapRecord', language)}
           </Text>
 
           {/* Fallback: type instead */}
@@ -213,7 +301,7 @@ export default function VoiceScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="create-outline" size={16} color={Colors.textMuted} />
-            <Text style={styles.typeInsteadText}>Type your question instead</Text>
+            <Text style={styles.typeInsteadText}>{t('voice_typeInstead', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -221,34 +309,40 @@ export default function VoiceScreen() {
       {/* Transcription review */}
       {state === 'transcribed' && (
         <View style={styles.transcriptionSection}>
-          <Text style={styles.sectionTitle}>Your question</Text>
+          <Text style={styles.sectionTitle}>{t('voice_yourQuestion', language)}</Text>
 
           {transcriptionWarning ? (
             <View style={styles.warningBox}>
-              <Ionicons name="warning" size={16} color={Colors.warningMutedCoral} />
+              <Ionicons name="warning" size={16} color={Colors.warning} />
               <Text style={styles.warningText}>{transcriptionWarning}</Text>
             </View>
           ) : null}
 
           {transcription ? (
             <>
-              <View style={styles.transcriptionBox}>
-                <Text style={styles.transcriptionText}>{transcription}</Text>
-              </View>
+              <Text style={styles.editHint}>{t('voice_edit_hint', language)}</Text>
+              <TextInput
+                style={styles.transcriptionInput}
+                value={transcription}
+                onChangeText={setTranscription}
+                multiline
+                textAlignVertical="top"
+                accessibilityLabel={t('voice_edit_hint', language)}
+              />
               <TouchableOpacity style={styles.submitBtn} onPress={submitTranscription} activeOpacity={0.85}>
                 <Ionicons name="send" size={18} color={Colors.textOnPrimary} />
-                <Text style={styles.submitBtnText}>Submit Question</Text>
+                <Text style={styles.submitBtnText}>{t('voice_submitQuestion', language)}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <TouchableOpacity style={styles.submitBtn} onPress={() => router.push('/ask')} activeOpacity={0.85}>
               <Ionicons name="create" size={18} color={Colors.textOnPrimary} />
-              <Text style={styles.submitBtnText}>Type Question Instead</Text>
+              <Text style={styles.submitBtnText}>{t('voice_typeQuestion', language)}</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity style={styles.retryLink} onPress={reset}>
-            <Text style={styles.retryLinkText}>Record Again</Text>
+            <Text style={styles.retryLinkText}>{t('voice_recordAgain', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -259,14 +353,12 @@ export default function VoiceScreen() {
           {/* Audio playback control */}
           <TouchableOpacity
             style={styles.audioRow}
-            onPress={playingAudio ? stopAudio : async () => {
-              if (sound) { setPlayingAudio(true); await sound.replayAsync(); }
-            }}
+            onPress={playingAudio ? stopAudio : () => playAnswer()}
           >
             <Ionicons
               name={playingAudio ? 'stop-circle' : 'play-circle'}
               size={24}
-              color={Colors.secondaryBurntOrange}
+              color={Colors.secondary}
             />
             <Text style={styles.audioLabel}>
               {playingAudio ? t('voice_stop', language) : t('voice_playback', language)}
@@ -276,10 +368,10 @@ export default function VoiceScreen() {
           {result.uncertainty_flag && <UncertaintyBanner />}
 
           <SectionCard
-            title="LegalBridge Answer"
+            title={t('voice_answer', language)}
             content={result.answer}
             iconName="shield-checkmark"
-            iconColor={Colors.primaryDeepTeal}
+            iconColor={Colors.primary}
           />
 
           {result.legal_sources?.length > 0 && (
@@ -294,11 +386,24 @@ export default function VoiceScreen() {
           <DisclaimerBanner message={result.disclaimer} />
 
           <TouchableOpacity style={styles.resetBtn} onPress={reset} activeOpacity={0.8}>
-            <Ionicons name="mic" size={18} color={Colors.primaryDeepTeal} />
-            <Text style={styles.resetBtnText}>Ask Another Question</Text>
+            <Ionicons name="mic" size={18} color={Colors.primary} />
+            <Text style={styles.resetBtnText}>{t('voice_askAnother', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Free legal aid connection */}
+      <TouchableOpacity
+        style={styles.legalAidButton}
+        onPress={() => router.push('/legal-aid' as any)}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t('voice_freeLegalAid', language)}
+      >
+        <Ionicons name="people-outline" size={20} color={Colors.primary} />
+        <Text style={styles.legalAidButtonText}>{t('voice_freeLegalAid', language)}</Text>
+        <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+      </TouchableOpacity>
 
       <DisclaimerBanner />
     </ScrollView>
@@ -306,11 +411,11 @@ export default function VoiceScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -318,11 +423,11 @@ const styles = StyleSheet.create({
     gap: Spacing.base,
   },
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.lg, color: Colors.textOnPrimary },
-  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.accentSoftPeach, marginTop: 2 },
+  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textOnPrimaryMuted, marginTop: 2 },
 
   warningBox: {
     flexDirection: 'row', gap: Spacing.sm, alignItems: 'flex-start',
-    backgroundColor: Colors.warningLight, borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.warningBg, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
   warningText: { flex: 1, fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: FontSize.xs * 1.6 },
 
@@ -333,10 +438,10 @@ const styles = StyleSheet.create({
   },
   micBtn: {
     width: 120, height: 120, borderRadius: 60,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  micBtnRecording: { backgroundColor: Colors.warningMutedCoral },
+  micBtnRecording: { backgroundColor: Colors.error },
   micLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
   typeInstead: {
     flexDirection: 'row', gap: Spacing.sm, alignItems: 'center',
@@ -347,15 +452,25 @@ const styles = StyleSheet.create({
   transcriptionSection: { gap: Spacing.base },
   sectionTitle: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textPrimary },
   transcriptionBox: {
-    backgroundColor: Colors.surfaceWhite, borderRadius: BorderRadius.lg,
-    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primaryDeepTeal,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primary,
   },
   transcriptionText: {
     fontFamily: FontFamily.regular, fontSize: FontSize.base,
     color: Colors.textPrimary, lineHeight: FontSize.base * 1.6,
   },
+  editHint: {
+    fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted,
+  },
+  transcriptionInput: {
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primary,
+    fontFamily: FontFamily.regular, fontSize: FontSize.base,
+    color: Colors.textPrimary, lineHeight: FontSize.base * 1.6,
+    minHeight: 90,
+  },
   submitBtn: {
-    backgroundColor: Colors.primaryDeepTeal, borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primary, borderRadius: BorderRadius.lg,
     padding: Spacing.base, flexDirection: 'row', alignItems: 'center',
     justifyContent: 'center', gap: Spacing.sm,
   },
@@ -363,21 +478,36 @@ const styles = StyleSheet.create({
   retryLink: { alignItems: 'center', padding: Spacing.sm },
   retryLinkText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
 
+  legalAidButton: {
+    backgroundColor: Colors.primaryTint,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  legalAidButtonText: {
+    flex: 1,
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+  },
+
   answerSection: { gap: Spacing.sm },
   audioRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: '#FEF0E8', borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.secondaryTint, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
-  audioLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
+  audioLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryText },
 
-  sourcesBox: { backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
+  sourcesBox: { backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
   sourcesTitle: { fontFamily: FontFamily.semiBold, fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase' },
   sourceItem: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary },
 
   resetBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: Spacing.sm, backgroundColor: '#E8F4F7',
+    gap: Spacing.sm, backgroundColor: Colors.primaryTint,
     borderRadius: BorderRadius.lg, padding: Spacing.base,
   },
-  resetBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.primaryDeepTeal },
+  resetBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.primary },
 });
