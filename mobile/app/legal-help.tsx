@@ -10,10 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { referralsApi } from '@/services/api';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
-import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
+import LegalAidConnectCard from '@/components/ui/LegalAidConnectCard';
 
 export default function LegalHelpScreen() {
   const { language } = useAppStore();
@@ -137,15 +137,11 @@ export default function LegalHelpScreen() {
 
   const displayOrgs = filtered.length > 0 ? filtered : (loading ? [] : fallbackOrgs);
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('legalHelp_title', language)}</Text>
-        <Text style={styles.headerSub}>{t('legalHelp_subtitle', language)}</Text>
-      </View>
+  const renderListHeader = () => (
+    <>
+      <LegalAidConnectCard />
 
-      {/* Search */}
+      {/* Directory search */}
       <View style={styles.searchBox}>
         <Ionicons name="search" size={18} color={Colors.textMuted} style={styles.searchIcon} />
         <TextInput
@@ -156,11 +152,22 @@ export default function LegalHelpScreen() {
           placeholderTextColor={Colors.textMuted}
         />
       </View>
+    </>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('legalHelp_title', language)}</Text>
+        <Text style={styles.headerSub}>{t('legalHelp_subtitle', language)}</Text>
+      </View>
 
       <FlatList
         data={displayOrgs}
         keyExtractor={(item) => item.id}
         renderItem={renderOrg}
+        ListHeaderComponent={renderListHeader}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
@@ -190,8 +197,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    marginHorizontal: Spacing.base,
-    marginVertical: Spacing.base,
+    marginTop: Spacing.base,
+    marginBottom: Spacing.md,
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.base,
     borderWidth: 1.5,

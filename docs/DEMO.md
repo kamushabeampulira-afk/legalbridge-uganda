@@ -118,6 +118,30 @@ Show the system:
 
 ---
 
+## Demo 2b: Free Legal Aid Connection
+
+**Available from**: Home → **Free Legal Aid**, the voice screen → **Connect to Legal Aid**, and inside **Find Legal Help**.
+
+### Steps
+
+1. Open Free Legal Aid (or Find Legal Help)
+2. Choose a district, e.g. **Kampala** or **Buikwe**
+3. Show the published area office:
+   - Kampala → Mmengo Justice Centre (`0800 100 210`, `0800 100 225`, `0759 500 440`)
+   - Buikwe → Mukono Justice Centre (`0800 100 218`, `0707 500 448`)
+4. Try a district without a published centre number, e.g. **Gulu** — the app says no verified area office is listed yet
+5. Show **Extra help**: Counsel Doug (`+256784122995`, Legal Officer) and the toll-free line (`+256323303969`)
+
+**Key talking points**:
+- Area office numbers come from the published Justice Centres Uganda contacts list
+- Districts with no published office number are not given a fake fallback
+- Doug and the toll-free line are clearly labelled extra help, not the district office
+- Every static label works in English and Luganda
+
+**Source**: https://justicecentres.go.ug/contacts/
+
+---
+
 ## Demo 3: USSD (feature phone / no internet)
 
 **Setup**: Africa's Talking simulator at simulator.africastalking.com
