@@ -75,7 +75,7 @@ export default function BodaStoppedScreen() {
 
   const handleSubmit = async () => {
     if (!toldAbout.trim()) {
-      Alert.alert('Required', 'Please describe what the officer told you.');
+      Alert.alert(t('alert_required', language), t('boda_requiredDetail', language));
       return;
     }
     setLoading(true);
@@ -90,7 +90,7 @@ export default function BodaStoppedScreen() {
       });
       setResult(res);
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -105,13 +105,13 @@ export default function BodaStoppedScreen() {
       >
         <View style={styles.resultHeader}>
           <Text style={styles.resultEmoji}>🏍️</Text>
-          <Text style={styles.resultTitle}>Your Guidance</Text>
+          <Text style={styles.resultTitle}>{t('guidance_resultTitle', language)}</Text>
         </View>
 
         {result.uncertainty_flag && <UncertaintyBanner />}
 
         <SectionCard
-          title="Guidance for Your Situation"
+          title={t('guidance_title', language)}
           content={result.guidance}
           iconName="shield-checkmark"
           iconColor={Colors.primaryDeepTeal}
@@ -139,7 +139,7 @@ export default function BodaStoppedScreen() {
         <DisclaimerBanner message={result.disclaimer} />
 
         <Button
-          label="Start Again"
+          label={t('guidance_startAgain', language)}
           onPress={() => setResult(null)}
           variant="outline"
         />
@@ -158,9 +158,7 @@ export default function BodaStoppedScreen() {
       <View style={styles.headerCard}>
         <Text style={styles.headerEmoji}>✋</Text>
         <Text style={styles.headerTitle}>{t('boda_stopped', language)}</Text>
-        <Text style={styles.headerSub}>
-          Answer a few questions so LegalBridge can give you relevant information.
-        </Text>
+        <Text style={styles.headerSub}>{t('guidance_intro_boda', language)}</Text>
       </View>
 
       {/* Q1 */}
@@ -172,7 +170,7 @@ export default function BodaStoppedScreen() {
           onChangeText={setToldAbout}
           multiline
           numberOfLines={3}
-          placeholder="e.g. The officer said I was riding without a helmet / I had expired insurance..."
+          placeholder={t('boda_q1_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -191,7 +189,7 @@ export default function BodaStoppedScreen() {
           style={styles.textInput}
           value={penaltyMentioned}
           onChangeText={setPenaltyMentioned}
-          placeholder="e.g. UGX 50,000 / Not mentioned"
+          placeholder={t('boda_q4_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
@@ -205,7 +203,7 @@ export default function BodaStoppedScreen() {
       {/* Additional */}
       <View style={styles.questionBlock}>
         <Text style={styles.questionLabel}>
-          {t('optional', language)}: Any other details?
+          {t('optional', language)}: {t('guidance_otherDetails', language)}
         </Text>
         <TextInput
           style={styles.textArea}
@@ -213,7 +211,7 @@ export default function BodaStoppedScreen() {
           onChangeText={setAdditionalDetails}
           multiline
           numberOfLines={3}
-          placeholder="Any other information that may be relevant..."
+          placeholder={t('boda_other_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />

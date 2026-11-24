@@ -74,7 +74,7 @@ export default function HomeScreen() {
   const { user, language } = useAppStore();
 
   const greeting = user?.full_name
-    ? `Hello, ${user.full_name.split(' ')[0]}`
+    ? `${t('home_hello', language)} ${user.full_name.split(' ')[0]}`
     : t('home_greeting', language);
 
   return (
@@ -90,7 +90,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Primary pathways */}
-      <Text style={styles.sectionLabel}>Choose your situation</Text>
+      <Text style={styles.sectionLabel}>{t('home_chooseSituation', language)}</Text>
       <View style={styles.primaryRow}>
         {PRIMARY_PATHS.map((p) => (
           <TouchableOpacity
@@ -114,7 +114,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Quick actions */}
-      <Text style={styles.sectionLabel}>Quick actions</Text>
+      <Text style={styles.sectionLabel}>{t('home_quickActions', language)}</Text>
       <View style={styles.actionsGrid}>
         {QUICK_ACTIONS.map((a) => (
           <TouchableOpacity
@@ -138,7 +138,7 @@ export default function HomeScreen() {
         style={[styles.ussdBanner, webShadow.sm]}
         onPress={() => Linking.openURL('tel:*384*0#')}
         activeOpacity={0.85}
-        accessibilityLabel="Dial USSD code for no-internet access"
+        accessibilityLabel={t('home_ussd_accessibility', language)}
       >
         <View style={styles.ussdLeft}>
           <Text style={styles.ussdIcon}>📱</Text>
@@ -153,10 +153,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Disclaimer */}
-      <Text style={styles.disclaimer}>
-        LegalBridge provides legal information, not legal advice.
-        For serious matters, consult a qualified lawyer.
-      </Text>
+      <Text style={styles.disclaimer}>{t('disclaimer', language)}</Text>
     </ScrollView>
   );
 }

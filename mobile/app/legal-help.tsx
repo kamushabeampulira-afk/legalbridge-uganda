@@ -73,7 +73,7 @@ export default function LegalHelpScreen() {
           <TouchableOpacity
             style={[styles.contactBtn, { backgroundColor: '#E8F4F7' }]}
             onPress={() => Linking.openURL(`tel:${item.phone_number}`)}
-            accessibilityLabel={`Call ${item.name}`}
+            accessibilityLabel={`${t('legalHelp_call', language)} ${item.name}`}
           >
             <Ionicons name="call" size={16} color={Colors.primaryDeepTeal} />
             <Text style={[styles.contactBtnText, { color: Colors.primaryDeepTeal }]}>
@@ -86,7 +86,7 @@ export default function LegalHelpScreen() {
           <TouchableOpacity
             style={[styles.contactBtn, { backgroundColor: '#FEF0E8' }]}
             onPress={() => Linking.openURL(item.website)}
-            accessibilityLabel={`Visit ${item.name} website`}
+            accessibilityLabel={`${t('legalHelp_visitWebsite', language)} ${item.name}`}
           >
             <Ionicons name="globe" size={16} color={Colors.secondaryBurntOrange} />
             <Text style={[styles.contactBtnText, { color: Colors.secondaryBurntOrange }]}>
@@ -104,34 +104,34 @@ export default function LegalHelpScreen() {
       id: 'uls',
       name: 'Uganda Law Society',
       district: 'Kampala',
-      description: 'Professional body for lawyers in Uganda. Referrals to qualified advocates.',
+      description: t('legalHelp_uls_description', language),
       phone_number: '+256414259808',
       website: 'https://www.uls.or.ug',
       is_free: false,
-      eligibility: 'Open to all — provides referrals to member advocates.',
-      consultation_info: 'Contact for referral to a qualified advocate in your area.',
+      eligibility: t('legalHelp_uls_eligibility', language),
+      consultation_info: t('legalHelp_uls_consult', language),
     },
     {
       id: 'fida',
       name: 'FIDA Uganda',
       district: 'Kampala',
-      description: 'Federation of Women Lawyers in Uganda. Free legal aid for women and families.',
+      description: t('legalHelp_fida_description', language),
       phone_number: '+256414530848',
       website: 'https://www.fidauganda.org',
       is_free: true,
-      eligibility: 'Primarily women and families. Low-income individuals prioritised.',
-      consultation_info: 'Walk-in and phone consultations available.',
+      eligibility: t('legalHelp_fida_eligibility', language),
+      consultation_info: t('legalHelp_fida_consult', language),
     },
     {
       id: 'laspnet',
       name: 'Legal Aid Service Providers Network',
-      district: 'National',
-      description: 'Network of legal aid providers across Uganda.',
+      district: t('legalHelp_district_national', language),
+      description: t('legalHelp_laspnet_description', language),
       phone_number: '',
       website: 'https://www.laspnet.org',
       is_free: true,
-      eligibility: 'Low-income individuals. Eligibility varies by member organisation.',
-      consultation_info: 'Contact to find the nearest legal aid provider in your district.',
+      eligibility: t('legalHelp_laspnet_eligibility', language),
+      consultation_info: t('legalHelp_laspnet_consult', language),
     },
   ];
 
@@ -152,7 +152,7 @@ export default function LegalHelpScreen() {
           style={styles.searchInput}
           value={search}
           onChangeText={setSearch}
-          placeholder={`${t('search', language)} by name or district...`}
+          placeholder={t('legalHelp_searchHint', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>

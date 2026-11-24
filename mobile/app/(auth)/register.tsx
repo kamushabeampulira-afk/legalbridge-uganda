@@ -15,9 +15,9 @@ import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 
 const USER_TYPES = [
-  { value: 'boda_boda', label: 'Boda Boda Rider', icon: '🏍️' },
-  { value: 'market_vendor', label: 'Market Vendor', icon: '🏪' },
-  { value: 'general', label: 'General User', icon: '👤' },
+  { value: 'boda_boda', labelKey: 'home_boda' as const, icon: '🏍️' },
+  { value: 'market_vendor', labelKey: 'home_vendor' as const, icon: '🏪' },
+  { value: 'general', labelKey: 'user_general' as const, icon: '👤' },
 ];
 
 export default function RegisterScreen() {
@@ -34,10 +34,10 @@ export default function RegisterScreen() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!phone.trim()) e.phone = 'Phone number is required.';
-    if (password.length < 6) e.password = 'Password must be at least 6 characters.';
-    if (password !== confirm) e.confirm = 'Passwords do not match.';
-    if (!consented) e.consent = 'You must agree to data processing to continue.';
+    if (!phone.trim()) e.phone = t('validation_phoneRequired', language);
+    if (password.length < 6) e.password = t('validation_passwordShort', language);
+    if (password !== confirm) e.confirm = t('validation_passwordsMismatch', language);
+    if (!consented) e.consent = t('validation_consentRequired', language);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -73,7 +73,7 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.title}>{t('register', language)}</Text>
-        <Text style={styles.subtitle}>Create your LegalBridge account</Text>
+        <Text style={styles.subtitle}>{t('register_subtitle', language)}</Text>
 
         {errors.general && (
           <View style={styles.errorBanner}>
@@ -94,7 +94,7 @@ export default function RegisterScreen() {
           label={`${t('fullName', language)}`}
           value={name}
           onChangeText={setName}
-          placeholder="Your name"
+          placeholder={t('register_namePlaceholder', language)}
         />
 
         <TextInput
@@ -125,7 +125,7 @@ export default function RegisterScreen() {
             >
               <Text style={styles.typeIcon}>{ut.icon}</Text>
               <Text style={[styles.typeLabel, userType === ut.value && styles.typeLabelSelected]}>
-                {ut.label}
+                {t(ut.labelKey, language)}
               </Text>
             </TouchableOpacity>
           ))}

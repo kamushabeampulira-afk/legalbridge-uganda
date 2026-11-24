@@ -69,7 +69,7 @@ export default function DocumentDetailScreen() {
       if (data.analysis) setAnalysis(data.analysis);
       else if (data.status === 'completed') triggerAnalysis();
     } catch {
-      Alert.alert('Error', t('error_generic', language));
+      Alert.alert(t('alert_error', language), t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -81,7 +81,7 @@ export default function DocumentDetailScreen() {
       const result = await documentsApi.analyze(id!, language);
       setAnalysis(result);
     } catch {
-      Alert.alert('Analysis failed', t('error_generic', language));
+      Alert.alert(t('alert_analysisFailed', language), t('error_generic', language));
     } finally {
       setAnalyzing(false);
     }
@@ -145,8 +145,8 @@ export default function DocumentDetailScreen() {
       } else {
         setPlayingAudio(false);
         Alert.alert(
-          'Voice unavailable',
-          result.warning ?? 'Voice synthesis is not available. Please read the text version.'
+          t('alert_voiceUnavailable', language),
+          result.warning ?? t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
@@ -180,7 +180,7 @@ export default function DocumentDetailScreen() {
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{t('analysisTitle', language)}</Text>
           <Text style={styles.headerSub}>
-            {doc?.doc_type?.replace(/_/g, ' ') ?? 'Document'}
+            {doc?.doc_type?.replace(/_/g, ' ') ?? t('document_defaultTitle', language)}
           </Text>
         </View>
         {/* Audio button in header */}
@@ -212,12 +212,12 @@ export default function DocumentDetailScreen() {
           />
           <Text style={[styles.listenText, playingAudio && styles.listenTextActive]}>
             {playingAudio
-              ? (language === 'lg' ? 'Yimirira' : 'Stop audio')
+              ? t('document_stopAudio', language)
               : t('listenToExplanation', language)}
           </Text>
           {Platform.OS === 'web' && !playingAudio && (
             <View style={styles.freeBadge}>
-              <Text style={styles.freeBadgeText}>Free</Text>
+              <Text style={styles.freeBadgeText}>{t('document_free', language)}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -314,12 +314,12 @@ export default function DocumentDetailScreen() {
         <View style={styles.noAnalysis}>
           <Text style={styles.noAnalysisText}>
             {doc?.status === 'processing'
-              ? 'Your document is still being processed. Please wait.'
-              : 'Analysis not yet available.'}
+              ? t('document_processingWait', language)
+              : t('document_notAvailable', language)}
           </Text>
           {doc?.status === 'completed' && (
             <TouchableOpacity style={styles.retryBtn} onPress={triggerAnalysis}>
-              <Text style={styles.retryText}>Analyse Now</Text>
+              <Text style={styles.retryText}>{t('document_analyseNow', language)}</Text>
             </TouchableOpacity>
           )}
         </View>

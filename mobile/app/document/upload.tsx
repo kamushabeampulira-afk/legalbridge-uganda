@@ -44,7 +44,7 @@ export default function UploadScreen() {
   const pickFromCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'LegalBridge needs camera access to photograph documents.');
+      Alert.alert(t('alert_permissionNeeded', language), t('upload_cameraPermission', language));
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -66,7 +66,7 @@ export default function UploadScreen() {
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'LegalBridge needs photo library access.');
+      Alert.alert(t('alert_permissionNeeded', language), t('upload_photoPermission', language));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -118,7 +118,7 @@ export default function UploadScreen() {
 
       router.replace(`/document/${docId}` as any);
     } catch (err: any) {
-      Alert.alert('Upload failed', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_uploadFailed', language), err.message ?? t('error_generic', language));
     } finally {
       setUploading(false);
       setLoadingMsg('');
@@ -136,10 +136,10 @@ export default function UploadScreen() {
       <Text style={styles.title}>{t('uploadDocument', language)}</Text>
       <Text style={styles.subtitle}>
         {userCategory === 'boda_boda'
-          ? 'Upload a traffic notice, penalty slip or any official road document'
+          ? t('upload_hint_boda', language)
           : userCategory === 'market_vendor'
-          ? 'Upload an allocation slip, eviction notice, receipt or market document'
-          : 'Upload any official legal document for analysis'}
+          ? t('upload_hint_vendor', language)
+          : t('upload_hint_general', language)}
       </Text>
 
       {/* Pick options */}
