@@ -190,6 +190,15 @@ USE_TZ = True
 # ---------------------------------------------------------
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4o')
+# Leave empty to use OpenAI. Set it to use another OpenAI-compatible provider with that
+# provider's key and model, e.g. Google Gemini (free tier):
+#   https://generativelanguage.googleapis.com/v1beta/openai/
+OPENAI_BASE_URL = env('OPENAI_BASE_URL', default='')
+# Optional "reasoning_effort" for models that think before answering (e.g. "low"). Empty: not sent.
+OPENAI_REASONING_EFFORT = env('OPENAI_REASONING_EFFORT', default='')
+# Extra output tokens added to every request, so a thinking model's reasoning cannot use up
+# the whole answer limit and return empty text. 0 for models that do not think (e.g. gpt-4o).
+OPENAI_EXTRA_MAX_TOKENS = env.int('OPENAI_EXTRA_MAX_TOKENS', default=0)
 OPENAI_TIMEOUT_SECONDS = env.float('OPENAI_TIMEOUT_SECONDS', default=60)
 OPENAI_MAX_RETRIES = env.int('OPENAI_MAX_RETRIES', default=1)
 OPENAI_HEALTHCHECK_TIMEOUT_SECONDS = env.float('OPENAI_HEALTHCHECK_TIMEOUT_SECONDS', default=20)
@@ -224,6 +233,18 @@ ELEVENLABS_API_KEY = env('ELEVENLABS_API_KEY', default='')
 ELEVENLABS_VOICE_EN = env('ELEVENLABS_VOICE_EN', default='')
 ELEVENLABS_VOICE_LG = env('ELEVENLABS_VOICE_LG', default='')
 STT_PROVIDER = env('STT_PROVIDER', default='openai_whisper')
+# Key for OpenAI voice (Whisper speech-to-text, OpenAI text-to-speech). Defaults to OPENAI_API_KEY
+# only when that is an OpenAI key; with another provider in OPENAI_BASE_URL it must be set separately.
+VOICE_OPENAI_API_KEY = env('VOICE_OPENAI_API_KEY', default='' if OPENAI_BASE_URL else OPENAI_API_KEY)
+# Sunbird AI (Uganda): free speech-to-text and text-to-speech in English and Luganda.
+# Used when STT_PROVIDER=sunbird and/or TTS_PROVIDER=sunbird. Register at
+# https://api.sunbird.ai/register, then copy the token from https://api.sunbird.ai/keys
+SUNBIRD_API_TOKEN = env('SUNBIRD_API_TOKEN', default='')
+SUNBIRD_API_URL = env('SUNBIRD_API_URL', default='https://api.sunbird.ai')
+SUNBIRD_TIMEOUT_SECONDS = env.float('SUNBIRD_TIMEOUT_SECONDS', default=120)
+# Voice names; empty uses Sunbird's default (English: Grace, Luganda: Namuli)
+SUNBIRD_TTS_VOICE_EN = env('SUNBIRD_TTS_VOICE_EN', default='')
+SUNBIRD_TTS_VOICE_LG = env('SUNBIRD_TTS_VOICE_LG', default='')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

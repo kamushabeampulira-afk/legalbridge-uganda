@@ -1,6 +1,7 @@
 """
 LegalBridge — Text-to-Speech module.
-Supports OpenAI TTS and ElevenLabs. Modular: swap provider without breaking the app.
+Supports OpenAI TTS, ElevenLabs and Sunbird AI (free; English and Luganda voices).
+Modular: swap provider (TTS_PROVIDER) without breaking the app.
 """
 from __future__ import annotations
 import logging
@@ -27,6 +28,8 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
         return _synthesize_elevenlabs(text, language)
     elif provider == 'openai':
         return _synthesize_openai(text, language)
+    elif provider == 'sunbird':
+        return _synthesize_sunbird(text, language)
     else:
         logger.warning(f'Unknown TTS provider: {provider}. Voice synthesis skipped.')
         return None
@@ -34,12 +37,13 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
 
 def _synthesize_openai(text: str, language: str) -> str | None:
     """Use OpenAI TTS (supports English well; Luganda limited)."""
-    if not settings.OPENAI_API_KEY:
-        logger.warning('OpenAI API key not configured. Skipping TTS.')
+    api_key = getattr(settings, 'VOICE_OPENAI_API_KEY', '')
+    if not api_key:
+        logger.warning('OpenAI voice key (VOICE_OPENAI_API_KEY) not configured. Skipping TTS.')
         return None
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        client = OpenAI(api_key=api_key)
 
         voice = 'alloy'  # Neutral voice; can be configured per language
         filename = f'tts_{uuid.uuid4()}.mp3'
@@ -91,4 +95,44 @@ def _synthesize_elevenlabs(text: str, language: str) -> str | None:
         return f'audio/{filename}'
     except Exception as e:
         logger.error(f'ElevenLabs TTS failed: {e}')
+        return None
+
+
+def _synthesize_sunbird(text: str, language: str) -> str | None:
+    """Use Sunbird AI TTS. Returns the audio as a file in media/audio/."""
+    token = getattr(settings, 'SUNBIRD_API_TOKEN', '')
+    if not token:
+        logger.warning('Sunbird API token (SUNBIRD_API_TOKEN) not configured. Skipping TTS.')
+        return None
+
+    payload = {
+        'text': text,
+        'language': 'lug' if language == 'lg' else 'eng',
+        'response_mode': 'stream',  # audio bytes in the response, nothing stored at Sunbird
+    }
+    voice = settings.SUNBIRD_TTS_VOICE_LG if language == 'lg' else settings.SUNBIRD_TTS_VOICE_EN
+    if voice:
+        payload['voice'] = voice
+
+    try:
+        import requests
+        resp = requests.post(
+            settings.SUNBIRD_API_URL.rstrip('/') + '/tasks/audio/speech',
+            json=payload,
+            headers={'Authorization': f'Bearer {token}'},
+            timeout=settings.SUNBIRD_TIMEOUT_SECONDS,
+        )
+        content_type = resp.headers.get('Content-Type', '').lower()
+        if resp.status_code != 200 or 'json' in content_type or not resp.content:
+            detail = resp.text[:300] if 'json' in content_type else f'content type {content_type!r}'
+            logger.error(f'Sunbird TTS failed: HTTP {resp.status_code}: {detail}')
+            return None
+
+        extension = '.mp3' if 'mpeg' in content_type or 'mp3' in content_type else '.wav'
+        filename = f'tts_{uuid.uuid4()}{extension}'
+        with open(AUDIO_DIR / filename, 'wb') as f:
+            f.write(resp.content)
+        return f'audio/{filename}'
+    except Exception as e:
+        logger.error(f'Sunbird TTS failed: {type(e).__name__}: {e}')
         return None

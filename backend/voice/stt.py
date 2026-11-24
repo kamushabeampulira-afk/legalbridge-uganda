@@ -1,7 +1,7 @@
 """
 LegalBridge — Speech-to-Text module.
-Uses OpenAI Whisper by default. Modular for future provider swaps.
-Luganda STT accuracy note: Whisper has limited Luganda support.
+Providers (STT_PROVIDER): 'openai_whisper' (default) or 'sunbird' (Sunbird AI, free,
+with real Luganda support). Luganda STT accuracy note: Whisper has limited Luganda support.
 Human-recorded prompts are the fallback for Luganda voice interaction.
 """
 import logging
@@ -10,6 +10,14 @@ import tempfile
 from django.conf import settings
 
 logger = logging.getLogger('legalbridge')
+
+# App language codes -> Sunbird ISO 639-3 codes
+SUNBIRD_LANGUAGES = {'en': 'eng', 'lg': 'lug'}
+FAILED = {
+    'text': '',
+    'confidence': None,
+    'warning': 'Speech recognition failed. Please type your question instead.',
+}
 
 
 def transcribe_audio(audio_file, language: str = 'en') -> dict:
@@ -23,6 +31,8 @@ def transcribe_audio(audio_file, language: str = 'en') -> dict:
 
     if provider == 'openai_whisper':
         return _transcribe_whisper(audio_file, language)
+    elif provider == 'sunbird':
+        return _transcribe_sunbird(audio_file, language)
     else:
         logger.warning(f'Unknown STT provider: {provider}')
         return {
@@ -34,7 +44,8 @@ def transcribe_audio(audio_file, language: str = 'en') -> dict:
 
 def _transcribe_whisper(audio_file, language: str) -> dict:
     """Transcribe using OpenAI Whisper API."""
-    if not settings.OPENAI_API_KEY:
+    api_key = getattr(settings, 'VOICE_OPENAI_API_KEY', '')
+    if not api_key:
         return {
             'text': '',
             'confidence': None,
@@ -54,7 +65,7 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
 
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        client = OpenAI(api_key=api_key)
 
         # audio_file may be a Django InMemoryUploadedFile
         kwargs = {
@@ -76,8 +87,56 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
         }
     except Exception as e:
         logger.error(f'Whisper transcription failed: {e}')
+        return dict(FAILED)
+
+
+def _transcribe_sunbird(audio_file, language: str) -> dict:
+    """Transcribe using Sunbird AI (supports English and Luganda natively)."""
+    token = getattr(settings, 'SUNBIRD_API_TOKEN', '')
+    if not token:
         return {
             'text': '',
             'confidence': None,
-            'warning': f'Speech recognition failed. Please type your question instead.',
+            'warning': 'Speech recognition is not configured. Please type your question.',
         }
+
+    url = settings.SUNBIRD_API_URL.rstrip('/') + '/tasks/audio/transcriptions'
+    opened = None
+    try:
+        import requests
+        if isinstance(audio_file, (str, os.PathLike)):
+            audio_file = opened = open(audio_file, 'rb')
+        elif hasattr(audio_file, 'seek'):
+            audio_file.seek(0)
+        name = os.path.basename(getattr(audio_file, 'name', '') or 'recording.wav')
+        content_type = getattr(audio_file, 'content_type', None) or 'application/octet-stream'
+
+        resp = requests.post(
+            url,
+            headers={'Authorization': f'Bearer {token}'},
+            files={'audio': (name, audio_file, content_type)},
+            data={'language': SUNBIRD_LANGUAGES.get(language, 'eng')},
+            timeout=settings.SUNBIRD_TIMEOUT_SECONDS,
+        )
+        if resp.status_code != 200:
+            logger.error(f'Sunbird transcription failed: HTTP {resp.status_code}: {resp.text[:300]}')
+            return dict(FAILED)
+        text = (resp.json().get('audio_transcription') or '').strip()
+    except Exception as e:
+        logger.error(f'Sunbird transcription failed: {type(e).__name__}: {e}')
+        return dict(FAILED)
+    finally:
+        if opened:
+            opened.close()
+
+    if not text:
+        return {
+            'text': '',
+            'confidence': None,
+            'warning': 'No speech was recognised. Please try again or type your question.',
+        }
+    return {
+        'text': text,
+        'confidence': None,  # Sunbird does not return a confidence score
+        'warning': None,
+    }
