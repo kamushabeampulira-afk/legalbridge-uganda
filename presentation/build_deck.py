@@ -167,34 +167,34 @@ def build():
     add_bg(s, NAVY)
     add_rect(s, 0, 0, 0.18, 7.5, PURPLE)
     add_text(s, 0.8, 0.65, 6.2, 0.3, "LEGALBRIDGE · JUDGE PRESENTATION", 11, GOLD, True)
-    add_text(s, 0.8, 1.15, 6.2, 1.0, "Know your rights.", 42, WHITE, True)
-    add_text(s, 0.8, 2.05, 6.2, 1.0, "Get your next step.", 42, WHITE, True)
-    add_text(s, 0.8, 2.95, 6.2, 0.8, "From any phone.", 42, GOLD, True)
+    add_text(s, 0.8, 1.12, 6.2, 0.85, "Stopped.", 44, WHITE, True)
+    add_text(s, 0.8, 1.95, 6.2, 0.85, "Impounded.", 44, WHITE, True)
+    add_text(s, 0.8, 2.78, 6.2, 0.85, "Unheard.", 44, GOLD, True)
     add_text(
         s,
         0.8,
-        3.95,
+        3.85,
         6.0,
-        1.15,
-        "A rights-and-legal-help companion for people in Uganda’s informal settlements — in English, Luganda and USSD.",
-        17,
+        1.25,
+        "A boda boda rider's bike is taken. The 48-hour court deadline passes.\nLegalBridge gives him the first sourced step — in Luganda, on any phone.",
+        15,
         RGBColor(222, 226, 235),
         spacing=1.15,
     )
-    add_rect(s, 0.8, 5.45, 3.2, 0.55, PURPLE, rounded=True)
-    add_text(s, 1.0, 5.57, 2.8, 0.3, "LIVE · 25 NOV 2026", 12, WHITE, True, align=PP_ALIGN.CENTER)
-    add_image(s, "02-rights.png", 7.25, 1.05, 5.25, 2.25)
+    add_rect(s, 0.8, 5.5, 3.2, 0.55, PURPLE, rounded=True)
+    add_text(s, 1.0, 5.62, 2.8, 0.3, "LIVE · 25 NOV 2026", 12, WHITE, True, align=PP_ALIGN.CENTER)
+    add_image(s, "03-boda.png", 7.25, 1.05, 5.25, 2.25)
     add_image(s, "06-voice.png", 7.25, 3.55, 5.25, 2.25)
     add_text(s, 7.25, 6.15, 5.25, 0.35, "legalbridge-app-free.onrender.com", 13, WHITE, align=PP_ALIGN.CENTER)
     set_notes(
         s,
-        "0:30 — Open with the promise, not the technology: a person with an eviction note at 5:40pm should not need a lawyer just to learn the first right step. Tell judges the app is live and the screenshots are from the real hosted product.",
+        "0:30 — Open with one rider, not a statistics lecture: he is waved down, the bike is loaded onto a pickup, and no one tells him when he will see a court. The Constitution gives him 48 hours. Tell judges the screenshots are from the live app, not a mock-up.",
     )
 
     # 2 — Problem
     s = new_slide(prs)
     add_bg(s, OFFWHITE)
-    add_header(s, "A legal problem does not wait for office hours.", "01 · The problem")
+    add_header(s, "The roadside becomes the first court.", "01 · The rider's problem")
     add_rect(s, 0.7, 1.45, 6.15, 4.9, WHITE, LINE, rounded=True)
     add_rect(s, 0.7, 1.45, 0.10, 4.9, PURPLE)
     add_text(s, 1.05, 1.75, 5.5, 0.35, "THE 5:40PM TEST", 12, PURPLE, True)
@@ -203,52 +203,53 @@ def build():
         1.05,
         2.2,
         5.45,
-        3.4,
-        "An eviction note is slipped under a door.\nCourt is closed. A lawyer is unaffordable.\nA relative sends a WhatsApp voice note.\n\nThe person still does not know:\nCan this happen? What do I do tonight?",
-        19,
+        3.3,
+        "A rider is waved down. The bike goes onto a police pickup. No receipt. No court date. No idea whether it comes back.\n\nArticle 23 says he must be produced in court within 48 hours. For thousands, that never happens.",
+        17,
         INK,
-        spacing=1.18,
+        spacing=1.16,
     )
-    add_text(s, 1.05, 5.9, 5.45, 0.3, "If the first step is unclear, the system has already failed.", 13, TEAL, True)
+    add_text(s, 1.05, 5.9, 5.45, 0.3, "When the bike is the livelihood, losing it is the sentence.", 12.5, TEAL, True)
 
     stats = [
-        ("126 / 142", "Uganda’s overall rank, WJP Rule of Law Index 2024; civil justice rank 115 / 142."),
-        ("46,000+", "cases still pending, even as Uganda’s backlog fell from 26.3% to 24.2% (Judiciary, Oct 2025)."),
-        ("SDG 16.3", "“Equal access to justice for all”; UN metadata names lack of knowledge, advice, distance and cost as barriers."),
+        ("12,217", "motorcycles impounded nationwide in six days (7–12 Nov 2022); 10,167 penalty tickets and 2,050 still at stations."),
+        ("787", "riders stopped in one week in July 2024 over helmets and reflective jackets; police said operations would continue."),
+        ("37,188", "people in pre-trial detention in Aug 2026 — 44.9% of all prisoners; prisons at 353% of capacity."),
+        ("10.3%", "of detainees interviewed were boda riders; 65% had spent more than six months on remand without trial."),
     ]
     for i, (big, label) in enumerate(stats):
-        y = 1.45 + i * 1.68
-        add_rect(s, 7.15, y, 5.48, 1.42, WHITE, LINE, rounded=True)
-        add_text(s, 7.42, y + 0.16, 4.9, 0.5, big, 25, PURPLE, True)
-        add_text(s, 7.42, y + 0.68, 4.95, 0.62, label, 12.5, INK, spacing=1.05)
+        y = 1.45 + i * 1.24
+        add_rect(s, 7.15, y, 5.48, 1.08, WHITE, LINE, rounded=True)
+        add_text(s, 7.4, y + 0.10, 4.95, 0.4, big, 22, PURPLE, True)
+        add_text(s, 7.4, y + 0.52, 4.95, 0.5, label, 10.2, INK, spacing=1.02)
     add_footer(
         s,
         2,
-        "Sources: WJP Rule of Law Index 2024 (Uganda); Judiciary of Uganda, 17 Oct 2025; UN SDG indicator 16.3.3 metadata.",
+        "Sources: The Source/Daily Monitor (Nov 2022); Uganda Police Force (15 Jul 2024); World Prison Brief (Aug 2026); ASF/New Vision (29 Oct 2026).",
     )
     set_notes(
         s,
-        "1:30 — Tell the story slowly. Then land the evidence: WJP 2024 places Uganda 126/142 overall and 115/142 on civil justice. The Judiciary reported over 46,000 pending cases in October 2025 even while backlog improved. UN SDG 16.3.3 explicitly lists lack of knowledge, legal advice, distance and cost as reasons people do not access dispute resolution. This is a first-step problem.",
+        "1:30 — Land the scale. Police reported 12,217 motorcycles impounded in six days in Nov 2022, with 2,050 still at stations; 787 riders were stopped in one week in Jul 2024. No official national daily arrest count is published, so we use these documented operations rather than invent one. World Prison Brief shows 37,188 people on remand in Aug 2026 (44.9%), and the ASF study found 10.3% of interviewed detainees were boda riders, with 65% over six months on remand.",
     )
 
     # 3 — Gap
     s = new_slide(prs)
     add_bg(s, OFFWHITE)
-    add_header(s, "The information exists. The bridge does not.", "02 · Why current options fail")
+    add_header(s, "The law is clear. The first step is not.", "02 · Why riders stay stuck")
     cols = [
         (
-            "The law is published",
-            "Uganda’s Constitution guarantees a fair, speedy and public hearing (Art. 28), and statutes are published online.\n\nBut a person in crisis still asks: “Where do I start?”",
+            "48 hours is the rule",
+            "Article 23 requires a person to be brought to court within 48 hours of arrest. Courts have held that detention beyond 48 hours is false imprisonment.\n\nA rider on the roadside rarely knows this.",
             PURPLE,
         ),
         (
-            "Formal justice is slow",
-            "With 46,000+ cases pending and civil justice ranked 115/142, the formal route is real but distant.\n\nDelay turns a small problem into an eviction.",
+            "The bike becomes the proof",
+            "Police say impounded motorcycles are released only on proof of ownership and after checking they are not linked to crime. Bikes with no case sit at stations.\n\nA court once awarded UGX 225m over an unlawful impoundment.",
             TEAL,
         ),
         (
-            "Digital help excludes many",
-            "Smartphone ownership, data cost and digital literacy are barriers across emerging markets.\n\nUSSD reaches basic and feature phones with no app and no internet (GSMA).",
+            "Bail is known but unused",
+            "In the ASF study, two-thirds of detainees knew about bail — only 7% applied. 65% had been on remand for more than six months.\n\nKnowledge, not guilt, is the missing step.",
             GOLD,
         ),
     ]
@@ -256,8 +257,8 @@ def build():
         x = 0.7 + i * 4.08
         add_rect(s, x, 1.5, 3.78, 3.9, WHITE, LINE, rounded=True)
         add_rect(s, x, 1.5, 3.78, 0.10, color)
-        add_text(s, x + 0.25, 1.8, 3.3, 0.5, title, 17, NAVY, True)
-        add_text(s, x + 0.25, 2.45, 3.3, 2.6, body, 13.5, INK, spacing=1.12)
+        add_text(s, x + 0.25, 1.8, 3.3, 0.5, title, 16, NAVY, True)
+        add_text(s, x + 0.25, 2.45, 3.3, 2.6, body, 12.2, INK, spacing=1.1)
     add_rect(s, 0.7, 5.7, 11.93, 0.85, NAVY, rounded=True)
     add_text(
         s,
@@ -265,8 +266,8 @@ def build():
         5.9,
         11.3,
         0.45,
-        "The gap is not the absence of law. It is the absence of a clear, trusted, local-language first step.",
-        18,
+        "A rider does not need a law degree. He needs to know what to do before 48 hours run out.",
+        17,
         WHITE,
         True,
         align=PP_ALIGN.CENTER,
@@ -274,17 +275,17 @@ def build():
     add_footer(
         s,
         3,
-        "Sources: Constitution of Uganda Art. 28 (ULII); WJP 2024; Judiciary of Uganda 2025; GSMA mobile-for-development research.",
+        "Sources: Constitution of Uganda Arts 23 & 28 (ULII); ULII false-imprisonment decisions; Uganda Police Force (Jul 2024); Business Focus (25 Jun 2021); ASF/New Vision (2026).",
     )
     set_notes(
         s,
-        "1:00 — Frame the gap as a bridge problem. We are not replacing courts or lawyers. We are making the first step intelligible. The Constitution already guarantees fair hearing; the Judiciary is working on backlog; GSMA shows USSD reaches people smartphones leave behind. LegalBridge sits between the person and those institutions.",
+        "1:00 — This is the demand for LegalBridge. The Constitution and courts are clear, but the practical pathway is not: ownership proof, no receipt, no date, bail procedures unknown. We are not accusing any individual of theft or replacing lawyers. We are closing the knowledge gap in the first 48 hours.",
     )
 
     # 4 — Solution
     s = new_slide(prs)
     add_bg(s, WHITE)
-    add_header(s, "One assistant. Three ways in. Verified sources.", "03 · The solution")
+    add_header(s, "The first step, in his language, on his phone.", "03 · The solution")
     add_image(s, "02-rights.png", 0.7, 1.45, 3.0, 1.95)
     add_image(s, "08-upload.png", 3.9, 1.45, 3.0, 1.95)
     add_image(s, "05-ask.png", 0.7, 3.65, 3.0, 1.95)
@@ -298,10 +299,10 @@ def build():
         4.8,
         3.6,
         [
-            "Know My Rights — rider and vendor guides in English and Luganda.",
-            "Ask —plain-language answers grounded in verified legal extracts.",
-            "Understand documents — photograph a notice and get a plain-language reading.",
-            "Speak or dial — Luganda voice, plus USSD *384*0# for any phone.",
+            "Know My Rights — what a stop, a seizure and the 48-hour rule actually mean.",
+            "Understand documents — read an EPS ticket or impound note in plain language.",
+            "Ask — “Can they keep my bike? What do I do tonight?” with sourced answers.",
+            "Speak or dial — Luganda voice and USSD on any phone, no data needed.",
         ],
         14,
         INK,
@@ -314,18 +315,18 @@ def build():
     add_footer(s, 4, "All screens captured from the live hosted LegalBridge web app on 25 Nov 2026.")
     set_notes(
         s,
-        "1:00 — Point at the screenshots and name the four capabilities. Emphasise that each answer carries a source link or a concrete next action. The QR code opens the live app for judges who want to try it after the session.",
+        "1:00 — Point at the screenshots and name the four capabilities. The key promise: a sourced answer and a practical next action, not a guess and not an invented phone number. Judges can scan the QR code to try it after the session.",
     )
 
     # 5 — Flow
     s = new_slide(prs)
     add_bg(s, OFFWHITE)
-    add_header(s, "From panic to a plan in four steps.", "04 · Demo flow")
+    add_header(s, "From roadside panic to a plan in four steps.", "04 · Demo flow")
     steps = [
-        ("1", "Choose your reality", "Rider or vendor entry point", "03-boda.png"),
-        ("2", "Read your rights", "Sourced guide, EN / LG", "02-rights.png"),
-        ("3", "Explain or ask", "Document or free-text question", "08-upload.png"),
-        ("4", "Get help", "Directory or USSD escalation", "07-legal-help.png"),
+        ("1", "He is stopped", "Bike taken, no date", "03-boda.png"),
+        ("2", "He checks rights", "48-hour rule, EN / LG", "02-rights.png"),
+        ("3", "He reads the paper", "EPS or impound note", "08-upload.png"),
+        ("4", "He finds help", "Legal aid or USSD", "07-legal-help.png"),
     ]
     for i, (num, title, sub, img) in enumerate(steps):
         x = 0.7 + i * 3.08
@@ -342,7 +343,7 @@ def build():
         6.53,
         11.4,
         0.28,
-        "Every answer points to a source or a next action — never an invented office or phone number.",
+        "Every answer points to a source or a next action — never an invented station, contact or bail figure.",
         13,
         WHITE,
         True,
@@ -351,7 +352,7 @@ def build():
     add_footer(s, 5, "Demo cue: open Know My Rights, switch English ↔ Luganda, upload a notice, then dial *384*0#.")
     set_notes(
         s,
-        "1:30 — This is the live demo slide. Start at Know My Rights, switch to Luganda, show a document upload, then ask a question. If time allows, show the USSD code on a phone. Keep returning to the phrase: sourced answer, practical next step.",
+        "1:30 — Live demo slide. Start at Know My Rights, switch to Luganda, show a document upload, then ask a question. If time allows, show the USSD code on a phone. Keep returning to: sourced answer, practical next step.",
     )
 
     # 6 — Trust
@@ -367,13 +368,13 @@ def build():
         5.2,
         3.6,
         [
-            "Rights guides authored in English and Luganda from published Ugandan legal materials.",
-            "Official-document manifest links each guide to its source.",
+            "Article 23 (48 hours) and Article 28 (fair hearing) cited from ULII.",
+            "Rider and vendor rights guides authored in English and Luganda from published Ugandan materials.",
+            "No invented police stations, bail amounts, contacts or legal claims.",
             "Runyankore, Acholi and Lugbara are honest drafts that fall back to English.",
-            "No invented district contacts, sections or legal claims.",
             "Every answer carries a “legal information, not legal advice” disclaimer.",
         ],
-        13.5,
+        13,
         INK,
         8,
     )
@@ -388,22 +389,22 @@ def build():
         [
             "English and Luganda are complete; other languages are clearly marked.",
             "Voice questions and spoken answers support Luganda users.",
-            "USSD *384*0# works on basic and feature phones.",
-            "GSMA: USSD needs no app, no mobile data and works across GSM networks.",
+            "USSD *384*0# works on basic and feature phones with no mobile data.",
+            "GSMA: USSD needs no app and works across GSM networks.",
             "Web, phone and USSD are one product, not three disconnected pilots.",
         ],
-        13.5,
+        13,
         INK,
         8,
     )
     add_footer(
         s,
         6,
-        "Sources: Constitution of Uganda Art. 28 (ULII); UN SDG 16.3.3; GSMA “Low Tech, High Impact” and USSD research.",
+        "Sources: Constitution of Uganda Arts 23 & 28 (ULII); GSMA “Low Tech, High Impact”; UN SDG 16.3.3 metadata.",
     )
     set_notes(
         s,
-        "0:45 — Judges often ask how we prevented hallucination. Our answer: guides are authored, sourced and reviewed; the AI explains those extracts rather than inventing law; unsupported languages fall back to English. GSMA evidence supports the USSD choice for feature-phone reach.",
+        "0:45 — Judges ask how we prevented hallucination. Our answer: the guides are authored, sourced and reviewed; the AI explains those extracts rather than inventing law; unsupported languages fall back to English; and we never name a station, contact or bail figure that we cannot source.",
     )
 
     # 7 — Impact / ask
@@ -415,7 +416,7 @@ def build():
 
     proofs = [
         ("WORKING PRODUCT", "Live web app and health-checked API; screenshots are real, not a Figma mock-up."),
-        ("EVIDENCE-LED CONTENT", "Verified source manifest, bilingual guides and visible disclaimers."),
+        ("EVIDENCE-LED", "48-hour rule, remand data and impound figures cited to ULII, UPF, WPB and ASF."),
         ("REACH BEYOND SMARTPHONES", "Web, Luganda voice and USSD for basic phones."),
     ]
     for i, (title, body) in enumerate(proofs):
@@ -432,7 +433,7 @@ def build():
         4.55,
         11.2,
         0.55,
-        "Time to first useful answer · % who complete a next step · language coverage · source-click rate · escalation to legal aid",
+        "Knowledge of the 48-hour rule · % who complete a next step · source-click rate · escalation to legal aid",
         14,
         WHITE,
     )
@@ -445,7 +446,7 @@ def build():
     add_text(s, 12.2, 7.05, 0.45, 0.25, "7", 9, RGBColor(180, 188, 202), align=PP_ALIGN.RIGHT)
     set_notes(
         s,
-        "0:45 — Close by separating proof from promise: the product is live and sourced; the outcomes are what a supervised pilot will measure. Ask for partnership with legal-aid organisations and the Uganda Human Rights Commission, then invite judges to scan the QR code. Reserve remaining time for questions.",
+        "0:45 — Separate proof from promise: the product is live and sourced; outcomes are what a supervised pilot will measure. Ask for partnership with legal-aid organisations and the Uganda Human Rights Commission, then invite judges to scan the QR. Reserve remaining time for questions.",
     )
 
     prs.save(OUT)

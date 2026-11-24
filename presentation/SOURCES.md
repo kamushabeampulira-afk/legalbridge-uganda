@@ -1,18 +1,29 @@
 # LegalBridge judge deck — sources
 
 Every factual claim in `LegalBridge_Judge_Deck.pptx` maps to a published source
-below. No district offices, section numbers, contact persons or legal claims were
+below. No district stations, bail figures, contact persons or legal claims were
 invented. Checked 25 Nov 2026.
 
-| Slide | Claim used | Source | URL |
-|---|---|---|---|
-| 2 | Uganda ranked **126 / 142** overall and **115 / 142** on civil justice, WJP Rule of Law Index 2024 | World Justice Project — Uganda 2024 country insights | https://worldjusticeproject.org/rule-of-law-index/country/2024/Uganda |
-| 2 | Same WJP ranking, with factor methodology (civil justice measures accessibility, affordability, delay, enforcement) | World Justice Project — Factors 2024, Uganda | https://worldjusticeproject.org/rule-of-law-index/factors/2024/Uganda |
-| 2 | Backlog fell from **26.3% (FY2023/24)** to **24.2% (FY2024/25)**, but **46,000+ cases** still pending | Judiciary of Uganda, “Judiciary Launches Digital Tool to Boost Efficiency, Transparency, and Accountability,” 17 Oct 2025 | https://judiciary.go.ug/data/news/1738/31609/Judiciary%20Launches%20Digital%20Tool%20to%20Boost%20Efficiency,%20Transparency,%20and%20Accountability.html |
-| 2, 3, 6 | SDG target **16.3**: equal access to justice for all; indicator **16.3.3** counts people who accessed formal or informal dispute resolution. Metadata lists lack of knowledge, advice, distance and cost as barriers | UN Statistics Division — SDG indicator 16.3.3 metadata (updated 2023-03-31) | https://unstats.un.org/sdgs/metadata/files/Metadata-16-03-03.pdf |
-| 3, 6 | Constitution of Uganda **Article 28**: right to a fair, speedy and public hearing before an independent court | Uganda Legal Information Institute (ULII), Constitution of the Republic of Uganda | https://ulii.org/akn/ug/act/statute/1995/constitution/eng@2023-12-31 |
-| 3, 6 | USSD works on basic and feature phones, needs no smartphone app or internet, and functions across GSM networks; nine in ten mobile-money transactions in Sub-Saharan Africa flow through USSD | GSMA Mobile for Development — “Low Tech, High Impact: USSD in the time of COVID-19” (17 Dec 2020, modified 7 Jan 2026) | https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/uncategorized/low-tech-high-impact-ussd-in-the-time-of-covid-19/ |
-| 6 | GSMA research on low-tech channels for the SDGs | GSMA — “Start-ups using USSD to tackle SDGs” | https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/wp-content/uploads/2018/05/Start-ups-using-USSD-to-tackle-SDGs.pdf |
+## Boda boda / pre-trial detention story (slides 1–3)
+
+| Claim used | Source | URL |
+|---|---|---|
+| **12,217 motorcycles** impounded nationwide in six days (7–12 Nov 2022); **10,167** express-penalty tickets; **2,050** motorcycles still pending at stations — figures given by Traffic Police spokesperson Faridah Nampiima | The Source, “12,217 Boda-bodas impounded country-wide during police crackdown,” 14 Nov 2022 (also Daily Monitor, 15 Nov 2022) | https://thesource.co.ug/national/12217-boda-bodas-impounded-country-wide-during-police-crackdown · https://www.monitor.co.ug/uganda/news/national/police-impound-more-than-12-000-boda-motorcycles-4020670 |
+| **787 riders** stopped in the week 7–13 Jul 2024 for riding without helmets/reflective jackets; police said operations would continue; unclaimed motorcycles with no case under inquiry were sitting at stations and owners were told to bring relevant documents | Uganda Police Force, “Traffic Police Urges Owners to Reclaim Impounded Motorcycles,” 15 Jul 2024 | https://upf.go.ug/traffic-police-urges-owners-to-reclaim-impounded-motorcycles/ |
+| Police position that motorcycles in custody are released to claimants on proof of ownership and after checking they are not linked to crime | Uganda Police Force official X post, Jul 2024 | https://x.com/PoliceUg/status/1813149997157736895 |
+| High Court ordered **UGX 225 million** compensation for an unlawful impoundment after the owner was never told why his vehicle was held and a 2013 release order was not honoured | Business Focus, “Gov't to Pay Shs 225m for Vehicle Illegally Impounded by Police,” 25 Jun 2021 | https://businessfocus.co.ug/govt-to-pay-shs-225m-for-vehicle-illegally-impounded-by-police/ |
+| **37,188** people in pre-trial/remand imprisonment in Aug 2026 = **44.9%** of Uganda's prison population; total population **82,734**; official capacity **23,437**; occupancy **353%** | World Prison Brief (Institute for Crime & Justice Policy Research, Birkbeck), Uganda country page, Aug 2026 data | https://prisonstudies.org/country/uganda |
+| **46.2%** of over 79,000 prisoners on pre-trial detention (= 36,498); **65%** of detainees interviewed spent more than six months on remand without trial; **10.3%** of interviewees were boda-boda riders before arrest; two-thirds knew about bail but only **7%** applied; **98%** of households lost income | New Vision, “Pre-trial detention taking heavy toll on families — study,” 29 Oct 2026, reporting the ASF / LASPNET study *Beyond the Cell: The Hidden Socio-Economic Costs of Pre-Trial Detention in Uganda* | https://newvision.co.ug/category/news/pre-trial-detention-taking-heavy-toll-on-fami-NV_243433_112026 |
+| Example of prolonged pre-trial detention of a rider: **David Kato**, 24, held at Kitalya for **4 years 11 months** without trial | Daily Monitor commentary, “Presumed guilty: Pre-trial detention crisis in Uganda” | https://monitor.co.ug/uganda/oped/commentary/presumed-guilty-pre-trial-detention-crisis-in-uganda-5184644 |
+| **Article 23**: a person must be brought to court within **48 hours** of arrest; **Article 28**: right to a fair, speedy and public hearing. ULII decisions record that detention beyond 48 hours is false imprisonment and the State is liable | Constitution of the Republic of Uganda (ULII) and ULII “Arrest and detention” case topic | https://ulii.org/akn/ug/act/statute/1995/constitution/eng@2023-12-31 · https://ulii.org/en/judgments/topics/67096/ |
+
+## Access-to-justice and inclusion context (slides 2, 6)
+
+| Claim used | Source | URL |
+|---|---|---|
+| Uganda ranked **126 / 142** overall and **115 / 142** on civil justice, WJP Rule of Law Index 2024 | World Justice Project — Uganda 2024 | https://worldjusticeproject.org/rule-of-law-index/country/2024/Uganda · https://worldjusticeproject.org/rule-of-law-index/factors/2024/Uganda |
+| SDG target **16.3** (equal access to justice) and indicator **16.3.3**; metadata lists lack of knowledge, advice, distance and cost as barriers | UN Statistics Division — SDG 16.3.3 metadata | https://unstats.un.org/sdgs/metadata/files/Metadata-16-03-03.pdf |
+| USSD works on basic and feature phones, needs no smartphone app or mobile data, and works across GSM networks | GSMA Mobile for Development — “Low Tech, High Impact: USSD in the time of COVID-19” | https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/uncategorized/low-tech-high-impact-ussd-in-the-time-of-covid-19/ |
 
 ## Product evidence (not external research)
 
@@ -27,7 +38,11 @@ invented. Checked 25 Nov 2026.
 
 ## Deliberate exclusions
 
+- **No daily national arrest figure is claimed.** No official published daily
+  count of boda boda arrests exists; the deck uses documented operations
+  (12,217 impounded in six days; 787 riders in one week) instead.
+- No accusation that any rider is a thief, and no invented police stations,
+  bail amounts, contact persons or case outcomes.
 - No claim that LegalBridge is a lawyer, a court, or a substitute for legal advice.
-- No invented legal-aid office names, phone numbers or coverage figures.
-- No claim of measured user outcomes; the deck states pilot metrics as future work.
-- No Figma images: all solution screenshots are from the live hosted product.
+- No measured user outcomes; pilot metrics are presented as future work.
+- No Figma images: all solution screenshots come from the live hosted product.
