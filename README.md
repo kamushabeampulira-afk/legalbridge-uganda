@@ -165,6 +165,14 @@ review them before release, especially legal wording.
 
 ---
 
+## Deployment
+
+The Django API can be deployed to Render with `render.yaml`. See
+`docs/RENDER.md` for the Blueprint steps, environment variables and mobile/USSD
+configuration. Do not commit `.env` files or API keys.
+
+---
+
 ## Demo Scenarios (Hack4Justice 2026)
 
 See `docs/DEMO.md` for the full walkthrough.

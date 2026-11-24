@@ -7,10 +7,13 @@ import type { Language } from '@/i18n/translations';
 import { Platform } from 'react-native';
 
 // ── Config ──────────────────────────────────────────────────────────────────
-// Change to your backend URL for device testing (use your machine's LAN IP)
-const BASE_URL = __DEV__
-  ? 'http://localhost:8000/api'
-  : 'https://api.legalbridgeug.org/api';
+// Set EXPO_PUBLIC_API_URL to point the app at a deployed backend.
+// For device testing on the same LAN, use your machine's IP instead.
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (__DEV__
+    ? 'http://localhost:8000/api'
+    : 'https://api.legalbridgeug.org/api');
 
 const TOKEN_KEY = 'lb_access_token';
 const REFRESH_KEY = 'lb_refresh_token';

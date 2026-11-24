@@ -5,7 +5,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from .health import healthz
+
 urlpatterns = [
+    # Deployment health check (no auth, no redirects — see settings_production)
+    path('healthz', healthz, name='healthz'),
+
     # Admin
     path('admin/', admin.site.urls),
 

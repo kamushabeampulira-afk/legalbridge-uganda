@@ -1,0 +1,123 @@
+# LegalBridge — Render Blueprint
+# Deploys the Django API from backend/Dockerfile, plus private Postgres and
+# Redis-compatible Key Value instances. No secrets are stored in this file.
+# See docs/RENDER.md for the dashboard steps.
+
+version: '1'
+
+services:
+  # Redis-compatible cache/session store. Internal access only.
+  - type: keyvalue
+    name: legalbridge-cache
+    region: frankfurt
+    plan: 256mb
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
+  # Django REST API. Docker is used because OCR/PDF processing needs system
+  # packages (tesseract-ocr, poppler-utils, libgl) installed in the image.
+  - type: web
+    name: legalbridge-api
+    runtime: docker
+    region: frankfurt
+    plan: 1c-2g
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /healthz
+    preDeployCommand: >-
+      python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput
+    dockerCommand: >-
+      sh -c "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000} --workers 3 --timeout 120"
+    # One-time seed of verified extracts and referrals after the first deploy.
+    # RAG indexing is deliberately manual; see docs/RENDER.md.
+    initialDeployHook: python manage.py seed_legal_data
+    disk:
+      name: legalbridge-app-data
+      mountPath: /app/data
+      sizeGB: 10
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings_production
+      - key: DJANGO_DEBUG
+        value: 'False'
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: legalbridgeug.org,api.legalbridgeug.org
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: https://legalbridgeug.org,https://api.legalbridgeug.org
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://legalbridgeug.org,http://localhost:8081,http://localhost:19006
+
+      - key: DB_ENGINE
+        value: postgresql
+      - key: DB_NAME
+        fromDatabase:
+          name: legalbridge-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: legalbridge-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: legalbridge-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: legalbridge-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: legalbridge-db
+          property: port
+
+      - key: REDIS_URL
+        fromService:
+          name: legalbridge-cache
+          type: keyvalue
+          property: connectionString
+
+      # Render's hostname is added to ALLOWED_HOSTS automatically by
+      # config/settings_production.py, so no hardcoded onrender.com URL here.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o
+      - key: AI_DEMO_MODE
+        value: 'False'
+
+      - key: TTS_PROVIDER
+        value: elevenlabs
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: STT_PROVIDER
+        value: openai_whisper
+
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: AT_SHORTCODE
+        value: '*384*0#'
+      - key: AT_ENVIRONMENT
+        value: sandbox
+
+      - key: CHROMA_PERSIST_DIR
+        value: /app/data/chroma_db
+      - key: CHROMA_COLLECTION_NAME
+        value: legalbridge_sources
+      - key: MEDIA_ROOT
+        value: /app/data/media
+      - key: MAX_UPLOAD_SIZE_MB
+        value: '10'
+
+databases:
+  - name: legalbridge-db
+    region: frankfurt
+    plan: 0.5c-1g
+    postgresMajorVersion: '15'
+    databaseName: legalbridge_db
+    user: legalbridge_user
+    ipAllowList: []
