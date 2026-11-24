@@ -13,7 +13,7 @@ from .prompts import (
     LEGAL_QUESTION_PROMPT,
     BODA_STOPPED_PROMPT,
     EVICTION_GUIDANCE_PROMPT,
-    UNCERTAINTY_RESPONSE,
+    uncertainty_response,
 )
 
 logger = logging.getLogger('legalbridge')
@@ -68,13 +68,13 @@ def _call_openai(system_prompt: str, user_message: str, language: str = 'en') ->
         raise
 
 
-def _format_retrieved_context(chunks: list) -> tuple[str, list, bool]:
+def _format_retrieved_context(chunks: list, language: str = 'en') -> tuple[str, list, bool]:
     """
     Format retrieved chunks into a prompt-ready string.
     Returns (formatted_context, sources_list, has_verified_sources).
     """
     if not chunks:
-        return UNCERTAINTY_RESPONSE, [], False
+        return uncertainty_response(language), [], False
 
     context_parts = []
     sources = []
@@ -107,7 +107,7 @@ def generate_document_explanation(document, language: str = 'en'):
     query = f"{document.doc_type} {document.extracted_text[:500]}"
 
     chunks = retrieve_relevant_chunks(query, subject_filter=subject, n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
 
     user_category_label = USER_CATEGORY_LABELS.get(document.user_category, 'person')
     system = SYSTEM_PROMPT.format(language=language)
@@ -120,14 +120,14 @@ def generate_document_explanation(document, language: str = 'en'):
     )
 
     if not has_sources:
-        raw_response = UNCERTAINTY_RESPONSE
+        raw_response = uncertainty_response(language)
         uncertainty_flag = True
     else:
         try:
             raw_response = _call_openai(system, prompt, language)
             uncertainty_flag = False
         except Exception:
-            raw_response = UNCERTAINTY_RESPONSE
+            raw_response = uncertainty_response(language)
             uncertainty_flag = True
 
     sections = _parse_response_sections(raw_response)
@@ -160,13 +160,13 @@ def answer_legal_question(question: str, user_category: str, language: str, user
 
     subject = _infer_subject_from_question(question, user_category)
     chunks = retrieve_relevant_chunks(question, subject_filter=subject, n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
 
     user_category_label = USER_CATEGORY_LABELS.get(user_category, 'person')
     system = SYSTEM_PROMPT.format(language=language)
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
         uncertainty_flag = True
     else:
         prompt = LEGAL_QUESTION_PROMPT.format(
@@ -178,7 +178,7 @@ def answer_legal_question(question: str, user_category: str, language: str, user
             response_text = _call_openai(system, prompt, language)
             uncertainty_flag = False
         except Exception:
-            response_text = UNCERTAINTY_RESPONSE
+            response_text = uncertainty_response(language)
             uncertainty_flag = True
 
     # Store the query (anonymised if no user)
@@ -209,7 +209,7 @@ def answer_boda_stopped(data: dict, language: str = 'en', user=None) -> dict:
     """Guided response for boda riders stopped by an officer."""
     query = f"traffic violation boda boda police stop Uganda rights {data.get('told_about', '')}"
     chunks = retrieve_relevant_chunks(query, subject_filter='traffic', n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
 
     system = SYSTEM_PROMPT.format(language=language)
     prompt = BODA_STOPPED_PROMPT.format(
@@ -222,14 +222,14 @@ def answer_boda_stopped(data: dict, language: str = 'en', user=None) -> dict:
     )
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
         uncertainty_flag = True
     else:
         try:
             response_text = _call_openai(system, prompt, language)
             uncertainty_flag = False
         except Exception:
-            response_text = UNCERTAINTY_RESPONSE
+            response_text = uncertainty_response(language)
             uncertainty_flag = True
 
     return {
@@ -245,7 +245,7 @@ def answer_eviction_guidance(data: dict, language: str = 'en', user=None) -> dic
     """Guided response for market vendor facing eviction."""
     query = f"eviction market vendor stall Uganda rights {data.get('reason_given', '')}"
     chunks = retrieve_relevant_chunks(query, subject_filter='markets', n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
 
     system = SYSTEM_PROMPT.format(language=language)
     prompt = EVICTION_GUIDANCE_PROMPT.format(
@@ -259,14 +259,14 @@ def answer_eviction_guidance(data: dict, language: str = 'en', user=None) -> dic
     )
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
         uncertainty_flag = True
     else:
         try:
             response_text = _call_openai(system, prompt, language)
             uncertainty_flag = False
         except Exception:
-            response_text = UNCERTAINTY_RESPONSE
+            response_text = uncertainty_response(language)
             uncertainty_flag = True
 
     return {

@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from config.languages import LANGUAGE_CODES, validated_language
 
 from .stt import transcribe_audio
 from .tts import synthesize_text
@@ -39,7 +40,14 @@ def transcribe_view(request):
             status=400
         )
 
-    language = request.data.get('language', request.user.preferred_language or 'en')
+    language, language_valid = validated_language(
+        request.data.get('language', request.user.preferred_language)
+    )
+    if not language_valid:
+        return Response(
+            {'error': f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'},
+            status=400,
+        )
 
     result = transcribe_audio(audio_file, language=language)
     return Response({
@@ -58,7 +66,14 @@ def synthesize_view(request):
     Returns: { audio_url }
     """
     text = request.data.get('text', '').strip()
-    language = request.data.get('language', request.user.preferred_language or 'en')
+    language, language_valid = validated_language(
+        request.data.get('language', request.user.preferred_language)
+    )
+    if not language_valid:
+        return Response(
+            {'error': f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'},
+            status=400,
+        )
 
     if not text:
         return Response({'error': 'Text is required.'}, status=400)

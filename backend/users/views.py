@@ -4,6 +4,8 @@ from django.utils import timezone
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from config.languages import LANGUAGE_CODES, is_supported_language
+
 from .serializers import UserRegistrationSerializer, UserProfileSerializer, OrganisationSerializer
 from .models import Organisation
 
@@ -55,8 +57,11 @@ def delete_account(request):
 @permission_classes([permissions.IsAuthenticated])
 def set_language(request):
     lang = request.data.get('language', 'en')
-    if lang not in ('en', 'lg'):
-        return Response({'error': 'Unsupported language. Use en or lg.'}, status=400)
+    if not is_supported_language(lang):
+        return Response(
+            {'error': f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'},
+            status=400,
+        )
     request.user.preferred_language = lang
     request.user.save(update_fields=['preferred_language'])
     return Response({'language': lang})

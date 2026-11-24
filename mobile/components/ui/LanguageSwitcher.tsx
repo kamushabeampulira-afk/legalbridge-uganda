@@ -1,29 +1,35 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useAppStore } from '@/store/useAppStore';
+import { LANGUAGES, getLanguageMeta } from '@/i18n/languages';
 import { Colors } from '@/constants/Colors';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 
 /**
- * Compact language toggle — shows current language and taps to switch.
- * Place in navigation header or settings screen.
+ * Compact language switcher — tap to cycle through supported languages.
+ * The full picker is available on the language screen and in Profile.
  */
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useAppStore();
+  const meta = getLanguageMeta(language);
 
-  const toggle = () => setLanguage(language === 'en' ? 'lg' : 'en');
+  const cycle = () => {
+    const index = LANGUAGES.findIndex((item) => item.code === language);
+    const next = LANGUAGES[(index + 1) % LANGUAGES.length];
+    setLanguage(next.code);
+  };
 
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={toggle}
+      onPress={cycle}
       activeOpacity={0.8}
-      accessibilityLabel={`Current language: ${language === 'en' ? 'English' : 'Luganda'}. Tap to switch.`}
+      accessibilityLabel={`Current language: ${meta.label}. Tap to change language.`}
       accessibilityRole="button"
     >
-      <Text style={styles.flag}>{language === 'en' ? '🇬🇧' : '🇺🇬'}</Text>
-      <Text style={styles.label}>{language === 'en' ? 'EN' : 'LG'}</Text>
+      <Text style={styles.flag}>{meta.emoji}</Text>
+      <Text style={styles.label}>{meta.shortCode}</Text>
     </TouchableOpacity>
   );
 }

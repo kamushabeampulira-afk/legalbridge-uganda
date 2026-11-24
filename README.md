@@ -13,8 +13,8 @@
 | Stopped by a traffic officer | Guided questions → structured rights information |
 | Received an eviction notice | Upload document or guided questions → explanation + next steps |
 | Cannot afford a lawyer | In-app legal aid directory + USSD for no-internet access |
-| Speaks Luganda, not comfortable typing | Voice recording → transcription → spoken AI answer |
-| Has a feature phone, no internet | Dial `*384*0#` → USSD menu in English or Luganda |
+| Speaks a local language, not comfortable typing | Voice recording → transcription → spoken AI answer |
+| Has a feature phone, no internet | Dial `*384*0#` → USSD menu in English, Luganda, Runyankore, Acholi or Lugbara |
 
 ---
 
@@ -48,7 +48,7 @@ legalbridge-informal/
 │   ├── components/ui/    Button, Card, SectionCard, DisclaimerBanner, etc.
 │   ├── constants/        Colors, Typography, Spacing (design system)
 │   ├── hooks/            useLanguage, useDocumentAnalysis, useAudioPlayer
-│   ├── i18n/             English + Luganda translations
+│   ├── i18n/             English, Luganda, Runyankore, Acholi + Lugbara translations
 │   ├── services/api.ts   All backend API calls (Axios + JWT)
 │   └── store/            Zustand global state (auth, language, user)
 │
@@ -152,6 +152,19 @@ LegalBridge enforces strict anti-hallucination rules in every AI prompt:
 
 ---
 
+## Languages
+
+Users can choose **English (`en`)**, **Luganda (`lg`)**, **Runyankore (`nyn`)**,
+**Acholi (`ach`)** or **Lugbara (`lgg`)** in the app or on USSD.
+
+The shared code list lives in `backend/config/languages.py` and
+`mobile/i18n/languages.ts`. Africa's Talking carries the USSD menus; it does
+not translate text. Runyankore, Acholi and Lugbara UI strings are first-pass
+drafts — keys not yet translated fall back to English. Have native speakers
+review them before release, especially legal wording.
+
+---
+
 ## Demo Scenarios (Hack4Justice 2026)
 
 See `docs/DEMO.md` for the full walkthrough.
@@ -163,7 +176,7 @@ Upload sample traffic notice → OCR → AI explanation citing Traffic & Road Sa
 Upload eviction notice → explanation citing Markets Act 2023 → guided scenario → legal aid referral
 
 **Demo 3 — USSD**  
-Africa's Talking simulator → `*384*0#` → English/Luganda menus → both user categories
+Africa's Talking simulator → `*384*0#` → five-language menus → both user categories
 
 ---
 
@@ -174,7 +187,7 @@ Africa's Talking simulator → `*384*0#` → English/Luganda menus → both user
 | Phone number auth (not email) | Most informal workers have a phone, not email |
 | RAG with ChromaDB | Prevents hallucination — AI only uses verified sources |
 | USSD as a separate channel | Feature phones, no internet — same backend services |
-| Luganda UI text; limited Luganda STT | Whisper has poor Luganda accuracy — honest limitation |
+| Five selectable languages; limited local-language STT | Whisper is reliable in English only — users see a warning and confirm the transcription |
 | Soft-delete documents | Users control their data; audit trail preserved |
 | Admin approval before RAG indexing | No unverified legal text reaches production AI |
 | UGX currency, admin-configurable prices | No hardcoded business logic |

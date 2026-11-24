@@ -4,8 +4,9 @@
  */
 import { create } from 'zustand';
 import { tokenStorage, authApi, userApi } from '@/services/api';
+import { normalizeLanguage, type Language } from '@/i18n/translations';
 
-export type Language = 'en' | 'lg';
+export type { Language } from '@/i18n/translations';
 export type UserType = 'boda_boda' | 'market_vendor' | 'general';
 
 export interface UserProfile {
@@ -50,7 +51,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         set({
           isAuthenticated: true,
           user: profile,
-          language: profile.preferred_language || 'en',
+          language: normalizeLanguage(profile.preferred_language),
           isLoading: false,
         });
       } else {
@@ -68,7 +69,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({
       isAuthenticated: true,
       user: profile,
-      language: profile.preferred_language || 'en',
+      language: normalizeLanguage(profile.preferred_language),
     });
   },
 
@@ -78,10 +79,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setLanguage: (lang: Language) => {
-    set({ language: lang });
+    const language = normalizeLanguage(lang);
+    set({ language });
     // Sync to backend if authenticated
     if (get().isAuthenticated) {
-      userApi.setLanguage(lang).catch(() => null);
+      userApi.setLanguage(language).catch(() => null);
     }
   },
 

@@ -18,7 +18,7 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
     """
     Convert text to speech. Returns the relative media path of the audio file,
     or None if synthesis fails.
-    language: 'en' | 'lg'
+    language: one of config.languages.LANGUAGE_CODES
     """
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     provider = settings.TTS_PROVIDER
@@ -64,7 +64,14 @@ def _synthesize_elevenlabs(text: str, language: str) -> str | None:
         logger.warning('ElevenLabs API key not configured. Skipping TTS.')
         return None
 
-    voice_id = settings.ELEVENLABS_VOICE_LG if language == 'lg' else settings.ELEVENLABS_VOICE_EN
+    voice_ids = {
+        'en': settings.ELEVENLABS_VOICE_EN,
+        'lg': settings.ELEVENLABS_VOICE_LG,
+        'nyn': settings.ELEVENLABS_VOICE_NYN,
+        'ach': settings.ELEVENLABS_VOICE_ACH,
+        'lgg': settings.ELEVENLABS_VOICE_LGG,
+    }
+    voice_id = voice_ids.get(language)
     if not voice_id:
         logger.warning(f'No ElevenLabs voice ID configured for language: {language}')
         return None

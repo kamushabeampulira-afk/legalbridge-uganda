@@ -106,6 +106,17 @@ def test_set_language(client, registered_user):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize('code', ['nyn', 'ach', 'lgg'])
+def test_set_additional_languages(client, registered_user, code):
+    client.force_authenticate(user=registered_user)
+    url = reverse('set_language')
+    response = client.post(url, {'language': code})
+    assert response.status_code == 200
+    registered_user.refresh_from_db()
+    assert registered_user.preferred_language == code
+
+
+@pytest.mark.django_db
 def test_set_invalid_language(client, registered_user):
     client.force_authenticate(user=registered_user)
     url = reverse('set_language')

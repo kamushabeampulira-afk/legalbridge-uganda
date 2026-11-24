@@ -155,15 +155,15 @@ Show the system:
 - Works on any phone with no internet
 - Same legal knowledge base as the mobile app
 - For full document analysis → app is required
-- English and Luganda support
+- Five languages: English, Luganda, Runyankore, Acholi, Lugbara
 - Session state tracked throughout
 
 ---
 
 ## Handling Demo Questions
 
-**"Can it really understand Luganda?"**
-> Voice recognition for Luganda has known limitations. For this version, Luganda support covers UI text and USSD menus. Voice STT uses Whisper which has limited Luganda accuracy — the app shows a warning and asks users to confirm the transcription. We recommend recorded human prompts as fallback.
+**"Can it really understand Luganda, Runyankore, Acholi or Lugbara?"**
+> Voice recognition for local languages has known limitations. For this version, local-language support covers UI text and USSD menus. Voice STT uses Whisper, which is reliable in English only — the app shows a warning and asks users to confirm the transcription. We recommend recorded human prompts as fallback. New-language translations are first-pass drafts pending native-speaker review.
 
 **"What if the AI makes up a law?"**
 > The system uses RAG — it only cites provisions from documents we have manually approved and indexed. If no relevant source is found, it displays: "I cannot verify the applicable legal provision..." rather than inventing an answer.

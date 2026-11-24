@@ -1,6 +1,8 @@
 """Documents serializers"""
 from rest_framework import serializers
 from django.conf import settings
+from config.languages import LANGUAGE_CODES, is_supported_language
+
 from .models import Document, DocumentAnalysis
 
 
@@ -9,6 +11,13 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         model = Document
         fields = ['id', 'file', 'original_filename', 'user_category', 'language']
         read_only_fields = ['id']
+
+    def validate_language(self, value):
+        if not is_supported_language(value):
+            raise serializers.ValidationError(
+                f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'
+            )
+        return value
 
     def validate_file(self, value):
         # Size check

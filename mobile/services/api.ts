@@ -3,6 +3,7 @@
  * All backend calls go through this module.
  */
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import type { Language } from '@/i18n/translations';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 // Change to your backend URL for device testing (use your machine's LAN IP)
@@ -112,7 +113,7 @@ export const authApi = {
     password_confirm: string;
     full_name?: string;
     user_type: string;
-    preferred_language: string;
+    preferred_language: Language;
     consented_to_processing: boolean;
   }) => {
     try {
@@ -144,11 +145,11 @@ export const userApi = {
     const res = await apiClient.get('/users/profile/');
     return res.data;
   },
-  updateProfile: async (data: { full_name?: string; preferred_language?: string }) => {
+  updateProfile: async (data: { full_name?: string; preferred_language?: Language }) => {
     const res = await apiClient.patch('/users/profile/', data);
     return res.data;
   },
-  setLanguage: async (language: 'en' | 'lg') => {
+  setLanguage: async (language: Language) => {
     const res = await apiClient.post('/users/language/', { language });
     return res.data;
   },
@@ -160,7 +161,7 @@ export const userApi = {
 
 // ── Documents ─────────────────────────────────────────────────────────────────
 export const documentsApi = {
-  upload: async (fileUri: string, fileName: string, mimeType: string, userCategory: string, language: string) => {
+  upload: async (fileUri: string, fileName: string, mimeType: string, userCategory: string, language: Language) => {
     const formData = new FormData();
     formData.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
     formData.append('user_category', userCategory);
@@ -175,7 +176,7 @@ export const documentsApi = {
     }
   },
 
-  analyze: async (documentId: string, language: string) => {
+  analyze: async (documentId: string, language: Language) => {
     try {
       const res = await apiClient.post(`/documents/${documentId}/analyze/`, { language });
       return res.data;
@@ -202,7 +203,7 @@ export const documentsApi = {
 
 // ── Legal ─────────────────────────────────────────────────────────────────────
 export const legalApi = {
-  ask: async (question: string, userCategory: string, language: string) => {
+  ask: async (question: string, userCategory: string, language: Language) => {
     try {
       const res = await apiClient.post('/legal/ask/', { question, user_category: userCategory, language });
       return res.data;
@@ -241,7 +242,7 @@ export const aiApi = {
 
 // ── Voice ─────────────────────────────────────────────────────────────────────
 export const voiceApi = {
-  transcribe: async (audioUri: string, language: string) => {
+  transcribe: async (audioUri: string, language: Language) => {
     const formData = new FormData();
     formData.append('audio', { uri: audioUri, name: 'recording.m4a', type: 'audio/m4a' } as any);
     formData.append('language', language);
@@ -256,7 +257,7 @@ export const voiceApi = {
     }
   },
 
-  synthesize: async (text: string, language: string) => {
+  synthesize: async (text: string, language: Language) => {
     try {
       const res = await apiClient.post('/voice/synthesize/', { text, language });
       return res.data;

@@ -1,6 +1,14 @@
 /**
- * LegalBridge — UI translations (English & Luganda).
+ * LegalBridge — UI translations.
  * Keep strings short and use plain language.
+ *
+ * Languages: en (English), lg (Luganda), nyn (Runyankore),
+ * ach (Acholi), lgg (Lugbara). Codes follow ISO 639-3 where no
+ * ISO 639-1 code exists.
+ *
+ * NOTE: nyn/ach/lgg overlays are first-pass drafts. Keys not listed there
+ * intentionally fall back to English via the spread. Have native speakers
+ * review and extend them before release.
  */
 export type TranslationKey = keyof typeof en;
 
@@ -24,6 +32,9 @@ const en = {
   selectLanguage: 'Choose Your Language',
   english: 'English',
   luganda: 'Luganda',
+  runyankore: 'Runyankore',
+  acholi: 'Acholi',
+  lugbara: 'Lugbara',
   changeLanguage: 'Change Language',
 
   // Home
@@ -35,6 +46,11 @@ const en = {
   home_voice: 'Speak to LegalBridge',
   home_findHelp: 'Find Legal Help',
   home_ussd: 'No internet? Dial',
+  home_boda_desc: 'Traffic notices, rights & legal info',
+  home_vendor_desc: 'Allocation slips, eviction notices & rights',
+  home_chooseSituation: 'Choose your situation',
+  home_quickActions: 'Quick actions',
+  disclaimer_short: 'LegalBridge provides legal information, not legal advice. For serious matters, consult a qualified lawyer.',
 
   // Auth
   login: 'Log In',
@@ -80,6 +96,14 @@ const en = {
   uncertaintyNotice: 'No verified legal source was found for this document. Please seek advice from a qualified legal professional.',
   disclaimer: 'This is legal information, not legal advice. For serious matters, consult a qualified lawyer.',
   askFollowUp: 'Ask a Follow-Up Question',
+  ask_headerSub: 'Ask any question about Ugandan law',
+  ask_inputPlaceholder: 'Type your legal question here...',
+  ask_voiceShortcut: 'Prefer to speak your question?',
+  ask_answerTitle: 'LegalBridge Answer',
+  ask_another: 'Ask Another Question',
+  ask_commonQuestions: 'Common questions',
+  ask_required: 'Please enter your question.',
+  ask_tooLong: 'Please keep your question under 2000 characters.',
 
   // Boda Boda
   boda_title: 'Boda Boda Rider',
@@ -93,6 +117,11 @@ const en = {
   boda_stopped_q3: 'Was a penalty or fine mentioned?',
   boda_stopped_q4: 'Were you given an official reference number?',
   boda_stopped_submit: 'Get Guidance',
+  boda_upload_desc: 'Photograph or upload a traffic notice',
+  boda_stopped_desc: 'Answer a few questions and get guidance',
+  boda_history_desc: 'View documents you have already uploaded',
+  boda_rights_desc: 'Ask about traffic law and your rights',
+  boda_info: 'Facing a traffic issue? Always request a written notice with a reference number.',
   yes: 'Yes',
   no: 'No',
   notSure: 'Not sure',
@@ -109,6 +138,11 @@ const en = {
   vendor_eviction_q3: 'Who gave you the eviction notice?',
   vendor_eviction_q4: 'Was a reason given?',
   vendor_eviction_q5: 'Were you given a deadline?',
+  vendor_upload_desc: 'Upload allocation slips, receipts, eviction notices',
+  vendor_eviction_desc: 'Answer a few questions and get practical guidance',
+  vendor_history_desc: 'View documents you have already uploaded',
+  vendor_rights_desc: 'Ask about market law and your rights',
+  vendor_info: 'Keep all your market documents safe: allocation slip, payment receipts, and any notices.',
 
   // Voice
   voice_title: 'Speak to LegalBridge',
@@ -117,6 +151,7 @@ const en = {
   voice_processing: 'Processing your voice...',
   voice_fallback: 'Voice recognition is unavailable. Please type your question.',
   voice_luganda_warning: 'Luganda voice recognition has limited accuracy. Please check the text before submitting.',
+  voice_accuracy_warning: 'Voice recognition has limited accuracy for this language. Please check the text before submitting.',
   voice_playback: 'Play Answer',
   voice_stop: 'Stop',
 
@@ -145,6 +180,7 @@ const en = {
   profile_deleteAccount: 'Delete My Account',
   profile_confirmDelete: 'Are you sure you want to delete your account? All your data will be removed.',
   profile_logout: 'Log Out',
+  profile_confirmLogout: 'Are you sure you want to log out?',
   profile_help: 'Help & Support',
   profile_version: 'Version',
 
@@ -188,6 +224,9 @@ const lg: typeof en = {
   selectLanguage: 'Londa Olulimi',
   english: 'Olungereza',
   luganda: 'Oluganda',
+  runyankore: 'Orunyankore',
+  acholi: 'Leb Acoli',
+  lugbara: 'Lugbarati',
   changeLanguage: 'Kyusa Olulimi',
 
   home_greeting: 'Nkuyambe ki leero?',
@@ -198,6 +237,11 @@ const lg: typeof en = {
   home_voice: 'Yogera ne LegalBridge',
   home_findHelp: 'Noonya Obuyambi',
   home_ussd: 'Tolina intaneti? Kuba',
+  home_boda_desc: 'Obubaka bw\'ekkubo n\'amateeka',
+  home_vendor_desc: 'Pepa ly\'okuweebwayo n\'amateeka',
+  home_chooseSituation: 'Londa embeera yo',
+  home_quickActions: 'Eby\'amangu',
+  disclaimer_short: 'LegalBridge ekuwa obubaka bw\'amateeka, si buqunzi. Ku nsonga enkulu, noonya looya.',
 
   login: 'Yingira',
   register: 'Tondawo Akawunti',
@@ -240,6 +284,14 @@ const lg: typeof en = {
   uncertaintyNotice: 'Tetusobola kukakasa amateeka agekwata ku mpapula eno. Noonya obuyambi obuva eri looya awungeddwa.',
   disclaimer: 'Kino kya bulimba bw\'amateeka, si buqunzi bw\'amateeka. Ku by\'okukaawa, noonya looya awungeddwa.',
   askFollowUp: 'Buuza Ekibuuzo Ekirala',
+  ask_headerSub: 'Buuza ku mateeka ga Uganda',
+  ask_inputPlaceholder: 'Wandiika ekibuuzo kyo wano...',
+  ask_voiceShortcut: 'Yogera ekibuuzo kyo',
+  ask_answerTitle: 'Okusubiza kwa LegalBridge',
+  ask_another: 'Buuza Ekibuuzo Ekirala',
+  ask_commonQuestions: 'Ebibuuzo ebitera',
+  ask_required: 'Wandiika ekibuuzo kyo.',
+  ask_tooLong: 'Ekibuuzo kyo kiri wansi wa 2000.',
 
   boda_title: 'Omuvuzi wa Boda Boda',
   boda_subtitle: 'Obubaka bw\'ekkubo, eddembe, n\'amateeka',
@@ -252,6 +304,11 @@ const lg: typeof en = {
   boda_stopped_q3: 'Baakugamba sente z\'okuliipirwa?',
   boda_stopped_q4: 'Baakuwa namba ya ndagamuntu?',
   boda_stopped_submit: 'Noonya Obuyambi',
+  boda_upload_desc: 'Isa obubaka bw\'ekkubo',
+  boda_stopped_desc: 'Noonya obuyambi ng\'okuggwa',
+  boda_history_desc: 'Laba empapula z\'edda',
+  boda_rights_desc: 'Buuza ku amateeka g\'ekkubo',
+  boda_info: 'Obuzibu obw\'ekkubo? Noonya obuyambi obuva eri looya awungeddwa.',
   yes: 'Yee',
   no: 'Nedda',
   notSure: 'Sigenda',
@@ -267,6 +324,11 @@ const lg: typeof en = {
   vendor_eviction_q3: 'Ani yakuwa obubaka bw\'okufulumizibwa?',
   vendor_eviction_q4: 'Baakubuulira ensonga?',
   vendor_eviction_q5: 'Baakuwa olunaku olw\'okufuluka?',
+  vendor_upload_desc: 'Isa empapula zo',
+  vendor_eviction_desc: 'Noonya obuyambi ku ngufu y\'okufuluka',
+  vendor_history_desc: 'Laba empapula z\'edda',
+  vendor_rights_desc: 'Buuza ku amateeka g\'akatale',
+  vendor_info: 'Kubika empapula zonna ez\'akatale lyo: pepa ly\'okuweebwayo, resiti, n\'obubaka.',
 
   voice_title: 'Yogera ne LegalBridge',
   voice_instruction: 'Nyiga era wekuume ekitandisi okuwandiika ekibuuzo kyo.',
@@ -274,6 +336,7 @@ const lg: typeof en = {
   voice_processing: 'Tuwulira amazina go...',
   voice_fallback: 'Okuwulira amazina kuleme. Wandiika ekibuuzo kyo.',
   voice_luganda_warning: 'Okuwulira amazina g\'Oluganda kulina obunene obunene. Kebera amazina nga watandika.',
+  voice_accuracy_warning: 'Okuwulira amazina mu lulimi luno kulina obunye mu butuufu. Kebera amazina nga watandika.',
   voice_playback: 'Wulira Okusubiza',
   voice_stop: 'Yimirira',
 
@@ -299,6 +362,7 @@ const lg: typeof en = {
   profile_deleteAccount: 'Sazaawo Akawunti Yange',
   profile_confirmDelete: 'Oli wa kusunga okusazaawo akawunti yo? Amawulire gona gasazaawako.',
   profile_logout: 'Fuluma',
+  profile_confirmLogout: 'Ofuna okufuluma?',
   profile_help: 'Obuyambi n\'Enyigiriza',
   profile_version: 'Ebika',
 
@@ -323,8 +387,183 @@ const lg: typeof en = {
   search: 'Noonya',
 };
 
-export const translations = { en, lg };
+/* Runyankore (Orunyankore) — first-pass draft, native-speaker review needed. */
+const nyn: typeof en = {
+  ...en,
+  tagline: 'Obwenkanya Bwaho',
+  onboarding_title_1: 'Tegeera Empapula Zaawe',
+  onboarding_body_1: 'Tweka empapula yoona, otunge obubaka mu rurimi rw\'omuntu.',
+  onboarding_title_2: 'Manya Ekitiibwa Kyawe',
+  onboarding_body_2: 'Laba amateeka ga Uganda agakwata ku nsonga yaawe.',
+  onboarding_title_3: 'Londa Eky\'okukora',
+  onboarding_body_3: 'Kubwa eby\'okukora, osobola okunoonya obuyambi bw\'amateeka.',
+  onboarding_skip: 'Salawo',
+  onboarding_next: 'Genda',
+  onboarding_getStarted: 'Tandika',
 
-export function t(key: TranslationKey, lang: 'en' | 'lg' = 'en'): string {
-  return translations[lang][key] ?? translations['en'][key] ?? key;
+  selectLanguage: 'Londa Orurimi Rwawe',
+  english: 'Olungereza',
+  luganda: 'Oluganda',
+  runyankore: 'Orunyankore',
+  acholi: 'Leb Acoli',
+  lugbara: 'Olugbara',
+  changeLanguage: 'Hindura Orurimi',
+
+  home_greeting: 'Nkuyambe ki leero?',
+  home_boda: 'Omuvuzi wa Boda Boda',
+  home_vendor: 'Omusuubuzi wa Akatale',
+  home_askLegal: 'Buuza LegalBridge',
+  home_upload: 'Tweka Empapula',
+  home_voice: 'Yogera ne LegalBridge',
+  home_findHelp: 'Noonya Obuyambi',
+  home_ussd: 'Tolina intaneti? Kuba',
+
+  login: 'Yingira',
+  register: 'Tonda Akawunti',
+  phoneNumber: 'Namba ya Simu',
+  password: 'Pasuwaadi',
+  confirmPassword: 'Kakasa Pasuwaadi',
+  fullName: 'Erinnya Lyawe Lyona (si kyeetaagibwa)',
+  iAmA: 'Ndi...',
+  bodaBodaRider: 'Omuvuzi wa Boda Boda',
+  marketVendor: 'Omusuubuzi wa Akatale',
+  generalUser: 'Omukozesa Wenna',
+
+  uploadDocument: 'Tweka Empapula',
+  takePhoto: 'Tendereza Kifaananyi',
+  chooseFile: 'Londa Fayiro',
+  chooseGallery: 'Londa mu Galale',
+  supportedFormats: 'Bikikirwa: JPG, PNG, PDF (okukiika 10 MB)',
+  uploading: 'Tweka...',
+  processing: 'Soma empapula yaawe...',
+  analyzing: 'LegalBridge etunuulira...',
+  uploadSuccess: 'Empapula etwekiddwa',
+  removeDocument: 'Ggyaho',
+  submitForAnalysis: 'Noonya Obubaka',
+
+  analysisTitle: 'Empapula Yaawe Etegeeddwa',
+  section_summary: 'Empapula Yaawe Egamba Ki',
+  section_meaning: 'Kino Kisobola Kutegeza Ki',
+  section_law: 'Amateeka ga Uganda Agekwata',
+  section_check: 'Ebikulu Eby\'okureberaho',
+  section_missing: 'Ebibula mu Empapula',
+  section_steps: 'Eby\'okukora Eby\'omubeera',
+  section_help: 'Noonya Obuyambi Wano',
+  section_sources: 'Ensibuko z\'Amateeka',
+  listenToExplanation: 'Wulira Okutegeezebwa',
+
+  boda_title: 'Omuvuzi wa Boda Boda',
+  vendor_title: 'Omusuubuzi wa Akatale',
+  yes: 'Yego',
+  no: 'Ngaaha',
+  notSure: 'Simanyi',
+
+  voice_title: 'Yogera ne LegalBridge',
+  voice_instruction: 'Nyiga okuwekuuta ekibuto, owandiika ekibuuzo kyawe.',
+  voice_recording: 'Wandiika... Leka.',
+  voice_processing: 'Tuwulira amazina gaawe...',
+  voice_fallback: 'Okuwulira amazina tikiri. Wandiika ekibuuzo kyawe.',
+  voice_accuracy_warning: 'Okuwulira amazina mu rurimi runo kulina obunye mu butuufu. Kebera ebiwandiikiddwa.',
+  voice_playback: 'Wulira Okusubiza',
+  voice_stop: 'Yimirira',
+
+  legalHelp_title: 'Noonya Obuyambi bw\'Amateeka',
+  legalHelp_free: 'Omulimu gwa Bwereere',
+  legalHelp_paid: 'Omulimu gw\'Amafaranga',
+  legalHelp_contact: 'Kwatana',
+  legalHelp_website: 'Weebisaiti',
+  history_title: 'Empapula Zange',
+  history_empty: 'Towezeeyo mpapula.',
+
+  profile_title: 'Profile n\'Enteekateeka',
+  profile_language: 'Orurimi',
+  ussd_title: 'Tolina Intaneti? Kozesa USSD',
+  ussd_body: 'Kuba ku simu yonna — simu n\'intaneti si kyeetaagibwa.',
+
+  submit: 'Tuma',
+  cancel: 'Sazaawo',
+  back: 'Odda',
+  next: 'Genda',
+  done: 'Waaho',
+  loading: 'Linda...',
+  error_generic: 'Waliwo ekisooka. Gezaako nate.',
+  error_network: 'Tolina intaneti. Kebera omuyiriko gwo.',
+  retry: 'Gezaako Nate',
+  close: 'Ggalawo',
+  required: 'Kyeetaagibwa',
+  optional: 'Sikyeetaagibwa',
+  search: 'Noonya',
+};
+
+/* Acholi (Leb Acoli) — first-pass draft, native-speaker review needed. */
+const ach: typeof en = {
+  ...en,
+  selectLanguage: 'Ywal Leb',
+  english: 'Leb Engereza',
+  luganda: 'Leb Luganda',
+  runyankore: 'Leb Runyankore',
+  acholi: 'Leb Acoli',
+  lugbara: 'Leb Lugbara',
+  changeLanguage: 'Ywal Leb Manyo',
+
+  home_greeting: 'Ikwom maber?',
+  yes: 'Ee',
+  no: 'Pe',
+  notSure: 'Pe angye',
+
+  submit: 'Ket',
+  cancel: 'Kwero',
+  back: 'Dok',
+  next: 'Oc',
+  done: 'Cek',
+  loading: 'Yengo...',
+  retry: 'Tem doki',
+  close: 'Cek',
+  search: 'Ywal',
+};
+
+/* Lugbara (Lugbarati) — first-pass draft, native-speaker review needed. */
+const lgg: typeof en = {
+  ...en,
+  selectLanguage: 'Londa Olulimi',
+  english: 'Olungereza',
+  luganda: 'Oluganda',
+  runyankore: 'Orunyankore',
+  acholi: 'Leb Acoli',
+  lugbara: 'Lugbarati',
+  changeLanguage: 'Hinduka Olulimi',
+
+  home_greeting: 'Mi ngoni?',
+  yes: 'Ada',
+  no: 'Inzo',
+  notSure: 'Ma adu ku',
+
+  submit: 'Tuma',
+  cancel: 'Sazaawo',
+  back: 'Dok',
+  next: 'Oc',
+  done: 'Cek',
+  loading: 'Linda...',
+  retry: 'Tem doki',
+  close: 'Cek',
+  search: 'Noonya',
+};
+
+export const translations = { en, lg, nyn, ach, lgg };
+
+export type Language = keyof typeof translations;
+
+export const SUPPORTED_LANGUAGES: Language[] = ['en', 'lg', 'nyn', 'ach', 'lgg'];
+
+export function isSupportedLanguage(value: unknown): value is Language {
+  return typeof value === 'string' && SUPPORTED_LANGUAGES.includes(value as Language);
+}
+
+export function normalizeLanguage(value: unknown): Language {
+  return isSupportedLanguage(value) ? value : 'en';
+}
+
+export function t(key: TranslationKey, lang: Language = 'en'): string {
+  const dictionary = translations[lang] ?? translations.en;
+  return dictionary[key] ?? translations.en[key] ?? key;
 }

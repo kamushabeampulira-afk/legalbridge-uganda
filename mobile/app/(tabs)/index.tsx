@@ -23,8 +23,7 @@ const PRIMARY_PATHS = [
     color: Colors.primaryDeepPurple,
     emoji: '🏍️',
     titleKey: 'home_boda' as const,
-    desc_en: 'Traffic notices, rights & legal info',
-    desc_lg: 'Obubaka bw\'ekkubo n\'amateeka',
+    descKey: 'home_boda_desc' as const,
   },
   {
     id: 'vendor',
@@ -33,8 +32,7 @@ const PRIMARY_PATHS = [
     color: Colors.secondaryGold,
     emoji: '🏪',
     titleKey: 'home_vendor' as const,
-    desc_en: 'Allocation slips, eviction notices & rights',
-    desc_lg: 'Pepa ly\'okuweebwayo n\'amateeka',
+    descKey: 'home_vendor_desc' as const,
   },
 ];
 
@@ -90,7 +88,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Primary pathways */}
-      <Text style={styles.sectionLabel}>Choose your situation</Text>
+      <Text style={styles.sectionLabel}>{t('home_chooseSituation', language)}</Text>
       <View style={styles.primaryRow}>
         {PRIMARY_PATHS.map((p) => (
           <TouchableOpacity
@@ -103,9 +101,7 @@ export default function HomeScreen() {
           >
             <Text style={styles.primaryEmoji}>{p.emoji}</Text>
             <Text style={styles.primaryTitle}>{t(p.titleKey, language)}</Text>
-            <Text style={styles.primaryDesc}>
-              {language === 'lg' ? p.desc_lg : p.desc_en}
-            </Text>
+            <Text style={styles.primaryDesc}>{t(p.descKey, language)}</Text>
             <View style={styles.primaryArrow}>
               <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.8)" />
             </View>
@@ -114,7 +110,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Quick actions */}
-      <Text style={styles.sectionLabel}>Quick actions</Text>
+      <Text style={styles.sectionLabel}>{t('home_quickActions', language)}</Text>
       <View style={styles.actionsGrid}>
         {QUICK_ACTIONS.map((a) => (
           <TouchableOpacity
@@ -153,10 +149,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Disclaimer */}
-      <Text style={styles.disclaimer}>
-        LegalBridge provides legal information, not legal advice.
-        For serious matters, consult a qualified lawyer.
-      </Text>
+      <Text style={styles.disclaimer}>{t('disclaimer_short', language)}</Text>
     </ScrollView>
   );
 }

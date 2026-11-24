@@ -40,7 +40,7 @@ const slides = [
     id: '4',
     icon: 'mic' as const,
     title: 'Speak or Type',
-    body: 'Ask questions by voice or text in English or Luganda. No internet? Dial our USSD service from any phone.',
+    body: 'Ask questions by voice or text in your chosen language. No internet? Dial our USSD service from any phone.',
     color: Colors.primaryDeepPurpleLight,
   },
 ];

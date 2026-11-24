@@ -212,6 +212,9 @@ TTS_PROVIDER = env('TTS_PROVIDER', default='openai')
 ELEVENLABS_API_KEY = env('ELEVENLABS_API_KEY', default='')
 ELEVENLABS_VOICE_EN = env('ELEVENLABS_VOICE_EN', default='')
 ELEVENLABS_VOICE_LG = env('ELEVENLABS_VOICE_LG', default='')
+ELEVENLABS_VOICE_NYN = env('ELEVENLABS_VOICE_NYN', default='')
+ELEVENLABS_VOICE_ACH = env('ELEVENLABS_VOICE_ACH', default='')
+ELEVENLABS_VOICE_LGG = env('ELEVENLABS_VOICE_LGG', default='')
 STT_PROVIDER = env('STT_PROVIDER', default='openai_whisper')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -16,6 +16,7 @@ import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
+import { getLanguageMeta } from '@/i18n/languages';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import SectionCard from '@/components/ui/SectionCard';
@@ -165,15 +166,15 @@ export default function VoiceScreen() {
         <Ionicons name="mic" size={28} color={Colors.textOnPrimary} />
         <View>
           <Text style={styles.headerTitle}>{t('voice_title', language)}</Text>
-          <Text style={styles.headerSub}>English & Luganda</Text>
+          <Text style={styles.headerSub}>{getLanguageMeta(language).nativeName}</Text>
         </View>
       </View>
 
-      {/* Luganda warning */}
-      {language === 'lg' && (
+      {/* Speech accuracy warning for languages without reliable STT support */}
+      {!getLanguageMeta(language).voiceReliable && (
         <View style={styles.warningBox}>
           <Ionicons name="warning" size={16} color={Colors.warningMutedCoral} />
-          <Text style={styles.warningText}>{t('voice_luganda_warning', language)}</Text>
+          <Text style={styles.warningText}>{t('voice_accuracy_warning', language)}</Text>
         </View>
       )}
 

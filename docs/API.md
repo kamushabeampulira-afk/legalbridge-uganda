@@ -60,6 +60,9 @@ Update profile fields (full_name, preferred_language).
 ```json
 { "language": "lg" }
 ```
+Allowed codes: `en` (English), `lg` (Luganda), `nyn` (Runyankore),
+`ach` (Acholi), `lgg` (Lugbara). The same codes are accepted by document
+analysis, legal questions, AI scenarios and voice endpoints.
 
 ### DELETE /users/delete/
 Soft-deletes the authenticated user's account.

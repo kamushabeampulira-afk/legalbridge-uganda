@@ -12,7 +12,7 @@ import { aiApi } from '@/services/api';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type Language } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 import Button from '@/components/ui/Button';
 import SectionCard from '@/components/ui/SectionCard';
@@ -24,7 +24,7 @@ type YesNo = 'yes' | 'no' | 'not_sure' | null;
 
 const YesNoSelector = ({
   value, onChange, language,
-}: { value: YesNo; onChange: (v: YesNo) => void; language: 'en' | 'lg' }) => (
+}: { value: YesNo; onChange: (v: YesNo) => void; language: Language }) => (
   <View style={yesNoStyles.row}>
     {(['yes', 'no', 'not_sure'] as YesNo[]).map((opt) => (
       <TouchableOpacity
