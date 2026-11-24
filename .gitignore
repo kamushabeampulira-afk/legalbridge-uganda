@@ -1,0 +1,77 @@
+# Environment
+.env
+*.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# ChromaDB
+chroma_db/
+
+# Node / React Native
+node_modules/
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+npm-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets
+*.pem
+*.key
+secrets/
+
+# Legal source PDFs (add your own, don't commit copyrighted material)
+legal_sources/raw/
+
+# Cloudflare executable
+cloudflared.exe
+
+# Cloudflare executable
+cloudflared.exe
+
+# Cloudflare executable
+cloudflared.exe
+
+# Cloudflare executable
+cloudflared.exe

@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: legalbridge_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: legalbridge_db
+      POSTGRES_USER: legalbridge_user
+      POSTGRES_PASSWORD: changeme
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U legalbridge_user -d legalbridge_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis (USSD session cache) ──────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: legalbridge_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: legalbridge_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    volumes:
+      - ./backend:/app
+      - media_files:/app/media
+      - chroma_data:/app/chroma_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py seed_legal_data &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"
+
+volumes:
+  postgres_data:
+  media_files:
+  chroma_data:
