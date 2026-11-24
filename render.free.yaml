@@ -42,7 +42,7 @@ services:
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
         value: https://legalbridgeug.org,https://api.legalbridgeug.org
       - key: CORS_ALLOWED_ORIGINS
-        value: https://legalbridgeug.org,http://localhost:8081,http://localhost:19006
+        value: https://legalbridgeug.org,https://legalbridge-app-free.onrender.com,http://localhost:8081,http://localhost:19006
 
       - key: DB_ENGINE
         value: postgresql
@@ -115,6 +115,20 @@ services:
         value: /app/media
       - key: MAX_UPLOAD_SIZE_MB
         value: '10'
+
+  - type: static
+    name: legalbridge-app-free
+    runtime: static
+    region: frankfurt
+    plan: free
+    rootDir: mobile
+    buildCommand: npm ci && npx expo export --platform web
+    publishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: '20'
+      - key: EXPO_PUBLIC_API_URL
+        value: https://legalbridge-api-free.onrender.com/api
 
 databases:
   - name: legalbridge-db-free
