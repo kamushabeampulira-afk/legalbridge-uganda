@@ -7,13 +7,13 @@ steps that require your accounts, keys, and confirmation.
 
 | # | Tap / open | What to copy |
 |---|------------|--------------|
-| 1 | <https://aistudio.google.com/apikey> | Gemini API key — paste into `OPENAI_API_KEY` |
-| 2 | <https://ai.google.dev/gemini-api/docs/models> | A current Gemini **Flash** model name — paste into `OPENAI_MODEL` |
+| 1 | <https://console.groq.com/keys> | Groq API key — paste into `OPENAI_API_KEY` |
+| 2 | <https://console.groq.com/docs/models> | Model ID is already set in the Blueprint (`openai/gpt-oss-20b`); no paste needed |
 | 3 | <https://api.sunbird.ai/register> then <https://api.sunbird.ai/keys> | Sunbird token — paste into `SUNBIRD_API_TOKEN` |
 | 4 | <https://account.africastalking.com/> | Sandbox username + API key — paste into `AT_USERNAME` and `AT_API_KEY` |
 
-> Rotate the OpenAI key that was previously pasted into chat. Do not paste any
-> real key into Git, `render.yaml`, or `render.free.yaml`.
+> Rotate the Groq, Sunbird, and OpenAI keys that were previously pasted into
+> chat. Do not paste any real key into Git, `render.yaml`, or `render.free.yaml`.
 
 ## 2. Create the free Render deployment
 
@@ -30,8 +30,8 @@ steps that require your accounts, keys, and confirmation.
 
    | Prompt | Value |
    |--------|-------|
-   | `OPENAI_API_KEY` | Gemini API key from step 1 |
-   | `OPENAI_MODEL` | Current Gemini Flash model from step 2 |
+   | `OPENAI_API_KEY` | Groq API key from step 1 |
+   | `OPENAI_MODEL` | Filled automatically by the Blueprint; leave it as-is |
    | `SUNBIRD_API_TOKEN` | Sunbird token from step 3 |
    | `AT_USERNAME` | `sandbox` |
    | `AT_API_KEY` | Africa's Talking sandbox key |

@@ -51,8 +51,8 @@ To deploy the free demo:
 
    | Prompted key | Suggested free value |
    |--------------|----------------------|
-   | `OPENAI_API_KEY` | Gemini API key from <https://aistudio.google.com/apikey> |
-   | `OPENAI_MODEL` | A current Gemini Flash model name (check locally with `python manage.py check_ai_services`) |
+   | `OPENAI_API_KEY` | Groq API key from <https://console.groq.com/keys> |
+   | `OPENAI_MODEL` | Set in the Blueprint to `openai/gpt-oss-20b` (official Groq model ID) |
    | `SUNBIRD_API_TOKEN` | Free Sunbird token from <https://api.sunbird.ai/register> |
    | `AT_USERNAME` / `AT_API_KEY` | Sandbox Africa's Talking credentials |
 
@@ -60,9 +60,10 @@ To deploy the free demo:
    extracts once, rebuilds the ChromaDB index if empty, then starts Gunicorn.
 4. Verify `https://<your-free-host>/healthz` returns `ok`.
 
-The free Blueprint uses Gemini's OpenAI-compatible endpoint for chat and
-Sunbird for Luganda speech, so it does not need a paid OpenAI or ElevenLabs
-account. Actual model availability is still controlled by those providers.
+The free Blueprint uses Groq's OpenAI-compatible endpoint for chat and Sunbird
+for Luganda speech, so it does not need a paid OpenAI or ElevenLabs account.
+Actual model availability is still controlled by those providers; see
+<https://console.groq.com/docs/models> for the current model list.
 
 ## 1. Prepare the repository
 

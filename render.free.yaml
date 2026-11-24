@@ -78,15 +78,15 @@ services:
           type: keyvalue
           property: connectionString
 
-      # Gemini's free OpenAI-compatible endpoint keeps AI costs at zero.
-      # Use a current Flash model name from https://aistudio.google.com/apikey
-      # (or run `python manage.py check_ai_services` locally to find one).
+      # Groq's free OpenAI-compatible endpoint keeps AI costs at zero.
+      # Model ID is from the official Groq model list:
+      # https://console.groq.com/docs/models
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_BASE_URL
-        value: https://generativelanguage.googleapis.com/v1beta/openai/
+        value: https://api.groq.com/openai/v1
       - key: OPENAI_MODEL
-        sync: false
+        value: openai/gpt-oss-20b
       - key: OPENAI_REASONING_EFFORT
         value: low
       - key: OPENAI_EXTRA_MAX_TOKENS
