@@ -1,10 +1,10 @@
 /**
  * Voice interaction screen — record question, receive spoken answer.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Alert, Animated,
+  View, Text, TextInput, StyleSheet, ScrollView,
+  TouchableOpacity, Alert, Animated, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Audio } from 'expo-av';
@@ -21,6 +21,40 @@ import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import SectionCard from '@/components/ui/SectionCard';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
+// ── Browser-native TTS (web only, no API key or voice ID required) ───────────
+function speakWithBrowser(text: string, lang: 'en' | 'lg'): boolean {
+  if (Platform.OS !== 'web') return false;
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+  window.speechSynthesis.cancel();
+  const utter = new (window as any).SpeechSynthesisUtterance(text);
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer a Luganda voice; Swahili is the closest common fallback on browsers.
+  const preferred = lang === 'lg'
+    ? voices.find((v: any) => v.lang.toLowerCase().startsWith('lg'))
+      ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('sw'))
+    : voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
+  if (preferred) utter.voice = preferred;
+  utter.lang = lang === 'lg' ? 'lg-LG' : 'en-GB';
+  utter.rate = 0.88;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+  return true;
+}
+
+function stopBrowserSpeech() {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function isBrowserSpeaking(): boolean {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    return window.speechSynthesis.speaking;
+  }
+  return false;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 type State = 'idle' | 'recording' | 'processing' | 'transcribed' | 'answered';
 
 export default function VoiceScreen() {
@@ -35,6 +69,7 @@ export default function VoiceScreen() {
   const [playingAudio, setPlayingAudio] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const speechPoll = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Recording ─────────────────────────────────────────────────────────────
 
@@ -87,6 +122,67 @@ export default function VoiceScreen() {
     }
   };
 
+  // ── Answer playback ────────────────────────────────────────────────────────
+  const clearSpeechPoll = () => {
+    if (speechPoll.current) {
+      clearInterval(speechPoll.current);
+      speechPoll.current = null;
+    }
+  };
+
+  const stopAudio = async () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
+    await sound?.stopAsync();
+    setPlayingAudio(false);
+  };
+
+  const playAnswer = async (answerText?: string) => {
+    const text = (answerText ?? result?.answer ?? '').slice(0, 800);
+    if (!text) return;
+
+    await stopAudio();
+
+    // Web: browser speech synthesis works without any API key or Luganda voice ID.
+    if (Platform.OS === 'web' && speakWithBrowser(text, language)) {
+      setPlayingAudio(true);
+      speechPoll.current = setInterval(() => {
+        if (!isBrowserSpeaking()) {
+          clearSpeechPoll();
+          setPlayingAudio(false);
+        }
+      }, 500);
+      return;
+    }
+
+    // Native: backend TTS (needs a configured provider and key).
+    try {
+      const audioRes = await voiceApi.synthesize(text, language);
+      if (audioRes.audio_url) {
+        const { sound: s } = await Audio.Sound.createAsync({ uri: audioRes.audio_url });
+        setSound(s);
+        setPlayingAudio(true);
+        await s.playAsync();
+        s.setOnPlaybackStatusUpdate((status) => {
+          if (!status.isLoaded || (status as any).didJustFinish) setPlayingAudio(false);
+        });
+      } else {
+        Alert.alert(
+          'Voice unavailable',
+          audioRes.warning ?? 'Voice synthesis is not available. Please read the text version.'
+        );
+      }
+    } catch {
+      Alert.alert('Voice unavailable', 'Voice synthesis is not available. Please read the text version.');
+    }
+  };
+
+  useEffect(() => () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
+    sound?.unloadAsync();
+  }, []);
+
   const submitTranscription = async () => {
     if (!transcription.trim()) {
       Alert.alert('No text', t('voice_fallback', language));
@@ -102,18 +198,9 @@ export default function VoiceScreen() {
       setResult(res);
       setState('answered');
 
-      // Auto-synthesize audio response
+      // Speak the answer (browser TTS on web, backend TTS on native)
       if (res.answer && !res.uncertainty_flag) {
-        const audioRes = await voiceApi.synthesize(res.answer.slice(0, 800), language);
-        if (audioRes.audio_url) {
-          const { sound: s } = await Audio.Sound.createAsync({ uri: audioRes.audio_url });
-          setSound(s);
-          setPlayingAudio(true);
-          await s.playAsync();
-          s.setOnPlaybackStatusUpdate((status) => {
-            if (!status.isLoaded || (status as any).didJustFinish) setPlayingAudio(false);
-          });
-        }
+        await playAnswer(res.answer);
       }
     } catch (err: any) {
       Alert.alert('Error', err.message ?? t('error_generic', language));
@@ -122,6 +209,8 @@ export default function VoiceScreen() {
   };
 
   const reset = () => {
+    clearSpeechPoll();
+    stopBrowserSpeech();
     sound?.unloadAsync();
     setSound(null);
     setPlayingAudio(false);
@@ -145,11 +234,6 @@ export default function VoiceScreen() {
   const stopPulse = () => {
     pulseAnim.stopAnimation();
     pulseAnim.setValue(1);
-  };
-
-  const stopAudio = async () => {
-    await sound?.stopAsync();
-    setPlayingAudio(false);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -231,9 +315,15 @@ export default function VoiceScreen() {
 
           {transcription ? (
             <>
-              <View style={styles.transcriptionBox}>
-                <Text style={styles.transcriptionText}>{transcription}</Text>
-              </View>
+              <Text style={styles.editHint}>{t('voice_edit_hint', language)}</Text>
+              <TextInput
+                style={styles.transcriptionInput}
+                value={transcription}
+                onChangeText={setTranscription}
+                multiline
+                textAlignVertical="top"
+                accessibilityLabel={t('voice_edit_hint', language)}
+              />
               <TouchableOpacity style={styles.submitBtn} onPress={submitTranscription} activeOpacity={0.85}>
                 <Ionicons name="send" size={18} color={Colors.textOnPrimary} />
                 <Text style={styles.submitBtnText}>Submit Question</Text>
@@ -258,9 +348,7 @@ export default function VoiceScreen() {
           {/* Audio playback control */}
           <TouchableOpacity
             style={styles.audioRow}
-            onPress={playingAudio ? stopAudio : async () => {
-              if (sound) { setPlayingAudio(true); await sound.replayAsync(); }
-            }}
+            onPress={playingAudio ? stopAudio : () => playAnswer()}
           >
             <Ionicons
               name={playingAudio ? 'stop-circle' : 'play-circle'}
@@ -352,6 +440,16 @@ const styles = StyleSheet.create({
   transcriptionText: {
     fontFamily: FontFamily.regular, fontSize: FontSize.base,
     color: Colors.textPrimary, lineHeight: FontSize.base * 1.6,
+  },
+  editHint: {
+    fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted,
+  },
+  transcriptionInput: {
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primary,
+    fontFamily: FontFamily.regular, fontSize: FontSize.base,
+    color: Colors.textPrimary, lineHeight: FontSize.base * 1.6,
+    minHeight: 90,
   },
   submitBtn: {
     backgroundColor: Colors.primary, borderRadius: BorderRadius.lg,

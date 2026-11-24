@@ -33,11 +33,25 @@ def transcribe_view(request):
         'audio/mp4', 'audio/m4a', 'audio/webm', 'audio/ogg',
         'video/webm',  # webm recordings from browsers
     ]
-    if getattr(audio_file, 'content_type', '') not in allowed_types:
+    content_type = (getattr(audio_file, 'content_type', '') or '').split(';')[0].strip().lower()
+    if content_type not in allowed_types:
         return Response(
             {'error': 'Unsupported audio format. Please use MP3, WAV, M4A, or WebM.'},
             status=400
         )
+
+    # Whisper infers the container from the filename. Browser recordings are
+    # WebM even if a client labels them .m4a — keep the two in sync.
+    extension_by_type = {
+        'audio/mpeg': '.mp3', 'audio/mp3': '.mp3',
+        'audio/wav': '.wav', 'audio/x-wav': '.wav',
+        'audio/mp4': '.m4a', 'audio/m4a': '.m4a',
+        'audio/webm': '.webm', 'video/webm': '.webm',
+        'audio/ogg': '.ogg',
+    }
+    expected_ext = extension_by_type.get(content_type)
+    if expected_ext and not audio_file.name.lower().endswith(expected_ext):
+        audio_file.name = f'recording{expected_ext}'
 
     language = request.data.get('language', request.user.preferred_language or 'en')
 
