@@ -263,11 +263,18 @@ export const voiceApi = {
     const formData = new FormData();
     // Expo AV records WebM on web and M4A on native — tell the backend the truth.
     const isWeb = Platform.OS === 'web';
-    formData.append('audio', {
-      uri: audioUri,
-      name: isWeb ? 'recording.webm' : 'recording.m4a',
-      type: isWeb ? 'audio/webm' : 'audio/m4a',
-    } as any);
+    try {
+      // appendFile sends a real File on web (a { uri } object would arrive as "[object Object]")
+      await appendFile(
+        formData,
+        'audio',
+        audioUri,
+        isWeb ? 'recording.webm' : 'recording.m4a',
+        isWeb ? 'audio/webm' : 'audio/m4a',
+      );
+    } catch {
+      throw new Error('Could not read the recording. Please try again.');
+    }
     formData.append('language', language);
     try {
       const res = await apiClient.post('/voice/transcribe/', formData, {
