@@ -118,6 +118,58 @@ Show the system:
 
 ---
 
+## Demo 2b: Free Legal Aid Connection
+
+**Available from**: Home → **Free Legal Aid**, the voice screen → **Connect to Legal Aid**, and inside **Find Legal Help**.
+
+### Steps
+
+1. Open Free Legal Aid (or Find Legal Help)
+2. Choose a district, e.g. **Kampala** or **Buikwe**
+3. Show the published area office:
+   - Kampala → Mmengo Justice Centre (`0800 100 210`, `0800 100 225`, `0759 500 440`)
+   - Buikwe → Mukono Justice Centre (`0800 100 218`, `0707 500 448`)
+4. Try a district without a published centre number, e.g. **Gulu** — the app says no verified area office is listed yet
+5. Show **Extra help**: Counsel Doug (`+256784122995`, Legal Officer) and the toll-free line (`+256323303969`)
+
+**Key talking points**:
+- Area office numbers come from the published Justice Centres Uganda contacts list
+- Districts with no published office number are not given a fake fallback
+- Doug and the toll-free line are clearly labelled extra help, not the district office
+- Every static label works in English and Luganda
+
+**Source**: https://justicecentres.go.ug/contacts/
+
+---
+
+## Demo 2c: Bilingual Know Your Rights
+
+**Available from**: Boda Boda dashboard → **Know My Rights**, and Market Vendor dashboard → **Know My Rights**.
+
+### Steps
+
+1. Open **Boda Boda** → **Know My Rights**.
+2. Show the guide with the two tabs (Boda Boda / Market vendors).
+3. Point out the four labelled blocks for each point:
+   - **What the law says** — cites the real section (e.g. s.146(1) for carrying a licence copy).
+   - **In plain language** — the same rule in everyday words.
+   - **What to do** — numbered practical steps.
+   - **Source** — opens the official Ministry of Works PDF.
+4. Scroll to **Official documents** and open the Markets Act or motorcycle regulations link.
+5. Switch the app language to **Luganda** (Profile → Language) and reopen the guide. Every heading, right, step, source label and document summary is now in Luganda. Switch back to English to confirm both are complete.
+6. Repeat from **Market Vendor** → **Know My Rights** and show the vendor points: free registration (s.18), committee allocation (s.21), displayed fees (s.24), three months' written notice for layout changes (s.16(2)), abandonment after three months (s.22), and seized goods after 14 days (s.26).
+
+**Key talking points**:
+- App language is the single source of truth — there is no separate document-language toggle.
+- Every claim cites a published Act, regulation or byelaw; no invented section numbers.
+- Old seed sections 118, 130, 15, 25, 26 and 30 were removed because they did not match current law.
+- The KCCA street trader byelaws are shown with a warning that they apply only to named Kampala street activities.
+- This is legal information, not legal advice; the disclaimer is shown at the bottom.
+
+**Source PDFs**: `legal_sources/official/` (manifest and URLs in `legal_sources/README.md`).
+
+---
+
 ## Demo 3: USSD (feature phone / no internet)
 
 **Setup**: Africa's Talking simulator at simulator.africastalking.com
@@ -143,11 +195,17 @@ Show the system:
 - Select 1 (Eviction notice)
 - Show practical guidance in USSD format
 
-**5. Language switch**
-- Restart → Select 5 (Change Language) → Select 2 (Luganda)
-- Show main menu in Luganda
+**5. Know Your Rights**
+- Restart → Select 3 (Know Your Rights) → Select 1 (Traffic laws / boda rights)
+- Show the verified s.146 licence-copy rule and helmet rule (Act 6/2020; S.I. 34/2023)
+- Restart → Select 3 → Select 2 (Market vendor rights)
+- Show free registration (s.18), committee allocation (s.21) and displayed fees (s.24)
 
-**6. Find Legal Help**
+**6. Language switch**
+- Restart → Select 5 (Change Language) → Select 2 (Luganda)
+- Restart → Select 3 → Select 1 to show the same boda rights in Luganda
+
+**7. Find Legal Help**
 - Navigate to option 4
 - Show Uganda Law Society contact details in USSD
 
@@ -155,15 +213,15 @@ Show the system:
 - Works on any phone with no internet
 - Same legal knowledge base as the mobile app
 - For full document analysis → app is required
-- English and Luganda support
+- Five languages: English, Luganda, Runyankore, Acholi, Lugbara
 - Session state tracked throughout
 
 ---
 
 ## Handling Demo Questions
 
-**"Can it really understand Luganda?"**
-> Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a Luganda prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is still limited, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a Luganda voice is used when the device has one, otherwise the closest available voice. For a guaranteed Luganda voice, use a pre-recorded human prompt as fallback.
+**"Can it really understand Luganda, Runyankore, Acholi or Lugbara?"**
+> Voice recognition for local languages has known limitations. Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is limited for all local languages, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a device voice is used when available, otherwise the closest available voice. Local-language support currently covers UI text and USSD menus; Runyankore, Acholi and Lugbara strings are first-pass drafts pending native-speaker review. For a guaranteed local-language voice, use a pre-recorded human prompt as fallback.
 
 **"What if the AI makes up a law?"**
 > The system uses RAG — it only cites provisions from documents we have manually approved and indexed. If no relevant source is found, it displays: "I cannot verify the applicable legal provision..." rather than inventing an answer.

@@ -57,6 +57,14 @@ def test_back_navigation():
     assert 'Boda' in response or 'Market' in response  # Back to main
 
 
+def test_back_from_language_menu():
+    handle_ussd_request(SESSION_ID, '*384*0#', '+256700000009', '')
+    handle_ussd_request(SESSION_ID, '*384*0#', '+256700000009', '5')
+    response = handle_ussd_request(SESSION_ID, '*384*0#', '+256700000009', '0')
+    assert response.startswith('CON')
+    assert 'Welcome to LegalBridge' in response
+
+
 def test_invalid_selection_shows_menu_again():
     handle_ussd_request(SESSION_ID, '*384*0#', '+256700000006', '')
     response = handle_ussd_request(SESSION_ID, '*384*0#', '+256700000006', '9')
@@ -72,6 +80,20 @@ def test_luganda_language_switch():
     response = handle_ussd_request(SESSION_ID, '*384*0#', '+256700000007', '2')
     # Main menu should show in Luganda
     assert 'Olulimi' in response or 'Boda' in response or 'Akatale' in response
+
+
+@pytest.mark.parametrize('option, expected_text', [
+    ('3', 'Obwenkanya'),  # Runyankore
+    ('4', 'Ywal Leb'),    # Acholi
+    ('5', 'Obubaka'),     # Lugbara
+])
+def test_additional_language_switch(option, expected_text):
+    phone = f'+2567000000{int(option) + 20}'
+    handle_ussd_request(SESSION_ID, '*384*0#', phone, '')
+    handle_ussd_request(SESSION_ID, '*384*0#', phone, '5')
+    response = handle_ussd_request(SESSION_ID, '*384*0#', phone, option)
+    assert response.startswith('CON')
+    assert expected_text in response
 
 
 def test_vendor_eviction_ends_session():

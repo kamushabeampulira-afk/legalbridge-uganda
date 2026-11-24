@@ -2,6 +2,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from config.languages import LANGUAGE_CODES, validated_language
+
 from .models import LegalSource, LegalQuery
 from .serializers import LegalSourceSerializer, LegalQuerySerializer
 
@@ -36,7 +38,14 @@ def ask_legal(request):
     """
     question = request.data.get('question', '').strip()
     user_category = request.data.get('user_category', 'general')
-    language = request.data.get('language', request.user.preferred_language or 'en')
+    language, language_valid = validated_language(
+        request.data.get('language', request.user.preferred_language)
+    )
+    if not language_valid:
+        return Response(
+            {'error': f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'},
+            status=400,
+        )
 
     if not question:
         return Response({'error': 'Question text is required.'}, status=400)

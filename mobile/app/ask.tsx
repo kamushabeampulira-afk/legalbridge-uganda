@@ -13,7 +13,7 @@ import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type Language } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 import Button from '@/components/ui/Button';
 import SectionCard from '@/components/ui/SectionCard';
@@ -21,7 +21,8 @@ import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
-const PRESET_QUESTIONS: Record<string, { en: string; lg: string }[]> = {
+/** Presets fall back to English when a translation is not available yet. */
+const PRESET_QUESTIONS: Record<string, Partial<Record<Language, string>>[]> = {
   boda_boda: [
     { en: 'What documents must I carry when riding my boda boda?', lg: 'Empapula ki ezinaabikibwa ng\'nkuba boda boda?' },
     { en: 'What should I do when stopped by a traffic officer?', lg: 'Nkole ki poliisi ng\'yansinzya ku kkubo?' },
@@ -43,6 +44,8 @@ export default function AskScreen() {
 
   const userCategory = params.category ?? 'general';
   const presets = PRESET_QUESTIONS[userCategory] ?? [];
+  const presetText = (preset: Partial<Record<Language, string>>) =>
+    preset[language] ?? preset.en ?? '';
 
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,11 +54,11 @@ export default function AskScreen() {
   const handleAsk = async (q?: string) => {
     const finalQuestion = (q ?? question).trim();
     if (!finalQuestion) {
-      Alert.alert('Required', 'Please enter your question.');
+      Alert.alert(t('alert_required', language), t('ask_required', language));
       return;
     }
     if (finalQuestion.length > 2000) {
-      Alert.alert('Too long', 'Please keep your question under 2000 characters.');
+      Alert.alert(t('alert_tooLong', language), t('ask_tooLong', language));
       return;
     }
     setLoading(true);
@@ -64,7 +67,7 @@ export default function AskScreen() {
       const res = await legalApi.ask(finalQuestion, userCategory, language);
       setResult({ ...res, question: finalQuestion });
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -88,7 +91,7 @@ export default function AskScreen() {
           <Ionicons name="chatbubble-ellipses" size={28} color={Colors.textOnPrimary} />
           <View>
             <Text style={styles.headerTitle}>{t('home_askLegal', language)}</Text>
-            <Text style={styles.headerSub}>Ask any question about Ugandan law</Text>
+            <Text style={styles.headerSub}>{t('ask_headerSub', language)}</Text>
           </View>
         </View>
 
@@ -98,11 +101,7 @@ export default function AskScreen() {
             style={styles.textArea}
             value={question}
             onChangeText={setQuestion}
-            placeholder={
-              language === 'lg'
-                ? 'Wandiika ekibuuzo kyo wano...'
-                : 'Type your legal question here...'
-            }
+            placeholder={t('ask_placeholder', language)}
             placeholderTextColor={Colors.textMuted}
             multiline
             numberOfLines={4}
@@ -115,7 +114,7 @@ export default function AskScreen() {
               style={[styles.sendBtn, !question.trim() && styles.sendBtnDisabled]}
               onPress={() => handleAsk()}
               disabled={!question.trim() || loading}
-              accessibilityLabel="Submit question"
+              accessibilityLabel={t('ask_submitAccessibility', language)}
             >
               <Ionicons name="send" size={20} color={Colors.textOnPrimary} />
             </TouchableOpacity>
@@ -130,7 +129,7 @@ export default function AskScreen() {
         >
           <Ionicons name="mic" size={18} color={Colors.secondary} />
           <Text style={styles.voiceText}>
-            {language === 'lg' ? 'Yogera ekibuuzo kyo' : 'Prefer to speak your question?'}
+            {t('ask_voiceShortcut', language)}
           </Text>
           <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
         </TouchableOpacity>
@@ -146,7 +145,7 @@ export default function AskScreen() {
             {result.uncertainty_flag && <UncertaintyBanner />}
 
             <SectionCard
-              title="LegalBridge Answer"
+              title={t('voice_answer', language)}
               content={result.answer}
               iconName="shield-checkmark"
               iconColor={Colors.primary}
@@ -171,7 +170,7 @@ export default function AskScreen() {
             <DisclaimerBanner message={result.disclaimer} />
 
             <Button
-              label="Ask Another Question"
+              label={t('voice_askAnother', language)}
               onPress={() => { setResult(null); setQuestion(''); }}
               variant="outline"
             />
@@ -181,19 +180,19 @@ export default function AskScreen() {
         {/* Preset questions */}
         {!result && presets.length > 0 && (
           <View style={styles.presetsSection}>
-            <Text style={styles.presetsTitle}>Common questions</Text>
+            <Text style={styles.presetsTitle}>{t('ask_commonQuestions', language)}</Text>
             {presets.map((p, i) => (
               <TouchableOpacity
                 key={i}
                 style={styles.presetCard}
                 onPress={() => {
-                  const q = language === 'lg' ? p.lg : p.en;
+                  const q = presetText(p);
                   setQuestion(q);
                   handleAsk(q);
                 }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.presetText}>{language === 'lg' ? p.lg : p.en}</Text>
+                <Text style={styles.presetText}>{presetText(p)}</Text>
                 <Ionicons name="arrow-forward-circle" size={20} color={Colors.primary} />
               </TouchableOpacity>
             ))}

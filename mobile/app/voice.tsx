@@ -15,26 +15,27 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { t, type Language } from '@/i18n/translations';
+import { getLanguageMeta } from '@/i18n/languages';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import SectionCard from '@/components/ui/SectionCard';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
 // ── Browser-native TTS (web only, no API key or voice ID required) ───────────
-function speakWithBrowser(text: string, lang: 'en' | 'lg'): boolean {
+function speakWithBrowser(text: string, lang: Language): boolean {
   if (Platform.OS !== 'web') return false;
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
   window.speechSynthesis.cancel();
   const utter = new (window as any).SpeechSynthesisUtterance(text);
   const voices = window.speechSynthesis.getVoices();
-  // Prefer a Luganda voice; Swahili is the closest common fallback on browsers.
-  const preferred = lang === 'lg'
-    ? voices.find((v: any) => v.lang.toLowerCase().startsWith('lg'))
-      ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('sw'))
-    : voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
+  const meta = getLanguageMeta(lang);
+  const prefix = meta.bcp47.split('-')[0].toLowerCase();
+  // Prefer the selected language; fall back to English when no voice exists.
+  const preferred = voices.find((v: any) => v.lang.toLowerCase().startsWith(prefix))
+    ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
   if (preferred) utter.voice = preferred;
-  utter.lang = lang === 'lg' ? 'lg-LG' : 'en-GB';
+  utter.lang = meta.bcp47;
   utter.rate = 0.88;
   utter.pitch = 1.0;
   window.speechSynthesis.speak(utter);
@@ -77,7 +78,7 @@ export default function VoiceScreen() {
     try {
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Microphone access is required for voice questions.');
+        Alert.alert(t('alert_permissionNeeded', language), t('voice_microphonePermission', language));
         return;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -88,7 +89,7 @@ export default function VoiceScreen() {
       setState('recording');
       startPulse();
     } catch (e) {
-      Alert.alert('Recording failed', 'Could not start recording. Please try typing your question.');
+      Alert.alert(t('alert_recordingFailed', language), t('voice_recordingRetry', language));
     }
   };
 
@@ -168,12 +169,12 @@ export default function VoiceScreen() {
         });
       } else {
         Alert.alert(
-          'Voice unavailable',
-          audioRes.warning ?? 'Voice synthesis is not available. Please read the text version.'
+          t('alert_voiceUnavailable', language),
+          audioRes.warning ?? t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
-      Alert.alert('Voice unavailable', 'Voice synthesis is not available. Please read the text version.');
+      Alert.alert(t('alert_voiceUnavailable', language), t('voice_synthesisUnavailable', language));
     }
   };
 
@@ -185,7 +186,7 @@ export default function VoiceScreen() {
 
   const submitTranscription = async () => {
     if (!transcription.trim()) {
-      Alert.alert('No text', t('voice_fallback', language));
+      Alert.alert(t('alert_noText', language), t('voice_fallback', language));
       return;
     }
     setState('processing');
@@ -203,7 +204,7 @@ export default function VoiceScreen() {
         await playAnswer(res.answer);
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
       setState('transcribed');
     }
   };
@@ -249,15 +250,15 @@ export default function VoiceScreen() {
         <Ionicons name="mic" size={28} color={Colors.textOnPrimary} />
         <View>
           <Text style={styles.headerTitle}>{t('voice_title', language)}</Text>
-          <Text style={styles.headerSub}>English & Luganda</Text>
+          <Text style={styles.headerSub}>{getLanguageMeta(language).nativeName}</Text>
         </View>
       </View>
 
-      {/* Luganda warning */}
-      {language === 'lg' && (
+      {/* Speech accuracy warning for languages without reliable STT support */}
+      {!getLanguageMeta(language).voiceReliable && (
         <View style={styles.warningBox}>
           <Ionicons name="warning" size={16} color={Colors.warning} />
-          <Text style={styles.warningText}>{t('voice_luganda_warning', language)}</Text>
+          <Text style={styles.warningText}>{t('voice_accuracy_warning', language)}</Text>
         </View>
       )}
 
@@ -275,7 +276,9 @@ export default function VoiceScreen() {
               style={[styles.micBtn, state === 'recording' && styles.micBtnRecording, webShadow.lg]}
               onPress={state === 'recording' ? stopRecording : startRecording}
               activeOpacity={0.8}
-              accessibilityLabel={state === 'recording' ? 'Stop recording' : 'Start recording'}
+              accessibilityLabel={state === 'recording'
+                ? t('voice_stopRecording', language)
+                : t('voice_startRecording', language)}
             >
               <Ionicons
                 name={state === 'recording' ? 'stop' : 'mic'}
@@ -286,7 +289,9 @@ export default function VoiceScreen() {
           </Animated.View>
 
           <Text style={styles.micLabel}>
-            {state === 'recording' ? 'Tap to stop' : 'Tap to record'}
+            {state === 'recording'
+              ? t('voice_tapStop', language)
+              : t('voice_tapRecord', language)}
           </Text>
 
           {/* Fallback: type instead */}
@@ -296,7 +301,7 @@ export default function VoiceScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="create-outline" size={16} color={Colors.textMuted} />
-            <Text style={styles.typeInsteadText}>Type your question instead</Text>
+            <Text style={styles.typeInsteadText}>{t('voice_typeInstead', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -304,7 +309,7 @@ export default function VoiceScreen() {
       {/* Transcription review */}
       {state === 'transcribed' && (
         <View style={styles.transcriptionSection}>
-          <Text style={styles.sectionTitle}>Your question</Text>
+          <Text style={styles.sectionTitle}>{t('voice_yourQuestion', language)}</Text>
 
           {transcriptionWarning ? (
             <View style={styles.warningBox}>
@@ -326,18 +331,18 @@ export default function VoiceScreen() {
               />
               <TouchableOpacity style={styles.submitBtn} onPress={submitTranscription} activeOpacity={0.85}>
                 <Ionicons name="send" size={18} color={Colors.textOnPrimary} />
-                <Text style={styles.submitBtnText}>Submit Question</Text>
+                <Text style={styles.submitBtnText}>{t('voice_submitQuestion', language)}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <TouchableOpacity style={styles.submitBtn} onPress={() => router.push('/ask')} activeOpacity={0.85}>
               <Ionicons name="create" size={18} color={Colors.textOnPrimary} />
-              <Text style={styles.submitBtnText}>Type Question Instead</Text>
+              <Text style={styles.submitBtnText}>{t('voice_typeQuestion', language)}</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity style={styles.retryLink} onPress={reset}>
-            <Text style={styles.retryLinkText}>Record Again</Text>
+            <Text style={styles.retryLinkText}>{t('voice_recordAgain', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -363,7 +368,7 @@ export default function VoiceScreen() {
           {result.uncertainty_flag && <UncertaintyBanner />}
 
           <SectionCard
-            title="LegalBridge Answer"
+            title={t('voice_answer', language)}
             content={result.answer}
             iconName="shield-checkmark"
             iconColor={Colors.primary}
@@ -382,10 +387,23 @@ export default function VoiceScreen() {
 
           <TouchableOpacity style={styles.resetBtn} onPress={reset} activeOpacity={0.8}>
             <Ionicons name="mic" size={18} color={Colors.primary} />
-            <Text style={styles.resetBtnText}>Ask Another Question</Text>
+            <Text style={styles.resetBtnText}>{t('voice_askAnother', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Free legal aid connection */}
+      <TouchableOpacity
+        style={styles.legalAidButton}
+        onPress={() => router.push('/legal-aid' as any)}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t('voice_freeLegalAid', language)}
+      >
+        <Ionicons name="people-outline" size={20} color={Colors.primary} />
+        <Text style={styles.legalAidButtonText}>{t('voice_freeLegalAid', language)}</Text>
+        <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+      </TouchableOpacity>
 
       <DisclaimerBanner />
     </ScrollView>
@@ -459,6 +477,21 @@ const styles = StyleSheet.create({
   submitBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textOnPrimary },
   retryLink: { alignItems: 'center', padding: Spacing.sm },
   retryLinkText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
+
+  legalAidButton: {
+    backgroundColor: Colors.primaryTint,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  legalAidButtonText: {
+    flex: 1,
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+  },
 
   answerSection: { gap: Spacing.sm },
   audioRow: {

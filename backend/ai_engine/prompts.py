@@ -29,8 +29,10 @@ UNCERTAINTY MESSAGE (use when no verified source is retrieved):
 "I cannot verify the applicable legal provision from the information currently available. 
 Please seek assistance from a qualified legal professional or an appropriate legal aid organisation."
 
-LANGUAGE: Respond in {language}. If language is 'lg', write in simple Luganda. 
-If language is 'en', write in clear simple English.
+LANGUAGE: Respond in {language}.
+Language codes: en = English, lg = Luganda, nyn = Runyankore,
+ach = Acholi, lgg = Lugbara. Use simple, short sentences for languages
+with limited written material, and never mix languages in one answer.
 """
 
 DOCUMENT_EXPLANATION_PROMPT = """
@@ -170,3 +172,28 @@ This may be because:
 
 LegalBridge provides legal information, not legal advice. For matters with serious consequences, always consult a qualified lawyer.
 """
+
+# First-pass localisations of the uncertainty message. Native-speaker review
+# is needed before release. Unknown codes fall back to English.
+UNCERTAINTY_RESPONSES = {
+    'en': UNCERTAINTY_RESPONSE,
+    'lg': (
+        'Tetusobola kukakasa amateeka agekwata ku kibuuzo kino. '
+        'Noonya obuyambi obuva eri looya awungeddwa oba ekibiina ky\'obuyambi bw\'amateeka. '
+        'LegalBridge ekuwa obubaka bw\'amateeka, si buqunzi bw\'amateeka.'
+    ),
+    'nyn': (
+        'Titusobola kuhamya amateeka agakwata ku kibuuzo kino. '
+        'Noonya obuyambi obuva eri looya omwungirwe oba ekibiina ky\'obuyambi bw\'amateeka. '
+        'LegalBridge ekuwa obubaka bw\'amateeka, si buqunzi.'
+    ),
+    # Acholi and Lugbara keep the English text until a native speaker
+    # reviews the legal wording — better than an inaccurate translation.
+    'ach': UNCERTAINTY_RESPONSE,
+    'lgg': UNCERTAINTY_RESPONSE,
+}
+
+
+def uncertainty_response(language: str) -> str:
+    """Return the uncertainty message in the requested language."""
+    return UNCERTAINTY_RESPONSES.get(language, UNCERTAINTY_RESPONSE)

@@ -67,14 +67,14 @@
 - Africa's Talking webhook: `POST /api/ussd/webhook/`
 - Session state: Django cache (configure Redis for production)
 - Menu tree: `ussd_menus.py` — CON/END format
-- English + Luganda menus
+- Menus: English, Luganda, Runyankore, Acholi, Lugbara (`LANGUAGE_OPTIONS` 1-5); untranslated menus fall back to English
 - Shares same backend services as mobile app
 
 ### Voice (voice app)
-- **STT**: OpenAI Whisper (`whisper-1`) — English; limited Luganda
+- **STT**: OpenAI Whisper (`whisper-1`) — reliable in English only; local languages return an accuracy warning
 - **TTS**: OpenAI TTS (`tts-1`) or ElevenLabs (configurable via env)
 - Modular provider pattern — swap provider without app changes
-- Luganda STT fallback: manual typed confirmation
+- Local-language STT fallback: manual typed confirmation
 
 ## Data Flow: Document Analysis
 

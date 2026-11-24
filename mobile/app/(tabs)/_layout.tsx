@@ -36,8 +36,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          headerTitle: 'LegalBridge',
+          title: t('tab_home', language),
+          headerTitle: t('appName', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -46,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="boda"
         options={{
-          title: 'Boda Boda',
+          title: t('tab_boda', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="bicycle" size={size} color={color} />
           ),
@@ -55,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="vendor"
         options={{
-          title: 'Market',
+          title: t('tab_market', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="storefront" size={size} color={color} />
           ),
@@ -64,7 +64,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: 'Documents',
+          title: t('tab_documents', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="folder" size={size} color={color} />
           ),
@@ -73,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: t('tab_profile', language),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

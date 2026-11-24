@@ -17,7 +17,8 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { normalizeLanguage, t } from '@/i18n/translations';
+import { getLanguageMeta } from '@/i18n/languages';
 import SectionCard from '@/components/ui/SectionCard';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
@@ -29,7 +30,7 @@ function speakWithBrowser(text: string, lang: string = 'en'): boolean {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
   window.speechSynthesis.cancel();
   const utter = new (window as any).SpeechSynthesisUtterance(text);
-  utter.lang = lang === 'lg' ? 'sw' : 'en-GB';
+  utter.lang = getLanguageMeta(normalizeLanguage(lang)).bcp47;
   utter.rate = 0.88;
   utter.pitch = 1.0;
   window.speechSynthesis.speak(utter);
@@ -50,21 +51,21 @@ function isBrowserSpeaking(): boolean {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DETAIL_FIELDS: [string, string][] = [
-  ['document_type', 'Document type'],
-  ['issuing_institution', 'Issued by'],
-  ['issuing_office', 'Station / office'],
-  ['reference_numbers', 'Reference number'],
-  ['date_of_issue', 'Date of issue'],
-  ['recipient', 'Addressed to'],
-  ['subject_or_offence', 'Subject / alleged offence'],
-  ['deadlines', 'Dates and deadlines'],
-  ['amounts', 'Amounts'],
-  ['instructions', 'What it asks you to do'],
-  ['signature_or_stamp', 'Signature / stamp'],
-  ['contact_information', 'Contacts printed on it'],
-  ['legal_provisions_mentioned', 'Laws it mentions'],
-];
+const DETAIL_FIELDS = [
+  ['document_type', 'detail_document_type'],
+  ['issuing_institution', 'detail_issuing_institution'],
+  ['issuing_office', 'detail_issuing_office'],
+  ['reference_numbers', 'detail_reference_numbers'],
+  ['date_of_issue', 'detail_date_of_issue'],
+  ['recipient', 'detail_recipient'],
+  ['subject_or_offence', 'detail_subject_or_offence'],
+  ['deadlines', 'detail_deadlines'],
+  ['amounts', 'detail_amounts'],
+  ['instructions', 'detail_instructions'],
+  ['signature_or_stamp', 'detail_signature_or_stamp'],
+  ['contact_information', 'detail_contact_information'],
+  ['legal_provisions_mentioned', 'detail_legal_provisions_mentioned'],
+] as const;
 
 function docIcon(docType?: string): string {
   if (!docType) return '📄';
@@ -183,8 +184,8 @@ export default function DocumentDetailScreen() {
       } else {
         setPlayingAudio(false);
         Alert.alert(
-          'Voice unavailable',
-          result.warning ?? 'Voice synthesis is not available. Please read the text version.'
+          t('alert_voiceUnavailable', language),
+          result.warning ?? t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
@@ -213,7 +214,7 @@ export default function DocumentDetailScreen() {
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{t('analysisTitle', language)}</Text>
           <Text style={styles.headerSub}>
-            {doc?.doc_type_label ?? doc?.doc_type?.replace(/_/g, ' ') ?? 'Document'}
+            {doc?.doc_type_label ?? doc?.doc_type?.replace(/_/g, ' ') ?? t('document_defaultTitle', language)}
           </Text>
         </View>
         {/* Audio button in header */}
@@ -245,12 +246,12 @@ export default function DocumentDetailScreen() {
           />
           <Text style={[styles.listenText, playingAudio && styles.listenTextActive]}>
             {playingAudio
-              ? (language === 'lg' ? 'Yimirira' : 'Stop audio')
+              ? t('document_stopAudio', language)
               : t('listenToExplanation', language)}
           </Text>
           {Platform.OS === 'web' && !playingAudio && (
             <View style={styles.freeBadge}>
-              <Text style={styles.freeBadgeText}>Free</Text>
+              <Text style={styles.freeBadgeText}>{t('document_free', language)}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -282,23 +283,23 @@ export default function DocumentDetailScreen() {
       {/* What LegalBridge read from the document */}
       {doc?.document_details && Object.keys(doc.document_details).length > 0 && (
         <View style={styles.detailsBox}>
-          <Text style={styles.sourcesTitle}>Details read from your document</Text>
-          {DETAIL_FIELDS.map(([key, label]) => {
+          <Text style={styles.sourcesTitle}>{t('detail_title', language)}</Text>
+          {DETAIL_FIELDS.map(([key, labelKey]) => {
             const field = doc.document_details[key];
             if (!field || !['found', 'unclear'].includes(field.status) || !field.value) return null;
             const value = Array.isArray(field.value) ? field.value.join(' · ') : String(field.value);
             return (
               <View key={key} style={styles.detailRow}>
-                <Text style={styles.detailLabel}>{label}</Text>
+                <Text style={styles.detailLabel}>{t(labelKey, language)}</Text>
                 <Text style={styles.detailValue}>{value}</Text>
                 {field.status === 'unclear' && (
-                  <Text style={styles.detailUnclear}>Unclear: {field.note}</Text>
+                  <Text style={styles.detailUnclear}>{t('detail_unclear', language)}: {field.note}</Text>
                 )}
               </View>
             );
           })}
           <Text style={styles.detailFootnote}>
-            Read automatically from the document text. Check every detail against the original.
+            {t('detail_footnote', language)}
           </Text>
         </View>
       )}
@@ -306,10 +307,10 @@ export default function DocumentDetailScreen() {
       {/* Analysis could not be generated: say why, keep the details above, allow retry */}
       {analysisError && !analysis && (
         <View style={[styles.statusCard, styles.statusError]}>
-          <Text style={styles.statusTitle}>The legal explanation is not available right now</Text>
+          <Text style={styles.statusTitle}>{t('analysis_unavailable', language)}</Text>
           <Text style={styles.statusBody}>{analysisError}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={triggerAnalysis}>
-            <Text style={styles.retryText}>Try again</Text>
+            <Text style={styles.retryText}>{t('retry', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -423,12 +424,12 @@ export default function DocumentDetailScreen() {
         <View style={styles.noAnalysis}>
           <Text style={styles.noAnalysisText}>
             {doc?.status === 'processing'
-              ? 'Your document is still being processed. Please wait.'
-              : 'Analysis not yet available.'}
+              ? t('document_processingWait', language)
+              : t('document_notAvailable', language)}
           </Text>
           {doc?.status === 'completed' && (
             <TouchableOpacity style={styles.retryBtn} onPress={triggerAnalysis}>
-              <Text style={styles.retryText}>Analyse Now</Text>
+              <Text style={styles.retryText}>{t('document_analyseNow', language)}</Text>
             </TouchableOpacity>
           )}
         </View>

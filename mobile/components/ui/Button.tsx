@@ -62,7 +62,7 @@ export default function Button({
         styles.base,
         shadowStyle,
         styles[variant],
-        styles[`size_${size}` as keyof typeof styles],
+        styles[`size_${size}` as keyof typeof styles] as ViewStyle,
         fullWidth && styles.fullWidth,
         isDisabled && styles.disabled,
         style,

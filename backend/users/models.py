@@ -6,6 +6,8 @@ import uuid
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
+from config.languages import LANGUAGE_CHOICES as LANGUAGE_CHOICES_FROM_REGISTRY
+
 from .phone import normalize_phone
 
 
@@ -46,10 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('admin', 'Administrator'),
     ]
 
-    LANGUAGE_CHOICES = [
-        ('en', 'English'),
-        ('lg', 'Luganda'),
-    ]
+    LANGUAGE_CHOICES = LANGUAGE_CHOICES_FROM_REGISTRY
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     phone_number = models.CharField(max_length=20, unique=True)

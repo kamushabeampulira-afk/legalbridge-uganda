@@ -54,7 +54,10 @@ Africa's Talking displays to user
 ├── 4. Find Legal Help                  [END]
 └── 5. Change Language
     ├── 1. English
-    └── 2. Luganda
+    ├── 2. Luganda
+    ├── 3. Runyankore
+    ├── 4. Acholi
+    └── 5. Lugbara
 ```
 
 ## Development Setup
@@ -103,9 +106,12 @@ And use `config/settings_production.py`.
 
 ## Language Support
 
-- English and Luganda menus available
+- English, Luganda, Runyankore, Acholi and Lugbara available
 - Language persisted per session in cache
 - Changed via "Change Language" menu option (option 5)
+- Deep menus not yet translated are shown in English; add a language-code key
+  to the menu in `ussd_menus.py` to translate it
+- Africa's Talking only transports the USSD text — it does not translate it
 
 ## Testing USSD Locally (without AT)
 

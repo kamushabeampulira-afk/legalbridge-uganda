@@ -228,23 +228,31 @@ AT_ENVIRONMENT = env('AT_ENVIRONMENT', default='sandbox')
 # ---------------------------------------------------------
 # Voice / TTS / STT
 # ---------------------------------------------------------
-TTS_PROVIDER = env('TTS_PROVIDER', default='openai')
-ELEVENLABS_API_KEY = env('ELEVENLABS_API_KEY', default='')
-ELEVENLABS_VOICE_EN = env('ELEVENLABS_VOICE_EN', default='')
-ELEVENLABS_VOICE_LG = env('ELEVENLABS_VOICE_LG', default='')
-STT_PROVIDER = env('STT_PROVIDER', default='openai_whisper')
+# django-environ does not strip inline comments in .env values, so strip them here.
+def _clean_env(name, default=''):
+    return env(name, default=default).split('#', 1)[0].strip()
+
+
+TTS_PROVIDER = _clean_env('TTS_PROVIDER', 'openai')
+ELEVENLABS_API_KEY = _clean_env('ELEVENLABS_API_KEY')
+ELEVENLABS_VOICE_EN = _clean_env('ELEVENLABS_VOICE_EN')
+ELEVENLABS_VOICE_LG = _clean_env('ELEVENLABS_VOICE_LG')
+ELEVENLABS_VOICE_NYN = _clean_env('ELEVENLABS_VOICE_NYN')
+ELEVENLABS_VOICE_ACH = _clean_env('ELEVENLABS_VOICE_ACH')
+ELEVENLABS_VOICE_LGG = _clean_env('ELEVENLABS_VOICE_LGG')
+STT_PROVIDER = _clean_env('STT_PROVIDER', 'openai_whisper')
 # Key for OpenAI voice (Whisper speech-to-text, OpenAI text-to-speech). Defaults to OPENAI_API_KEY
 # only when that is an OpenAI key; with another provider in OPENAI_BASE_URL it must be set separately.
 VOICE_OPENAI_API_KEY = env('VOICE_OPENAI_API_KEY', default='' if OPENAI_BASE_URL else OPENAI_API_KEY)
 # Sunbird AI (Uganda): free speech-to-text and text-to-speech in English and Luganda.
 # Used when STT_PROVIDER=sunbird and/or TTS_PROVIDER=sunbird. Register at
 # https://api.sunbird.ai/register, then copy the token from https://api.sunbird.ai/keys
-SUNBIRD_API_TOKEN = env('SUNBIRD_API_TOKEN', default='')
-SUNBIRD_API_URL = env('SUNBIRD_API_URL', default='https://api.sunbird.ai')
+SUNBIRD_API_TOKEN = _clean_env('SUNBIRD_API_TOKEN')
+SUNBIRD_API_URL = _clean_env('SUNBIRD_API_URL', 'https://api.sunbird.ai')
 SUNBIRD_TIMEOUT_SECONDS = env.float('SUNBIRD_TIMEOUT_SECONDS', default=120)
 # Voice names; empty uses Sunbird's default (English: Grace, Luganda: Namuli)
-SUNBIRD_TTS_VOICE_EN = env('SUNBIRD_TTS_VOICE_EN', default='')
-SUNBIRD_TTS_VOICE_LG = env('SUNBIRD_TTS_VOICE_LG', default='')
+SUNBIRD_TTS_VOICE_EN = _clean_env('SUNBIRD_TTS_VOICE_EN')
+SUNBIRD_TTS_VOICE_LG = _clean_env('SUNBIRD_TTS_VOICE_LG')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

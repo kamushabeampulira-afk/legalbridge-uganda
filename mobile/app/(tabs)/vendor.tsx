@@ -20,8 +20,7 @@ const ACTIONS = [
     icon: 'cloud-upload' as const,
     color: Colors.primary,
     titleKey: 'vendor_upload' as const,
-    desc_en: 'Upload allocation slips, receipts, eviction notices',
-    desc_lg: 'Isa empapula zo',
+    descKey: 'vendor_upload_desc' as const,
   },
   {
     id: 'eviction',
@@ -29,8 +28,7 @@ const ACTIONS = [
     icon: 'exit' as const,
     color: Colors.secondary,
     titleKey: 'vendor_eviction' as const,
-    desc_en: 'Answer a few questions and get practical guidance',
-    desc_lg: 'Noonya obuyambi ku ngufu y\'okufuluka',
+    descKey: 'vendor_eviction_desc' as const,
   },
   {
     id: 'history',
@@ -38,17 +36,15 @@ const ACTIONS = [
     icon: 'folder-open' as const,
     color: Colors.textPrimary,
     titleKey: 'vendor_history' as const,
-    desc_en: 'View documents you have already uploaded',
-    desc_lg: 'Laba empapula z\'edda',
+    descKey: 'vendor_history_desc' as const,
   },
   {
     id: 'rights',
-    route: '/ask?category=market_vendor&preset=rights',
+    route: '/rights?category=market_vendor',
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'vendor_rights' as const,
-    desc_en: 'Ask about market law and your rights',
-    desc_lg: 'Buuza ku amateeka g\'akatale',
+    descKey: 'vendor_rights_desc' as const,
   },
 ];
 
@@ -84,9 +80,7 @@ export default function VendorScreen() {
           </View>
           <View style={styles.actionText}>
             <Text style={styles.actionTitle}>{t(action.titleKey, language)}</Text>
-            <Text style={styles.actionDesc}>
-              {language === 'lg' ? action.desc_lg : action.desc_en}
-            </Text>
+            <Text style={styles.actionDesc}>{t(action.descKey, language)}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
         </TouchableOpacity>
@@ -94,11 +88,7 @@ export default function VendorScreen() {
 
       <View style={styles.infoBanner}>
         <Ionicons name="document-text" size={20} color={Colors.accentStrong} />
-        <Text style={styles.infoText}>
-          {language === 'lg'
-            ? 'Kubika empapula zonna ez\'akatale lyo: pepa ly\'okuweebwayo, resiti, n\'obubaka.'
-            : 'Keep all your market documents safe: allocation slip, payment receipts, and any notices.'}
-        </Text>
+        <Text style={styles.infoText}>{t('vendor_info', language)}</Text>
       </View>
 
       <DisclaimerBanner />

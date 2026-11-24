@@ -1,4 +1,4 @@
-"""
+r"""
 LegalBridge — Local USSD test script.
 Simulates Africa's Talking webhook calls without needing the AT simulator.
 
@@ -91,6 +91,15 @@ def run_tests():
     r = ussd(sid4, '5*2', 'Select Luganda (5→2)')
     assert 'CON' in r or 'Boda' in r or 'Akatale' in r, "FAIL: Expected Luganda menu"
     print("  PASS")
+
+    # ── Test 6b: Language switch to Runyankore, Acholi, Lugbara ──
+    print("\n[TEST 6b] Change language to additional languages")
+    for option, name in [('3', 'Runyankore'), ('4', 'Acholi'), ('5', 'Lugbara')]:
+        sid = new_session()
+        ussd(sid, '', 'Fresh session')
+        ussd(sid, '5', 'Select Change Language (5)')
+        r = ussd(sid, f'5*{option}', f'Select {name} (5→{option})')
+        assert 'CON' in r, f"FAIL: Expected {name} menu"
 
     # ── Test 7: Back navigation ──────────────────────────────────
     print("\n[TEST 7] Navigate into sub-menu then back")

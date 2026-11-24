@@ -2,7 +2,22 @@
 LegalBridge — USSD menu tree.
 Text must stay within USSD character limits (~182 chars per screen).
 Session state is tracked in memory (use Redis/DB for production).
+
+Menus not yet translated into a local language fall back to English via
+_render_menu(). Add a key with the language code to translate a menu.
 """
+
+# Africa's Talking sends only digits, so the language menu uses option
+# numbers. Keep this map in sync with the 'change_language' menu below.
+LANGUAGE_OPTIONS = {
+    '1': 'en',
+    '2': 'lg',
+    '3': 'nyn',  # Runyankore
+    '4': 'ach',  # Acholi
+    '5': 'lgg',  # Lugbara
+}
+
+LANGUAGE_OPTION_BY_CODE = {code: option for option, code in LANGUAGE_OPTIONS.items()}
 
 # ---------------------------------------------------------------------------
 # Menu definitions
@@ -31,6 +46,32 @@ MENUS = {
             "3. Manya Eddembe Lyo\n"
             "4. Noonya Obuyambi bw'Amateeka\n"
             "5. Kyusa Olulimi"
+        ),
+        'nyn': (
+            "CON Mukaribuni ku LegalBridge\n"
+            "Obwenkanya Bwaho\n\n"
+            "1. Omuvuzi wa Boda Boda\n"
+            "2. Omusuubuzi wa Akatale\n"
+            "3. Manya Ekitiibwa Kyawe\n"
+            "4. Noonya Obuyambi bw'Amateeka\n"
+            "5. Hindura Orurimi"
+        ),
+        'ach': (
+            "CON Welcome to LegalBridge\n\n"
+            "1. Boda Boda Rider\n"
+            "2. Market Vendor\n"
+            "3. Know Your Rights\n"
+            "4. Find Legal Help\n"
+            "5. Ywal Leb"
+        ),
+        'lgg': (
+            "CON LegalBridge Ati\n"
+            "Obubaka obw'amateeka\n\n"
+            "1. Omuvuzi wa Boda\n"
+            "2. Omusuubuzi wa Akatale\n"
+            "3. Manya eddembe lyawe\n"
+            "4. Noonya obuyambi\n"
+            "5. Hinduka Olulimi"
         ),
         'options': {
             '1': 'boda_main',
@@ -287,28 +328,20 @@ MENUS = {
 
     'vendor_rights': {
         'en': (
-            "END Market Vendor Rights\n\n"
-            "Uganda's Markets Act 2023 and "
-            "local government rules govern "
-            "market operations.\n\n"
-            "General information:\n"
-            "- Vendors may have rights under "
-            "their allocation terms\n"
-            "- Official notices should be in "
-            "writing\n"
-            "- Disputes may be referred to "
-            "market management or local gov\n\n"
-            "For verified legal information "
-            "specific to your situation, use "
-            "the LegalBridge app.\n"
-            "Legal aid: FIDA Uganda"
+            "END Vendor Rights (Markets Act)\n"
+            "s.18: registration is free. s.21: "
+            "committee allocates stalls.\n"
+            "s.24: fees displayed. s.16(2): "
+            "3 months' written notice.\n"
+            "Source: Markets Act 2023"
         ),
         'lg': (
-            "END Eddembe ly'Omusuubuzi\n\n"
-            "Amateeka g'Akatale 2023 n'amateeka "
-            "g'gavumenti y'ensi agulabirira "
-            "byokusuubuza.\n\n"
-            "Kozesa app ya LegalBridge."
+            "END Eddembe ly'Omusuubuzi\n"
+            "s.18: okuweebwa kwa bwereere. s.21: "
+            "ekitiibwa kigaba essimbi.\n"
+            "s.24: omusaasizo gulagibwa. s.16(2): "
+            "obubaka bwa myezi 3.\n"
+            "Ensibuko: Markets Act 2023"
         ),
         'options': {}
     },
@@ -342,27 +375,20 @@ MENUS = {
 
     'rights_traffic': {
         'en': (
-            "END Traffic Laws (Uganda)\n\n"
-            "Key information:\n"
-            "- The Traffic and Road Safety Act "
-            "governs road use in Uganda\n"
-            "- All motorcycles require valid "
-            "registration and insurance\n"
-            "- Riders require a valid licence\n"
-            "- Official fines must have receipts\n\n"
-            "For specific provisions, use the "
-            "LegalBridge app which references "
-            "verified Ugandan law.\n\n"
-            "Source: Traffic & Road Safety Act"
+            "END Boda Rights\n"
+            "s.146: carry copy of licence & "
+            "registration book; originals in "
+            "72h/120h if asked.\n"
+            "Reg 11: helmet must be worn & "
+            "fastened.\n"
+            "Sources: Act 6/2020; S.I.34/2023"
         ),
         'lg': (
-            "END Amateeka g'Ekkubo\n\n"
-            "Ebikulu:\n"
-            "- Ettaka n'Enkola y'Eddiro "
-            "elabirira ekkubo\n"
-            "- Boda zonna zieetaaga "
-            "ndagamuntu n'inshuurensi\n\n"
-            "Kozesa app ya LegalBridge."
+            "END Eddembe ly'Omuvuzi\n"
+            "s.146: twala kopi ya layisensi n'empapula "
+            "z'ebidduka; ey'edda mu ssaawa 72/120.\n"
+            "Reg 11: enkufiira esibibwe bulungi.\n"
+            "Ensibuko: Act 6/2020; S.I.34/2023"
         ),
         'options': {}
     },
@@ -452,18 +478,56 @@ MENUS = {
     # ── Language ─────────────────────────────────────────────────────────────
     'change_language': {
         'en': (
-            "CON Select Language / Londa Olulimi\n\n"
+            "CON Choose Language\n\n"
             "1. English\n"
-            "2. Luganda"
+            "2. Luganda\n"
+            "3. Runyankore\n"
+            "4. Acholi\n"
+            "5. Lugbara\n"
+            "0. Back"
         ),
         'lg': (
-            "CON Select Language / Londa Olulimi\n\n"
-            "1. English\n"
-            "2. Luganda"
+            "CON Londa Olulimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Lugbarati\n"
+            "0. Back"
+        ),
+        'nyn': (
+            "CON Londa Orurimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Olugbara\n"
+            "0. Back"
+        ),
+        'ach': (
+            "CON Ywal Leb\n\n"
+            "1. Leb Engereza\n"
+            "2. Leb Luganda\n"
+            "3. Leb Runyankore\n"
+            "4. Leb Acoli\n"
+            "5. Leb Lugbara\n"
+            "0. Back"
+        ),
+        'lgg': (
+            "CON Londa Olulimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Lugbarati\n"
+            "0. Back"
         ),
         'options': {
             '1': '__set_lang_en__',
             '2': '__set_lang_lg__',
+            '3': '__set_lang_nyn__',
+            '4': '__set_lang_ach__',
+            '5': '__set_lang_lgg__',
         }
     },
 }

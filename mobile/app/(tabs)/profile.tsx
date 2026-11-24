@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Alert, Switch,
+  TouchableOpacity, Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,21 +15,23 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { t } from '@/i18n/translations';
+import { LANGUAGES, getLanguageMeta } from '@/i18n/languages';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, language, setLanguage, logout } = useAppStore();
   const [deleting, setDeleting] = useState(false);
 
-  const handleLanguageToggle = () => {
-    const next = language === 'en' ? 'lg' : 'en';
-    setLanguage(next);
+  const handleLanguageCycle = () => {
+    const index = LANGUAGES.findIndex((item) => item.code === language);
+    const next = LANGUAGES[(index + 1) % LANGUAGES.length];
+    setLanguage(next.code);
   };
 
   const handleLogout = () => {
     Alert.alert(
       t('profile_logout', language),
-      language === 'lg' ? 'Ofuna okufuluma?' : 'Are you sure you want to log out?',
+      t('profile_confirmLogout', language),
       [
         { text: t('cancel', language), style: 'cancel' },
         {
@@ -59,7 +61,7 @@ export default function ProfileScreen() {
               await logout();
               router.replace('/(auth)/login');
             } catch {
-              Alert.alert('Error', t('error_generic', language));
+              Alert.alert(t('alert_error', language), t('error_generic', language));
             } finally {
               setDeleting(false);
             }
@@ -108,7 +110,7 @@ export default function ProfileScreen() {
           </Text>
         </View>
         <View>
-          <Text style={styles.userName}>{user?.full_name || 'LegalBridge User'}</Text>
+          <Text style={styles.userName}>{user?.full_name || t('profile_defaultName', language)}</Text>
           <Text style={styles.userPhone}>{user?.phone_number}</Text>
           <Text style={styles.userType}>
             {user?.user_type?.replace(/_/g, ' ') ?? 'User'}
@@ -121,23 +123,16 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>{t('profile_language', language)}</Text>
         <SettingRow
           icon="language"
-          title={language === 'en' ? 'English' : 'Luganda'}
-          right={
-            <Switch
-              value={language === 'lg'}
-              onValueChange={handleLanguageToggle}
-              trackColor={{ false: Colors.borderStrong, true: Colors.primary }}
-              thumbColor={Colors.surface}
-            />
-          }
+          title={`${getLanguageMeta(language).nativeName} · ${t('changeLanguage', language)}`}
+          onPress={handleLanguageCycle}
         />
       </View>
 
       <View style={[styles.section, webShadow.sm]}>
-        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={styles.sectionTitle}>{t('profile_account', language)}</Text>
         <SettingRow
           icon="person-outline"
-          title="Edit Profile"
+          title={t('profile_editProfile', language)}
           onPress={() => {/* TODO: edit profile screen */}}
         />
         <SettingRow
@@ -180,10 +175,8 @@ export default function ProfileScreen() {
         />
       </View>
 
-      <Text style={styles.version}>LegalBridge Informal v1.0.0 · Hack4Justice 2026</Text>
-      <Text style={styles.disclaimer}>
-        LegalBridge provides legal information, not legal advice.
-      </Text>
+      <Text style={styles.version}>{t('profile_versionText', language)}</Text>
+      <Text style={styles.disclaimer}>{t('disclaimer', language)}</Text>
     </ScrollView>
   );
 }

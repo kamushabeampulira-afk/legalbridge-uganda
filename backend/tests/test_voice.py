@@ -106,6 +106,8 @@ def test_whisper_luganda_has_no_language_hint(settings):
     assert 'language' not in kwargs
     assert kwargs['prompt'] == 'Yogera mu Luganda: '
     assert kwargs['model'] == 'whisper-1'
+    assert kwargs['file'][0].endswith('.m4a')
+    assert kwargs['file'][1] == b'fake-audio-payload'
     assert result['text'] == 'kintu'
     assert result['warning'] is not None
 

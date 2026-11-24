@@ -1,13 +1,18 @@
 """
 LegalBridge — Speech-to-Text module.
 Providers (STT_PROVIDER): 'openai_whisper' (default) or 'sunbird' (Sunbird AI, free,
-with real Luganda support). Luganda STT accuracy note: Whisper has limited Luganda support.
-Human-recorded prompts are the fallback for Luganda voice interaction.
+with real Luganda support).
+Local-language STT note: Whisper reliably supports English only. Luganda,
+Runyankore, Acholi and Lugbara are auto-detected and always return a warning
+asking the user to check the transcription. Human-recorded prompts are the
+fallback for Luganda voice interaction.
 """
 import logging
 import os
 import tempfile
 from django.conf import settings
+
+from config.languages import SUPPORTED_LANGUAGES
 
 logger = logging.getLogger('legalbridge')
 
@@ -24,7 +29,7 @@ def transcribe_audio(audio_file, language: str = 'en') -> dict:
     """
     Transcribe an audio file.
     audio_file: file-like object or path string
-    language: 'en' | 'lg'
+    language: one of config.languages.LANGUAGE_CODES
     Returns: { 'text': str, 'confidence': float|None, 'warning': str|None }
     """
     provider = settings.STT_PROVIDER
@@ -52,14 +57,14 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
             'warning': 'Speech recognition is not configured. Please type your question.',
         }
 
-    # Map language codes to Whisper language hints
-    lang_map = {'en': 'en', 'lg': None}  # Whisper has no native Luganda support
-    whisper_lang = lang_map.get(language, 'en')
+    # Only English has a reliable Whisper hint. Other supported languages are
+    # auto-detected (no hint) and always return a transcription warning.
+    whisper_lang = 'en' if language == 'en' else None
 
     warning = None
-    if language == 'lg':
+    if language != 'en':
         warning = (
-            'Luganda speech recognition has limited accuracy. '
+            f'Speech recognition for {SUPPORTED_LANGUAGES.get(language, language)} has limited accuracy. '
             'Please check the transcription and correct any errors before submitting.'
         )
 
@@ -67,10 +72,18 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
 
-        # audio_file may be a Django InMemoryUploadedFile
+        # The OpenAI SDK needs bytes/path, not a Django UploadedFile object.
+        if hasattr(audio_file, 'read'):
+            audio_file.seek(0)
+            filename = getattr(audio_file, 'name', 'audio.webm')
+            content_type = getattr(audio_file, 'content_type', '') or 'audio/webm'
+            file_arg = (filename, audio_file.read(), content_type)
+        else:
+            file_arg = audio_file
+
         kwargs = {
             'model': 'whisper-1',
-            'file': audio_file,
+            'file': file_arg,
         }
         if whisper_lang:
             kwargs['language'] = whisper_lang

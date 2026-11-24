@@ -7,7 +7,7 @@ import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from .ussd_handler import handle_ussd_request
+from .ussd_handler import get_session_language, handle_ussd_request
 from .models import USSDSession
 
 logger = logging.getLogger('legalbridge')
@@ -53,6 +53,7 @@ def ussd_webhook(request):
                     'service_code': service_code,
                     'input_text': text,
                     'response_text': response_text[:1000],
+                    'language': get_session_language(session_id),
                     'ended': ended,
                 }
             )

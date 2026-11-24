@@ -24,8 +24,7 @@ const PRIMARY_PATHS = [
     color: Colors.primary,
     emoji: '🏍️',
     titleKey: 'home_boda' as const,
-    desc_en: 'Traffic notices, rights & legal info',
-    desc_lg: 'Obubaka bw\'ekkubo n\'amateeka',
+    descKey: 'home_boda_desc' as const,
   },
   {
     id: 'vendor',
@@ -34,8 +33,7 @@ const PRIMARY_PATHS = [
     color: Colors.secondary,
     emoji: '🏪',
     titleKey: 'home_vendor' as const,
-    desc_en: 'Allocation slips, eviction notices & rights',
-    desc_lg: 'Pepa ly\'okuweebwayo n\'amateeka',
+    descKey: 'home_vendor_desc' as const,
   },
 ];
 
@@ -68,6 +66,13 @@ const QUICK_ACTIONS = [
     color: Colors.textPrimary,
     titleKey: 'home_findHelp' as const,
   },
+  {
+    id: 'legal-aid',
+    route: '/legal-aid' as const,
+    icon: 'shield-checkmark' as const,
+    color: Colors.secondary,
+    titleKey: 'home_freeLegalAid' as const,
+  },
 ];
 
 export default function HomeScreen() {
@@ -75,7 +80,7 @@ export default function HomeScreen() {
   const { user, language } = useAppStore();
 
   const greeting = user?.full_name
-    ? `Hello, ${user.full_name.split(' ')[0]}`
+    ? `${t('home_hello', language)} ${user.full_name.split(' ')[0]}`
     : t('home_greeting', language);
 
   return (
@@ -96,7 +101,7 @@ export default function HomeScreen() {
       </LinearGradient>
 
       {/* Primary pathways */}
-      <Text style={styles.sectionLabel}>Choose your situation</Text>
+      <Text style={styles.sectionLabel}>{t('home_chooseSituation', language)}</Text>
       <View style={styles.primaryRow}>
         {PRIMARY_PATHS.map((p) => (
           <TouchableOpacity
@@ -109,9 +114,7 @@ export default function HomeScreen() {
           >
             <Text style={styles.primaryEmoji}>{p.emoji}</Text>
             <Text style={styles.primaryTitle}>{t(p.titleKey, language)}</Text>
-            <Text style={styles.primaryDesc}>
-              {language === 'lg' ? p.desc_lg : p.desc_en}
-            </Text>
+            <Text style={styles.primaryDesc}>{t(p.descKey, language)}</Text>
             <View style={styles.primaryArrow}>
               <Ionicons name="arrow-forward" size={18} color={Colors.textOnPrimary} />
             </View>
@@ -120,13 +123,13 @@ export default function HomeScreen() {
       </View>
 
       {/* Quick actions */}
-      <Text style={styles.sectionLabel}>Quick actions</Text>
+      <Text style={styles.sectionLabel}>{t('home_quickActions', language)}</Text>
       <View style={styles.actionsGrid}>
         {QUICK_ACTIONS.map((a) => (
           <TouchableOpacity
             key={a.id}
             style={[styles.actionCard, webShadow.sm]}
-            onPress={() => router.push(a.route)}
+            onPress={() => router.push(a.route as any)}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={t(a.titleKey, language)}
@@ -144,7 +147,7 @@ export default function HomeScreen() {
         style={[styles.ussdBanner, webShadow.sm]}
         onPress={() => Linking.openURL('tel:*384*0#')}
         activeOpacity={0.85}
-        accessibilityLabel="Dial USSD code for no-internet access"
+        accessibilityLabel={t('home_ussd_accessibility', language)}
       >
         <View style={styles.ussdLeft}>
           <Text style={styles.ussdIcon}>📱</Text>
@@ -159,10 +162,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Disclaimer */}
-      <Text style={styles.disclaimer}>
-        LegalBridge provides legal information, not legal advice.
-        For serious matters, consult a qualified lawyer.
-      </Text>
+      <Text style={styles.disclaimer}>{t('disclaimer', language)}</Text>
     </ScrollView>
   );
 }
