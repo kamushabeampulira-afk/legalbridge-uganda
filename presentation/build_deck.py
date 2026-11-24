@@ -176,7 +176,7 @@ def build():
         3.85,
         6.0,
         1.25,
-        "A boda boda rider's bike is taken. The 48-hour court deadline passes.\nLegalBridge gives him the first sourced step — in Luganda, on any phone.",
+        "A boda boda rider's bike is taken. A market vendor is told to leave.\nLegalBridge gives both the first sourced step — in Luganda, on any phone.",
         15,
         RGBColor(222, 226, 235),
         spacing=1.15,
@@ -188,7 +188,7 @@ def build():
     add_text(s, 7.25, 6.15, 5.25, 0.35, "legalbridge-app-free.onrender.com", 13, WHITE, align=PP_ALIGN.CENTER)
     set_notes(
         s,
-        "0:30 — Open with one rider, not a statistics lecture: he is waved down, the bike is loaded onto a pickup, and no one tells him when he will see a court. The Constitution gives him 48 hours. Tell judges the screenshots are from the live app, not a mock-up.",
+        "0:20 — Open with two people: a rider whose bike is loaded onto a pickup, and a vendor handed a notice to leave. We will show both stories, but the promise is the same — a sourced first step in Luganda. Tell judges the screenshots are from the live app, not a mock-up.",
     )
 
     # 2 — Problem
@@ -240,7 +240,7 @@ def build():
     )
     set_notes(
         s,
-        "1:30 — Start with the photograph: it shows police stopping riders in Kampala in Nov 2022, not an illustration. Police reported 12,217 motorcycles impounded in six days, with 2,050 still at stations; 787 riders were stopped in one week in Jul 2024. No official national daily arrest count is published, so we use these documented operations rather than invent one. World Prison Brief shows 37,188 people on remand in Aug 2026 (44.9%), and the ASF study found 10.3% of interviewed detainees were boda riders, with 65% over six months on remand.",
+        "1:15 — Start with the photograph: police stopping riders in Kampala in Nov 2022. Police reported 12,217 motorcycles impounded in six days, with 2,050 still at stations; 787 riders were stopped in one week in Jul 2024. No official daily arrest count is published, so we use documented operations instead of inventing one. World Prison Brief shows 37,188 on remand in Aug 2026 (44.9%); ASF found 10.3% of interviewees were boda riders, with 65% over six months on remand.",
     )
 
     # 3 — Gap
@@ -305,7 +305,7 @@ def build():
     )
     set_notes(
         s,
-        "1:00 — The photo is real: motorcycles parked at Kampala Central Police Station in Jul 2024, with no case under inquiry, waiting for owners with proof. The High Court once awarded UGX 225m over an unlawful impoundment. The Constitution and courts are clear, but the practical pathway is not: ownership proof, no receipt, no date, bail procedures unknown. We are not accusing any rider of theft or replacing lawyers — we are closing the knowledge gap in the first 48 hours.",
+        "0:45 — The photo shows motorcycles at Kampala Central Police Station in Jul 2024, waiting for owners with proof. The High Court once awarded UGX 225m over an unlawful impoundment. The law is clear, but the pathway is not: ownership proof, no receipt, no date, bail unknown. We are not accusing riders of theft or replacing lawyers — we are closing the knowledge gap in the first 48 hours.",
     )
 
     # 4 — Solution
@@ -341,7 +341,7 @@ def build():
     add_footer(s, 4, "All screens captured from the live hosted LegalBridge web app on 25 Nov 2026.")
     set_notes(
         s,
-        "1:00 — Point at the screenshots and name the four capabilities. The key promise: a sourced answer and a practical next action, not a guess and not an invented phone number. Judges can scan the QR code to try it after the session.",
+        "0:50 — Point at the screenshots and name the four capabilities. The promise: a sourced answer and a practical next action, not a guess or an invented phone number. Judges can scan the QR code to try it after the session.",
     )
 
     # 5 — Flow
@@ -378,13 +378,108 @@ def build():
     add_footer(s, 5, "Demo cue: open Know My Rights, switch English ↔ Luganda, upload a notice, then dial *384*0#.")
     set_notes(
         s,
-        "1:30 — Live demo slide. Start at Know My Rights, switch to Luganda, show a document upload, then ask a question. If time allows, show the USSD code on a phone. Keep returning to: sourced answer, practical next step.",
+        "1:15 — Live demo. Start at Know My Rights, switch to Luganda, show a document upload, then ask a question. If time allows, show the USSD code on a phone. Keep returning to: sourced answer, practical next step.",
     )
 
-    # 6 — Trust
+    # 6 — Vendor facts
+    s = new_slide(prs)
+    add_bg(s, OFFWHITE)
+    add_header(s, "A vendor has seven days to find the rules.", "05 · The market vendor's problem")
+    add_rect(s, 0.7, 1.45, 5.95, 4.9, WHITE, LINE, rounded=True)
+    add_rect(s, 0.7, 1.45, 0.10, 4.9, PURPLE)
+    add_text(s, 1.05, 1.72, 5.25, 0.3, "THE VENDOR'S 7-DAY TEST", 12, PURPLE, True)
+    add_text(
+        s,
+        1.05,
+        2.12,
+        5.25,
+        3.35,
+        "KCCA told vendors in unauthorised spaces to vacate within seven days in Oct 2025; enforcement from 31 Oct. In Feb 2026 it set 19 Feb enforcement and pointed to thousands of vacant market spaces.\n\nThe Markets Act already sets rules for free registration, allocation, fees, notices and disputes. A vendor needs to know which rule applies before the deadline.",
+        15,
+        INK,
+        spacing=1.14,
+    )
+    add_text(s, 1.05, 5.72, 5.25, 0.35, "Nine in ten workers are in the informal economy.", 12.5, TEAL, True)
+
+    vendor_stats = [
+        ("91.7%", "of employed Ugandans aged 14–64 were in informal employment, including agriculture; 87% excluding agriculture (UBOS)."),
+        ("7 days", "KCCA directive on 24 Oct 2025 to vacate unauthorised trading spaces; enforcement from 31 Oct 2025."),
+        ("2,520", "vacant spaces in 17 public markets, plus at least 1,980 in 69 private markets, by Feb 2026."),
+        ("3 months", "written notice before altering a public market under the Markets Act, 2023."),
+    ]
+    for i, (big, label) in enumerate(vendor_stats):
+        y = 1.45 + i * 1.24
+        add_rect(s, 6.9, y, 5.73, 1.08, WHITE, LINE, rounded=True)
+        add_text(s, 7.15, y + 0.10, 5.2, 0.4, big, 22, PURPLE, True)
+        add_text(s, 7.15, y + 0.52, 5.2, 0.5, label, 10.2, INK, spacing=1.02)
+    add_rect(s, 0.7, 6.45, 11.93, 0.42, TEAL, rounded=True)
+    add_text(
+        s,
+        0.95,
+        6.53,
+        11.4,
+        0.28,
+        "Different spaces, different rules. Vendors need the right rule before the deadline.",
+        13,
+        WHITE,
+        True,
+        align=PP_ALIGN.CENTER,
+    )
+    add_footer(
+        s,
+        6,
+        "Sources: UBOS Labour Market Survey / New Vision (2026/27 Q1); UBC (24 Oct 2025); KCCA (17 Feb 2026); Markets Act 2023 (Parliament / ULII).",
+    )
+    set_notes(
+        s,
+        "0:40 — Second story: UBOS says 91.7% of employed Ugandans were informal in Q1 2026/27. KCCA gave vendors seven days in Oct 2025, then set 19 Feb 2026 enforcement with 2,520 public and 1,980 private spaces. We are not saying the directive is unlawful; the Markets Act sets registration, allocation, notice and dispute rules. Vendors need help choosing the right one before the deadline.",
+    )
+
+    # 7 — Vendor app flow
     s = new_slide(prs)
     add_bg(s, WHITE)
-    add_header(s, "Built to be checked, not trusted blindly.", "05 · Research integrity & inclusion")
+    add_header(s, "The same bridge works for a stall notice.", "06 · The vendor flow")
+    vendor_steps = [
+        ("1", "He picks vendor", "Free registration", "04-vendor.png"),
+        ("2", "He checks rights", "Fees, allocation, notices", "13-vendor-rights.png"),
+        ("3", "He answers eviction questions", "Slip? receipts? deadline?", "12-vendor-eviction.png"),
+        ("4", "He uploads the notice", "Plain-language next step", "08-upload.png"),
+    ]
+    for i, (num, title, sub, img) in enumerate(vendor_steps):
+        x = 0.7 + i * 3.08
+        add_rect(s, x, 1.5, 2.85, 4.75, WHITE, LINE, rounded=True)
+        add_rect(s, x + 0.2, 1.75, 0.55, 0.55, PURPLE, rounded=True)
+        add_text(s, x + 0.2, 1.84, 0.55, 0.3, num, 15, WHITE, True, align=PP_ALIGN.CENTER)
+        add_text(s, x + 0.2, 2.5, 2.45, 0.55, title, 14.5, NAVY, True)
+        add_text(s, x + 0.2, 3.08, 2.45, 0.4, sub, 11.5, MUTED)
+        add_image(s, img, x + 0.18, 3.55, 2.48, 2.25, border=False)
+    add_rect(s, 0.7, 6.45, 11.93, 0.42, TEAL, rounded=True)
+    add_text(
+        s,
+        0.95,
+        6.53,
+        11.4,
+        0.28,
+        "Free registration · displayed fees · 14-day seizure rule · EN/LG · voice and USSD",
+        12.5,
+        WHITE,
+        True,
+        align=PP_ALIGN.CENTER,
+    )
+    add_footer(
+        s,
+        7,
+        "Live app screens captured 25 Nov 2026: /vendor, /rights?category=market_vendor, /vendor/eviction, /document/upload.",
+    )
+    set_notes(
+        s,
+        "0:40 — Show the vendor tab in the live app. The rights guide gives sourced rules: registration is free, fees must be displayed, seized goods may be sold after 14 days with surplus reimbursed, and elected department heads settle disputes. The eviction screen asks about an allocation slip, receipts, who gave notice and the deadline — no invented legal advice. English, Luganda, voice and USSD are the same channels riders use.",
+    )
+
+    # 8 — Trust
+    s = new_slide(prs)
+    add_bg(s, WHITE)
+    add_header(s, "Built to be checked, not trusted blindly.", "07 · Research integrity & inclusion")
     add_rect(s, 0.7, 1.5, 5.85, 4.75, PURPLE_LIGHT, rounded=True)
     add_text(s, 1.0, 1.8, 5.2, 0.35, "SOURCE DISCIPLINE", 12, PURPLE, True)
     add_bullets(
@@ -425,24 +520,24 @@ def build():
     )
     add_footer(
         s,
-        6,
-        "Sources: Constitution of Uganda Arts 23 & 28 (ULII); GSMA “Low Tech, High Impact”; UN SDG 16.3.3 metadata.",
+        8,
+        "Sources: Constitution of Uganda Arts 23 & 28 (ULII); Markets Act 2023 (Parliament / ULII); GSMA “Low Tech, High Impact”; UN SDG 16.3.3 metadata.",
     )
     set_notes(
         s,
-        "0:45 — Judges ask how we prevented hallucination. Our answer: the guides are authored, sourced and reviewed; the AI explains those extracts rather than inventing law; unsupported languages fall back to English; and we never name a station, contact or bail figure that we cannot source.",
+        "0:35 — Judges ask how we prevented hallucination. The guides are authored, sourced and reviewed; the AI explains those extracts rather than inventing law; unsupported languages fall back to English; and we never name a station, contact or bail figure we cannot source.",
     )
 
-    # 7 — Impact / ask
+    # 9 — Impact / ask
     s = new_slide(prs)
     add_bg(s, NAVY)
     add_rect(s, 0, 0, 0.18, 7.5, PURPLE)
-    add_text(s, 0.8, 0.45, 11.8, 0.3, "06 · What we ask you to see", 11, GOLD, True)
+    add_text(s, 0.8, 0.45, 11.8, 0.3, "08 · What we ask you to see", 11, GOLD, True)
     add_text(s, 0.8, 0.85, 11.8, 0.7, "A working bridge, not a slideware idea.", 31, WHITE, True)
 
     proofs = [
         ("WORKING PRODUCT", "Live web app and health-checked API; screenshots are real, not a Figma mock-up."),
-        ("EVIDENCE-LED", "48-hour rule, remand data and impound figures cited to ULII, UPF, WPB and ASF."),
+        ("EVIDENCE-LED", "Rider remand and impound figures, plus vendor rights, cited to ULII, UPF, WPB, ASF and the Markets Act."),
         ("REACH BEYOND SMARTPHONES", "Web, Luganda voice and USSD for basic phones."),
     ]
     for i, (title, body) in enumerate(proofs):
@@ -469,10 +564,10 @@ def build():
     add_text(s, 1.05, 6.2, 8.9, 0.28, "USSD: *384*0#   ·   API health: /healthz", 12, RGBColor(244, 229, 240))
     add_image(s, "app-qr.png", 11.05, 5.78, 0.78, 0.78, border=False)
     add_text(s, 0.8, 7.05, 10.9, 0.25, "Facts checked 25 Nov 2026. Full source list in presentation/SOURCES.md.", 8.5, RGBColor(180, 188, 202))
-    add_text(s, 12.2, 7.05, 0.45, 0.25, "7", 9, RGBColor(180, 188, 202), align=PP_ALIGN.RIGHT)
+    add_text(s, 12.2, 7.05, 0.45, 0.25, "9", 9, RGBColor(180, 188, 202), align=PP_ALIGN.RIGHT)
     set_notes(
         s,
-        "0:45 — Separate proof from promise: the product is live and sourced; outcomes are what a supervised pilot will measure. Ask for partnership with legal-aid organisations and the Uganda Human Rights Commission, then invite judges to scan the QR. Reserve remaining time for questions.",
+        "1:40 — Separate proof from promise: the product is live and sourced; outcomes are what a supervised pilot will measure. Ask for partnership with legal-aid organisations and the Uganda Human Rights Commission, then invite judges to scan the QR. Use the remaining time for questions. If asked about the KCCA directive, say we do not label it unlawful — we help vendors identify the applicable rule and next step.",
     )
 
     prs.save(OUT)

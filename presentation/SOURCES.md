@@ -17,7 +17,17 @@ invented. Checked 25 Nov 2026.
 | Example of prolonged pre-trial detention of a rider: **David Kato**, 24, held at Kitalya for **4 years 11 months** without trial | Daily Monitor commentary, “Presumed guilty: Pre-trial detention crisis in Uganda” | https://monitor.co.ug/uganda/oped/commentary/presumed-guilty-pre-trial-detention-crisis-in-uganda-5184644 |
 | **Article 23**: a person must be brought to court within **48 hours** of arrest; **Article 28**: right to a fair, speedy and public hearing. ULII decisions record that detention beyond 48 hours is false imprisonment and the State is liable | Constitution of the Republic of Uganda (ULII) and ULII “Arrest and detention” case topic | https://ulii.org/akn/ug/act/statute/1995/constitution/eng@2023-12-31 · https://ulii.org/en/judgments/topics/67096/ |
 
-## Access-to-justice and inclusion context (slides 2, 6)
+## Market vendor story (slides 6–7)
+
+| Claim used | Source | URL |
+|---|---|---|
+| **91.7%** of employed Ugandans aged 14–64 were in informal employment when agriculture is included; **87%** excluding agriculture — UBOS Labour Market Survey, Q1 2026/27 | New Vision, “Nine out of every 10 employed Ugandans work in informal sector — UBOS report” | https://newvision.co.ug/category/business/nine-out-of-every-10-employed-ugandans-work-i-NV_243945_112026 |
+| KCCA directive of **24 Oct 2025**: vendors in unauthorised spaces to vacate within **7 days**; enforcement from **31 Oct 2025**; **2,320 free trading spaces** requiring an LC1 introduction letter and a copy of a National ID | Uganda Broadcasting Corporation, “KCCA Orders Street Vendors to Vacate Unauthorized Trading Spaces Within Seven Days, Provides 2,320 Free Market Stalls,” 24 Oct 2025 | https://ubc.go.ug/2025/10/24/kcca-orders-street-vendors-to-vacate-unauthorized-trading-spaces-within-seven-days-provides-2320-free-market-stalls |
+| Enforcement from **19 Feb 2026**; **2,520** vacant spaces in **17 public markets** and at least **1,980** in **69 private markets**; allocation first-come, first-served; a stall abandoned for **three months** may be reallocated | KCCA, “Vendors in City Markets Rally Street Traders to Relocate,” 17 Feb 2026 | https://www.kcca.go.ug/news/1078/vendors-in-city-markets-rally-street-traders-to-relocate |
+| Markets Act, 2023: at least **three months’ written notice** before market layout changes; **free vendor registration** with a registration number and displayed register; elected department heads settle disputes; allocation committee gives existing registered vendors priority; fees displayed; seized goods may be sold after **14 days** with surplus reimbursed; designated trading areas and pathways | Parliament of Uganda / ULII, Markets Act 2023, Act 7 of 2023 | https://www.bills.parliament.ug/attachments/Markets%20Act,%202023.pdf · https://ulii.org/en/akn/ug/act/2023/7/eng@2023-12-31 |
+| Vendor app guide reflects the same verified extracts; live eviction-guidance screen asks about allocation slip, payment receipts, who gave the notice, reason and deadline; rights screen is available in English and Luganda | Live LegalBridge app routes `/rights?category=market_vendor` and `/vendor/eviction` | https://legalbridge-app-free.onrender.com/rights?category=market_vendor · https://legalbridge-app-free.onrender.com/vendor/eviction |
+
+## Access-to-justice and inclusion context (slides 2, 8)
 
 | Claim used | Source | URL |
 |---|---|---|
@@ -41,8 +51,13 @@ reuse rights with Daily Monitor / Nation Media Group first.
 - Live app: https://legalbridge-app-free.onrender.com
 - Health-checked API: https://legalbridge-api-free.onrender.com/healthz
 - Screen captures in `presentation/assets/` were taken from the hosted app on
-  25 Nov 2026 (routes `/onboarding`, `/rights`, `/boda`, `/vendor`, `/ask`,
-  `/voice`, `/legal-help`, `/document/upload`, `/language`).
+  25 Nov 2026 (routes `/onboarding`, `/rights`, `/boda`, `/vendor`,
+  `/rights?category=market_vendor`, `/vendor/eviction`, `/ask`, `/voice`,
+  `/legal-help`, `/document/upload`, `/language`).
+- New vendor screenshots: `assets/13-vendor-rights.png` (sourced market-vendor
+  rights), `assets/12-vendor-eviction.png` (eviction-guidance questions), with
+  `assets/04-vendor.png` (vendor dashboard) and `assets/08-upload.png` (notice
+  upload) reused on slide 7.
 - Rights guides and the official-document manifest in `backend/legal_data/` are
   the source of the “verified sources” claim; English and Luganda are complete,
   Runyankore/Acholi/Lugbara are drafts that fall back to English.
@@ -56,4 +71,6 @@ reuse rights with Daily Monitor / Nation Media Group first.
   bail amounts, contact persons or case outcomes.
 - No claim that LegalBridge is a lawyer, a court, or a substitute for legal advice.
 - No measured user outcomes; pilot metrics are presented as future work.
+- No claim that the KCCA vacate directive is unlawful; the deck reports the
+  published directive and the Markets Act rules side by side.
 - No Figma images: all solution screenshots come from the live hosted product.
