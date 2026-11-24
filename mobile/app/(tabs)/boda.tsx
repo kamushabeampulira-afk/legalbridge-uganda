@@ -43,12 +43,12 @@ const ACTIONS = [
   },
   {
     id: 'rights',
-    route: '/ask?category=boda_boda&preset=rights',
+    route: '/rights?category=boda_boda',
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'boda_rights' as const,
-    desc_en: 'Ask about traffic law and your rights',
-    desc_lg: 'Buuza ku amateeka g\'ekkubo',
+    desc_en: 'Your rights under Ugandan traffic law, in plain language',
+    desc_lg: 'Eddembe lyo mu mateeka g\'ekkubo, mu lulimi olwangu',
   },
 ];
 

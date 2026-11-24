@@ -18,6 +18,20 @@ const en = {
   stack_legalHelp: 'Find Legal Help',
   stack_legalAid: 'Free Legal Aid',
   stack_ask: 'Ask LegalBridge',
+  stack_rights: 'Know Your Rights',
+
+  // Know Your Rights guides
+  rights_tab_boda: 'Boda Boda',
+  rights_tab_vendor: 'Market vendors',
+  rights_whatLaw: 'What the law says',
+  rights_plain: 'In plain language',
+  rights_steps: 'What to do',
+  rights_source: 'Source',
+  rights_openSource: 'Open official document',
+  rights_documents: 'Official documents',
+  rights_note: 'Note',
+  rights_ask: 'Ask a question',
+  rights_footer: 'Based on published Ugandan law. This is legal information, not legal advice.',
 
   // Onboarding
   onboarding_title_1: 'Understand Your Documents',
@@ -349,6 +363,19 @@ const lg: typeof en = {
   stack_legalHelp: 'Noonya Obuyambi bw\'Amateeka',
   stack_legalAid: 'Obuyambi bwa Bwereere',
   stack_ask: 'Buuza LegalBridge',
+  stack_rights: 'Manya Eddembe Lyo',
+
+  rights_tab_boda: 'Boda Boda',
+  rights_tab_vendor: 'Abasuubuzi',
+  rights_whatLaw: 'Eky’amateeka kye kigamba',
+  rights_plain: 'Mu lulimi olwangu',
+  rights_steps: 'Eky’okola',
+  rights_source: 'Ensibuko',
+  rights_openSource: 'Yagaza empapula ey’esigika',
+  rights_documents: 'Empapula ez’esigika',
+  rights_note: 'Ekimanyiddwa',
+  rights_ask: 'Buuza ekibuuzo',
+  rights_footer: 'Kisinziira ku mateeka ga Uganda agafulumizibwa. Kino kya bulimba bw’amateeka, si buqunzi.',
 
   onboarding_title_1: 'Tegeera Empapula Zo',
   onboarding_body_1: 'Kuba oba isa empapula yonna eyesigika — obubaka bw\'ekkubo, ebarua z\'okufuluka, empapula z\'akatale — ofune obunnyonnyola obwangu.',

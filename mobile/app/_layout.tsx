@@ -64,6 +64,7 @@ export default function RootLayout() {
         <Stack.Screen name="legal-help" options={{ title: t('stack_legalHelp', language) }} />
         <Stack.Screen name="legal-aid" options={{ title: t('stack_legalAid', language) }} />
         <Stack.Screen name="ask" options={{ title: t('stack_ask', language) }} />
+        <Stack.Screen name="rights" options={{ title: t('stack_rights', language) }} />
       </Stack>
     </GestureHandlerRootView>
   );

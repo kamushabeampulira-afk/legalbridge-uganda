@@ -287,28 +287,20 @@ MENUS = {
 
     'vendor_rights': {
         'en': (
-            "END Market Vendor Rights\n\n"
-            "Uganda's Markets Act 2023 and "
-            "local government rules govern "
-            "market operations.\n\n"
-            "General information:\n"
-            "- Vendors may have rights under "
-            "their allocation terms\n"
-            "- Official notices should be in "
-            "writing\n"
-            "- Disputes may be referred to "
-            "market management or local gov\n\n"
-            "For verified legal information "
-            "specific to your situation, use "
-            "the LegalBridge app.\n"
-            "Legal aid: FIDA Uganda"
+            "END Vendor Rights (Markets Act)\n"
+            "s.18: registration is free. s.21: "
+            "committee allocates stalls.\n"
+            "s.24: fees displayed. s.16(2): "
+            "3 months' written notice.\n"
+            "Source: Markets Act 2023"
         ),
         'lg': (
-            "END Eddembe ly'Omusuubuzi\n\n"
-            "Amateeka g'Akatale 2023 n'amateeka "
-            "g'gavumenti y'ensi agulabirira "
-            "byokusuubuza.\n\n"
-            "Kozesa app ya LegalBridge."
+            "END Eddembe ly'Omusuubuzi\n"
+            "s.18: okuweebwa kwa bwereere. s.21: "
+            "ekitiibwa kigaba essimbi.\n"
+            "s.24: omusaasizo gulagibwa. s.16(2): "
+            "obubaka bwa myezi 3.\n"
+            "Ensibuko: Markets Act 2023"
         ),
         'options': {}
     },
@@ -342,27 +334,20 @@ MENUS = {
 
     'rights_traffic': {
         'en': (
-            "END Traffic Laws (Uganda)\n\n"
-            "Key information:\n"
-            "- The Traffic and Road Safety Act "
-            "governs road use in Uganda\n"
-            "- All motorcycles require valid "
-            "registration and insurance\n"
-            "- Riders require a valid licence\n"
-            "- Official fines must have receipts\n\n"
-            "For specific provisions, use the "
-            "LegalBridge app which references "
-            "verified Ugandan law.\n\n"
-            "Source: Traffic & Road Safety Act"
+            "END Boda Rights\n"
+            "s.146: carry copy of licence & "
+            "registration book; originals in "
+            "72h/120h if asked.\n"
+            "Reg 11: helmet must be worn & "
+            "fastened.\n"
+            "Sources: Act 6/2020; S.I.34/2023"
         ),
         'lg': (
-            "END Amateeka g'Ekkubo\n\n"
-            "Ebikulu:\n"
-            "- Ettaka n'Enkola y'Eddiro "
-            "elabirira ekkubo\n"
-            "- Boda zonna zieetaaga "
-            "ndagamuntu n'inshuurensi\n\n"
-            "Kozesa app ya LegalBridge."
+            "END Eddembe ly'Omuvuzi\n"
+            "s.146: twala kopi ya layisensi n'empapula "
+            "z'ebidduka; ey'edda mu ssaawa 72/120.\n"
+            "Reg 11: enkufiira esibibwe bulungi.\n"
+            "Ensibuko: Act 6/2020; S.I.34/2023"
         ),
         'options': {}
     },

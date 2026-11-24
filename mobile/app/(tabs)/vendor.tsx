@@ -43,12 +43,12 @@ const ACTIONS = [
   },
   {
     id: 'rights',
-    route: '/ask?category=market_vendor&preset=rights',
+    route: '/rights?category=market_vendor',
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'vendor_rights' as const,
-    desc_en: 'Ask about market law and your rights',
-    desc_lg: 'Buuza ku amateeka g\'akatale',
+    desc_en: 'Your rights under the Markets Act 2023, in plain language',
+    desc_lg: 'Eddembe lyo mu Markets Act 2023, mu lulimi olwangu',
   },
 ];
 
