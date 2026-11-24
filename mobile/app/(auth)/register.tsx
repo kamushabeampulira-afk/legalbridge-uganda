@@ -163,7 +163,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.backgroundOffWhite,
+    backgroundColor: Colors.background,
     padding: Spacing.xl,
     gap: Spacing.sm,
   },
@@ -180,14 +180,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   errorBanner: {
-    backgroundColor: Colors.errorLight,
+    backgroundColor: Colors.errorBg,
     borderRadius: 10,
     padding: Spacing.md,
   },
   errorText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
   sectionLabel: {
     fontFamily: FontFamily.medium,
@@ -202,13 +202,13 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.surfaceWhite,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     gap: 4,
   },
   typeSelected: {
-    borderColor: Colors.primaryDeepPurple,
-    backgroundColor: '#EDE8F5',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryTint,
   },
   typeIcon: { fontSize: 24 },
   typeLabel: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
   },
-  typeLabelSelected: { color: Colors.primaryDeepPurple },
+  typeLabelSelected: { color: Colors.primary },
   consentRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
@@ -229,14 +229,14 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: Colors.borderMedium,
+    borderColor: Colors.borderStrong,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   checkboxChecked: {
-    backgroundColor: Colors.primaryDeepPurple,
-    borderColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   consentText: {
     flex: 1,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   errorSmall: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.errorRed,
+    color: Colors.error,
   },
   link: { alignItems: 'center', padding: Spacing.md },
   linkText: {
@@ -256,5 +256,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
   },
-  linkBold: { fontFamily: FontFamily.bold, color: Colors.primaryDeepPurple },
+  linkBold: { fontFamily: FontFamily.bold, color: Colors.primary },
 });

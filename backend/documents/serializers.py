@@ -52,26 +52,31 @@ class DocumentAnalysisSerializer(serializers.ModelSerializer):
 
 class DocumentDetailSerializer(serializers.ModelSerializer):
     analysis = DocumentAnalysisSerializer(read_only=True)
+    doc_type_label = serializers.CharField(source='get_doc_type_display', read_only=True)
+    verification_status_label = serializers.CharField(source='get_verification_status_display', read_only=True)
 
     class Meta:
         model = Document
         fields = [
             'id', 'original_filename', 'file_type', 'file_size_kb',
-            'doc_type', 'user_category', 'status', 'language',
+            'doc_type', 'doc_type_label', 'user_category', 'status', 'language',
             'extracted_text', 'ocr_confidence', 'ocr_warnings',
             'detected_dates', 'detected_amounts', 'detected_reference_numbers',
-            'detected_names', 'created_at', 'analysis',
+            'detected_names', 'classification', 'document_details',
+            'verification_status', 'verification_status_label', 'verification_guidance',
+            'created_at', 'analysis',
         ]
 
 
 class DocumentListSerializer(serializers.ModelSerializer):
     has_analysis = serializers.SerializerMethodField()
+    doc_type_label = serializers.CharField(source='get_doc_type_display', read_only=True)
 
     class Meta:
         model = Document
         fields = [
-            'id', 'original_filename', 'doc_type', 'user_category',
-            'status', 'created_at', 'has_analysis',
+            'id', 'original_filename', 'doc_type', 'doc_type_label', 'user_category',
+            'status', 'verification_status', 'created_at', 'has_analysis',
         ]
 
     def get_has_analysis(self, obj):

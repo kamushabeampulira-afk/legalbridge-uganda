@@ -22,28 +22,29 @@ const getSlides = (language: 'en' | 'lg') => [
     icon: 'document-text' as const,
     title: t('onboarding_title_1', language),
     body: t('onboarding_body_1', language),
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
   },
   {
     id: '2',
     icon: 'shield-checkmark' as const,
     title: t('onboarding_title_2', language),
     body: t('onboarding_body_2', language),
-    color: Colors.secondaryGold,
+    color: Colors.accent,
+    iconColor: Colors.textPrimary,
   },
   {
     id: '3',
     icon: 'footsteps' as const,
     title: t('onboarding_title_3', language),
     body: t('onboarding_body_3', language),
-    color: Colors.accentSoftBlueDark,
+    color: Colors.primaryPressed,
   },
   {
     id: '4',
     icon: 'mic' as const,
     title: t('onboarding_title_4', language),
     body: t('onboarding_body_4', language),
-    color: Colors.primaryDeepPurpleLight,
+    color: Colors.secondary,
   },
 ];
 
@@ -100,7 +101,7 @@ export default function OnboardingScreen() {
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
             <View style={[styles.iconCircle, { backgroundColor: item.color }]}>
-              <Ionicons name={item.icon} size={56} color={Colors.textOnPrimary} />
+              <Ionicons name={item.icon} size={56} color={'iconColor' in item ? item.iconColor : Colors.textOnPrimary} />
             </View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.body}>{item.body}</Text>
@@ -136,7 +137,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -187,10 +188,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.borderMedium,
+    backgroundColor: Colors.borderStrong,
   },
   dotActive: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     width: 24,
   },
   buttonArea: {
@@ -202,6 +203,6 @@ const styles = StyleSheet.create({
   loginText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
   },
 });

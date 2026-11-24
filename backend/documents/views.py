@@ -11,7 +11,10 @@ from .serializers import (
     DocumentDetailSerializer,
     DocumentListSerializer,
 )
-from .ocr import extract_text_from_file, extract_key_fields, classify_document_type
+from .ocr import extract_text_from_file, extract_key_fields
+from .classification import classify_document
+from .extraction import extract_document_details
+from .verification import assess_verification
 
 logger = logging.getLogger('legalbridge')
 
@@ -54,21 +57,28 @@ class DocumentUploadView(generics.CreateAPIView):
 
             result = extract_text_from_file(doc.file.path)
             fields = extract_key_fields(result['text'])
-            doc_type = classify_document_type(result['text'])
+            classification = classify_document(result['text'])
+            details = extract_document_details(result['text'], classification, result['confidence'])
 
             doc.extracted_text = result['text']
             doc.ocr_confidence = result['confidence']
             doc.ocr_warnings = '; '.join(result['warnings'])
-            doc.doc_type = doc_type
+            doc.doc_type = classification['doc_type']
+            doc.classification = classification
+            doc.document_details = details
             doc.detected_dates = fields['dates']
             doc.detected_amounts = fields['amounts']
             doc.detected_reference_numbers = fields['reference_numbers']
+            # Never overwrite a status an administrator recorded after checking with the issuer
+            if not doc.verification_records.exists():
+                doc.verification_status, doc.verification_guidance = assess_verification(
+                    classification, details, result['text'])
             doc.status = 'completed'
             doc.processing_completed_at = timezone.now()
             doc.save()
 
         except Exception as e:
-            logger.error(f'Document processing failed for {doc.id}: {e}')
+            logger.exception(f'Document processing failed for {doc.id}: {e}')
             doc.status = 'failed'
             doc.processing_error = str(e)
             doc.save(update_fields=['status', 'processing_error'])
@@ -91,12 +101,20 @@ def analyze_document(request, pk):
 
     # Import here to avoid circular imports
     from ai_engine.engine import generate_document_explanation
+    from ai_engine.openai_service import AIServiceUnavailable
     try:
         analysis = generate_document_explanation(doc, language=request.data.get('language', doc.language))
         from .serializers import DocumentAnalysisSerializer
         return Response(DocumentAnalysisSerializer(analysis).data, status=200)
+    except AIServiceUnavailable as e:
+        # Report the outage honestly; the document details remain available to the user
+        return Response({
+            'error': e.user_message,
+            'error_category': e.category,
+            'document_processed': True,
+        }, status=503)
     except Exception as e:
-        logger.error(f'AI analysis failed for doc {doc.id}: {e}')
+        logger.exception(f'AI analysis failed for doc {doc.id}: {e}')
         return Response({'error': 'Analysis failed. Please try again.'}, status=500)
 
 

@@ -111,7 +111,7 @@ def test_infer_subject_returns_none_for_general():
 @pytest.mark.django_db
 def test_answer_legal_question_uncertainty_when_no_chunks():
     """Core anti-hallucination test: no chunks = uncertainty message returned."""
-    with patch('legal_data.vector_store.retrieve_relevant_chunks', return_value=[]):
+    with patch('ai_engine.engine.retrieve_relevant_chunks', return_value=[]):
         result = answer_legal_question(
             question='What is the fine for speeding?',
             user_category='boda_boda',
@@ -134,6 +134,7 @@ def test_answer_legal_question_uses_retrieved_context():
             'issuing_authority': 'Parliament of Uganda',
             'source_url': 'https://ulii.org',
             'publication_date': '1998-01-01',
+            'is_current_verified': True,
         },
         'distance': 0.2,
         'relevance_score': 0.8,
@@ -146,8 +147,8 @@ def test_answer_legal_question_uses_retrieved_context():
         "This is legal information, not legal advice."
     )
 
-    with patch('legal_data.vector_store.retrieve_relevant_chunks', return_value=mock_chunks), \
-         patch('ai_engine.engine._get_openai_client') as mock_client_fn:
+    with patch('ai_engine.engine.retrieve_relevant_chunks', return_value=mock_chunks), \
+         patch('ai_engine.openai_service.get_client') as mock_client_fn,          patch('ai_engine.openai_service.is_configured', return_value=True):
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = mock_response
         mock_client_fn.return_value = mock_client

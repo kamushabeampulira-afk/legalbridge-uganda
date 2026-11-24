@@ -37,7 +37,7 @@ export default function LegalHelpScreen() {
     <View style={styles.orgCard}>
       <View style={styles.orgHeader}>
         <View style={styles.orgIconBox}>
-          <Ionicons name="business" size={24} color={Colors.primaryDeepTeal} />
+          <Ionicons name="business" size={24} color={Colors.primary} />
         </View>
         <View style={styles.orgHeaderText}>
           <Text style={styles.orgName}>{item.name}</Text>
@@ -71,12 +71,12 @@ export default function LegalHelpScreen() {
       <View style={styles.contactRow}>
         {item.phone_number ? (
           <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#E8F4F7' }]}
+            style={[styles.contactBtn, { backgroundColor: Colors.primaryTint }]}
             onPress={() => Linking.openURL(`tel:${item.phone_number}`)}
             accessibilityLabel={`${t('legalHelp_call', language)} ${item.name}`}
           >
-            <Ionicons name="call" size={16} color={Colors.primaryDeepTeal} />
-            <Text style={[styles.contactBtnText, { color: Colors.primaryDeepTeal }]}>
+            <Ionicons name="call" size={16} color={Colors.primary} />
+            <Text style={[styles.contactBtnText, { color: Colors.primary }]}>
               {t('legalHelp_contact', language)}
             </Text>
           </TouchableOpacity>
@@ -84,12 +84,12 @@ export default function LegalHelpScreen() {
 
         {item.website ? (
           <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#FEF0E8' }]}
+            style={[styles.contactBtn, { backgroundColor: Colors.secondaryTint }]}
             onPress={() => Linking.openURL(item.website)}
             accessibilityLabel={`${t('legalHelp_visitWebsite', language)} ${item.name}`}
           >
-            <Ionicons name="globe" size={16} color={Colors.secondaryBurntOrange} />
-            <Text style={[styles.contactBtnText, { color: Colors.secondaryBurntOrange }]}>
+            <Ionicons name="globe" size={16} color={Colors.secondary} />
+            <Text style={[styles.contactBtnText, { color: Colors.secondaryText }]}>
               {t('legalHelp_website', language)}
             </Text>
           </TouchableOpacity>
@@ -175,27 +175,27 @@ export default function LegalHelpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     padding: Spacing.xl,
     paddingTop: Spacing.base,
     gap: 4,
   },
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.xl, color: Colors.textOnPrimary },
-  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.accentSoftPeach },
+  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.textOnPrimaryMuted },
 
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     marginHorizontal: Spacing.base,
     marginVertical: Spacing.base,
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.base,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     minHeight: 48,
   },
   searchIcon: { marginRight: Spacing.sm },
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: Spacing.base, paddingBottom: Spacing['3xl'] },
 
   orgCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing.base,
     gap: Spacing.sm,
@@ -218,24 +218,24 @@ const styles = StyleSheet.create({
   orgHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm },
   orgIconBox: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: '#E8F4F7', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.primaryTint, alignItems: 'center', justifyContent: 'center',
   },
   orgHeaderText: { flex: 1 },
   orgName: { fontFamily: FontFamily.bold, fontSize: FontSize.base, color: Colors.textPrimary },
   orgDistrict: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   freeBadge: {
-    backgroundColor: Colors.successLight,
+    backgroundColor: Colors.successBg,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 3,
     borderRadius: BorderRadius.full,
   },
-  freeText: { fontFamily: FontFamily.medium, fontSize: 11, color: Colors.successLeafGreen },
+  freeText: { fontFamily: FontFamily.medium, fontSize: 11, color: Colors.success },
 
   orgDesc: { fontFamily: FontFamily.regular, fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: FontSize.sm * 1.6 },
 
   eligibilityBox: {
     flexDirection: 'row', gap: Spacing.xs, alignItems: 'flex-start',
-    backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.sm, padding: Spacing.sm,
+    backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.sm, padding: Spacing.sm,
   },
   eligibilityText: { flex: 1, fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textMuted, lineHeight: FontSize.xs * 1.5 },
 

@@ -15,7 +15,7 @@ export default function UncertaintyBanner({ message }: Props) {
   const language = useAppStore((s) => s.language);
   return (
     <View style={styles.container}>
-      <Ionicons name="warning" size={20} color={Colors.warningMutedCoral} style={styles.icon} />
+      <Ionicons name="warning" size={20} color={Colors.warning} style={styles.icon} />
       <Text style={styles.text}>
         {message ?? t('uncertaintyNotice', language)}
       </Text>
@@ -26,10 +26,10 @@ export default function UncertaintyBanner({ message }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: Colors.warningLight,
+    backgroundColor: Colors.warningBg,
     borderRadius: BorderRadius.md,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.warningMutedCoral,
+    borderLeftColor: Colors.warningBorder,
     padding: Spacing.md,
     marginVertical: Spacing.sm,
     alignItems: 'flex-start',
