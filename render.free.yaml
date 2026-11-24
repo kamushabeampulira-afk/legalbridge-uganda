@@ -116,14 +116,12 @@ services:
       - key: MAX_UPLOAD_SIZE_MB
         value: '10'
 
-  - type: static
+  - type: web
     name: legalbridge-app-free
     runtime: static
-    region: frankfurt
-    plan: free
     rootDir: mobile
     buildCommand: npm ci && npx expo export --platform web
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: NODE_VERSION
         value: '20'
