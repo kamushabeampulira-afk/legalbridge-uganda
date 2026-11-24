@@ -79,16 +79,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ---------------------------------------------------------
 # Database
 # ---------------------------------------------------------
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME', default='legalbridge_db'),
-        'USER': env('DB_USER', default='legalbridge_user'),
-        'PASSWORD': env('DB_PASSWORD', default=''),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
+if env('DB_ENGINE', default='postgresql') == 'sqlite':
+    # Local dev convenience: set DB_ENGINE=sqlite in .env to skip PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME', default='legalbridge_db'),
+            'USER': env('DB_USER', default='legalbridge_user'),
+            'PASSWORD': env('DB_PASSWORD', default=''),
+            'HOST': env('DB_HOST', default='localhost'),
+            'PORT': env('DB_PORT', default='5432'),
+        }
+    }
 
 # ---------------------------------------------------------
 # Auth
