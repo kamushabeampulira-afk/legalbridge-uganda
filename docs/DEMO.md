@@ -163,7 +163,7 @@ Show the system:
 ## Handling Demo Questions
 
 **"Can it really understand Luganda?"**
-> Voice recognition for Luganda has known limitations. For this version, Luganda support covers UI text and USSD menus. Voice STT uses Whisper which has limited Luganda accuracy — the app shows a warning and asks users to confirm the transcription. We recommend recorded human prompts as fallback.
+> Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a Luganda prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is still limited, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a Luganda voice is used when the device has one, otherwise the closest available voice. For a guaranteed Luganda voice, use a pre-recorded human prompt as fallback.
 
 **"What if the AI makes up a law?"**
 > The system uses RAG — it only cites provisions from documents we have manually approved and indexed. If no relevant source is found, it displays: "I cannot verify the applicable legal provision..." rather than inventing an answer.

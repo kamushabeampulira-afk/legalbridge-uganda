@@ -3,6 +3,7 @@
  * All backend calls go through this module.
  */
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { Platform } from 'react-native';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 // Change to your backend URL for device testing (use your machine's LAN IP)
@@ -243,7 +244,13 @@ export const aiApi = {
 export const voiceApi = {
   transcribe: async (audioUri: string, language: string) => {
     const formData = new FormData();
-    formData.append('audio', { uri: audioUri, name: 'recording.m4a', type: 'audio/m4a' } as any);
+    // Expo AV records WebM on web and M4A on native — tell the backend the truth.
+    const isWeb = Platform.OS === 'web';
+    formData.append('audio', {
+      uri: audioUri,
+      name: isWeb ? 'recording.webm' : 'recording.m4a',
+      type: isWeb ? 'audio/webm' : 'audio/m4a',
+    } as any);
     formData.append('language', language);
     try {
       const res = await apiClient.post('/voice/transcribe/', formData, {

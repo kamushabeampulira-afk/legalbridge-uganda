@@ -117,6 +117,7 @@ const en = {
   voice_processing: 'Processing your voice...',
   voice_fallback: 'Voice recognition is unavailable. Please type your question.',
   voice_luganda_warning: 'Luganda voice recognition has limited accuracy. Please check the text before submitting.',
+  voice_edit_hint: 'You can correct the text below before submitting.',
   voice_playback: 'Play Answer',
   voice_stop: 'Stop',
 
@@ -274,6 +275,7 @@ const lg: typeof en = {
   voice_processing: 'Tuwulira amazina go...',
   voice_fallback: 'Okuwulira amazina kuleme. Wandiika ekibuuzo kyo.',
   voice_luganda_warning: 'Okuwulira amazina g\'Oluganda kulina obunene obunene. Kebera amazina nga watandika.',
+  voice_edit_hint: 'Osobola okulongoosa ekiwandiiko wamukkaaga nga tonnakuweereza.',
   voice_playback: 'Wulira Okusubiza',
   voice_stop: 'Yimirira',
 
