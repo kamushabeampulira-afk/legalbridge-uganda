@@ -136,7 +136,7 @@ export default function BodaStoppedScreen() {
           <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
         </TouchableOpacity>
 
-        <DisclaimerBanner message={result.disclaimer} />
+        <DisclaimerBanner />
 
         <Button
           label={t('guidance_startAgain', language)}

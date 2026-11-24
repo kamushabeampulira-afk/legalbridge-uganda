@@ -163,3 +163,47 @@ def test_answer_legal_question_uses_retrieved_context():
     assert result['has_verified_sources'] is True
     assert result['uncertainty_flag'] is False
     assert len(result['legal_sources']) == 1
+
+
+# ── Non-English questions: the legal index is English-only ──────────────────
+
+from ai_engine.engine import _english_search_query, _localise_uncertainty  # noqa: E402
+from ai_engine.openai_service import AIServiceUnavailable  # noqa: E402
+from ai_engine.prompts import uncertainty_response  # noqa: E402
+
+LG_QUESTION = 'Omupoliisi yansiba ku boda boda yange. Nnina ddembe ki?'
+
+
+def test_english_question_is_searched_as_is():
+    with patch('ai_engine.engine.chat_completion') as chat:
+        assert _english_search_query('What are my rights?', 'en') == 'What are my rights?'
+    chat.assert_not_called()
+
+
+def test_luganda_question_is_translated_for_search():
+    with patch('ai_engine.engine.chat_completion', return_value=' A police officer stopped my boda boda. ') as chat:
+        assert _english_search_query(LG_QUESTION, 'lg') == 'A police officer stopped my boda boda.'
+    args, kwargs = chat.call_args
+    assert 'Luganda' in args[1] and LG_QUESTION in args[1]
+    assert kwargs['purpose'] == 'query_translation'
+
+
+def test_translation_failure_falls_back_to_original_question():
+    with patch('ai_engine.engine.chat_completion', side_effect=AIServiceUnavailable('rate_limited')):
+        assert _english_search_query(LG_QUESTION, 'lg') == LG_QUESTION
+
+
+@pytest.mark.django_db
+def test_luganda_question_retrieves_with_english_query():
+    with patch('ai_engine.engine.chat_completion', return_value='A police officer stopped my boda boda.'), \
+         patch('ai_engine.engine.retrieve_relevant_chunks', return_value=[]) as retrieve:
+        result = answer_legal_question(LG_QUESTION, user_category='boda_boda', language='lg')
+    assert retrieve.call_args.args[0] == 'A police officer stopped my boda boda.'
+    assert result['answer'] == uncertainty_response('lg')
+
+
+def test_english_uncertainty_copied_by_model_is_localised():
+    copied = UNCERTAINTY_RESPONSE + '\nSome extra text.'
+    assert _localise_uncertainty(copied, 'lg') == uncertainty_response('lg')
+    assert _localise_uncertainty(copied, 'en') == copied
+    assert _localise_uncertainty('Ekitundu 146 kigamba...', 'lg') == 'Ekitundu 146 kigamba...'

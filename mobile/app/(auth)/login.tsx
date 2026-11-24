@@ -99,9 +99,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.disclaimer}>
-          LegalBridge provides legal information, not legal advice.
-        </Text>
+        <Text style={styles.disclaimer}>{t('disclaimer_short', language)}</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

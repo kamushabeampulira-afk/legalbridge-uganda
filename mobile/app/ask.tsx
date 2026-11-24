@@ -167,7 +167,7 @@ export default function AskScreen() {
               <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
             </TouchableOpacity>
 
-            <DisclaimerBanner message={result.disclaimer} />
+            <DisclaimerBanner />
 
             <Button
               label={t('voice_askAnother', language)}

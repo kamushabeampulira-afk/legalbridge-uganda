@@ -185,7 +185,7 @@ export default function DocumentDetailScreen() {
         setPlayingAudio(false);
         Alert.alert(
           t('alert_voiceUnavailable', language),
-          result.warning ?? t('voice_synthesisUnavailable', language)
+          t('voice_synthesisUnavailable', language)
         );
       }
     } catch {

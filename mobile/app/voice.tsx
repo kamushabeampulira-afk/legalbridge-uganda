@@ -109,12 +109,13 @@ export default function VoiceScreen() {
       const result = await voiceApi.transcribe(uri, language);
       if (!result.transcription) {
         setTranscription('');
-        setTranscriptionWarning(result.warning ?? t('voice_fallback', language));
+        setTranscriptionWarning(t('voice_fallback', language));
         setState('transcribed');
         return;
       }
       setTranscription(result.transcription);
-      setTranscriptionWarning(result.warning ?? '');
+      // The server's warning text is English; show the app's translation instead.
+      setTranscriptionWarning(result.warning ? t('voice_accuracy_warning', language) : '');
       setState('transcribed');
     } catch (err: any) {
       setTranscription('');
@@ -170,7 +171,7 @@ export default function VoiceScreen() {
       } else {
         Alert.alert(
           t('alert_voiceUnavailable', language),
-          audioRes.warning ?? t('voice_synthesisUnavailable', language)
+          t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
@@ -383,7 +384,7 @@ export default function VoiceScreen() {
             </View>
           )}
 
-          <DisclaimerBanner message={result.disclaimer} />
+          <DisclaimerBanner />
 
           <TouchableOpacity style={styles.resetBtn} onPress={reset} activeOpacity={0.8}>
             <Ionicons name="mic" size={18} color={Colors.primary} />

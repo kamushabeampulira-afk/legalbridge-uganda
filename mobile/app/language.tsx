@@ -25,7 +25,6 @@ export default function LanguageScreen() {
         <View style={styles.header}>
           <Text style={styles.logo}>⚖️</Text>
           <Text style={styles.title}>{t('selectLanguage', language)}</Text>
-          <Text style={styles.subtitle}>Choose the language you prefer</Text>
         </View>
 
         <View style={styles.options}>
