@@ -20,12 +20,23 @@ def test_classify_traffic_notice():
     assert classify_document_type(text) == 'traffic_notice'
 
 
-def test_classify_eviction_notice():
+def test_classify_notice_to_vacate_trading_space():
+    # A notice to leave a market stall is its own category (not a housing eviction)
     text = (
         "NOTICE TO VACATE\n"
         "To: Jane Nakato, Stall 14B\n"
         "You are hereby required to vacate the market stall\n"
         "within 14 days from the date of this notice."
+    )
+    assert classify_document_type(text) == 'trading_space_vacate_notice'
+
+
+def test_classify_eviction_notice():
+    text = (
+        "EVICTION NOTICE\n"
+        "To: Jane Nakato, tenant of Room 4\n"
+        "You are required to vacate the premises within 30 days due to rent arrears.\n"
+        "Signed: Landlord"
     )
     assert classify_document_type(text) == 'eviction_notice'
 

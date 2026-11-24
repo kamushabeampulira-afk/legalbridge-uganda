@@ -190,6 +190,17 @@ USE_TZ = True
 # ---------------------------------------------------------
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4o')
+OPENAI_TIMEOUT_SECONDS = env.float('OPENAI_TIMEOUT_SECONDS', default=60)
+OPENAI_MAX_RETRIES = env.int('OPENAI_MAX_RETRIES', default=1)
+OPENAI_HEALTHCHECK_TIMEOUT_SECONDS = env.float('OPENAI_HEALTHCHECK_TIMEOUT_SECONDS', default=20)
+# A health-check response slower than this is reported as "working with warnings"
+OPENAI_HEALTHCHECK_SLOW_MS = env.int('OPENAI_HEALTHCHECK_SLOW_MS', default=10000)
+# Development only: return clearly-labelled placeholder text when no API key is set.
+# Off by default so a missing key is reported as an error, never as an explanation.
+AI_DEMO_MODE = env.bool('AI_DEMO_MODE', default=False)
+
+# Legal sources verified longer ago than this are flagged as needing re-checking
+LEGAL_SOURCE_MAX_AGE_DAYS = env.int('LEGAL_SOURCE_MAX_AGE_DAYS', default=365)
 
 # ---------------------------------------------------------
 # ChromaDB (RAG vector store)

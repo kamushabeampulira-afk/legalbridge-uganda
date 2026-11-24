@@ -303,7 +303,10 @@ class Command(BaseCommand):
                     **source_data,
                     'publication_date': pub_date,
                     'status': 'approved',
-                    'last_verified_at': timezone.now(),
+                    # Placeholder text: flagged so it is never presented as current law
+                    'is_sample': True,
+                    'legal_status': 'unknown',
+                    'last_verified_at': None,
                     'verification_notes': 'SAMPLE DATA — not verified for production use.',
                 }
             )

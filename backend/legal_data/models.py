@@ -23,6 +23,8 @@ class LegalSource(models.Model):
 
     SUBJECT_CHOICES = [
         ('traffic', 'Traffic and Road Safety'),
+        ('police', 'Police Powers and Procedure'),
+        ('criminal_procedure', 'Criminal Procedure and Courts'),
         ('markets', 'Markets and Trade'),
         ('employment', 'Employment and Labour'),
         ('land', 'Land and Property'),
@@ -38,16 +40,42 @@ class LegalSource(models.Model):
         ('rejected', 'Rejected'),
     ]
 
+    LEGAL_STATUS_CHOICES = [
+        ('in_force', 'In force'),
+        ('amended', 'In force, as amended'),
+        ('partially_repealed', 'Partially repealed'),
+        ('repealed', 'Repealed'),
+        ('unknown', 'Not yet confirmed'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=500)
     short_title = models.CharField(max_length=200, blank=True)
+    instrument_number = models.CharField(
+        max_length=200, blank=True,
+        help_text='Act, chapter, regulation or statutory instrument number exactly as published, '
+                  'e.g. "Act No. 15 of 1998" or "S.I. No. 12 of 2004".',
+    )
     category = models.CharField(max_length=30, choices=CATEGORY_CHOICES)
     subject = models.CharField(max_length=30, choices=SUBJECT_CHOICES, default='general')
     issuing_authority = models.CharField(max_length=300, blank=True)
     publication_date = models.DateField(null=True, blank=True)
-    effective_date = models.DateField(null=True, blank=True)
+    effective_date = models.DateField(
+        null=True, blank=True, verbose_name='Commencement / effective date',
+    )
     source_url = models.URLField(max_length=1000, blank=True)
-    version_or_amendment = models.CharField(max_length=200, blank=True)
+    version_or_amendment = models.CharField(
+        max_length=200, blank=True, verbose_name='Version / amendment notes',
+    )
+    legal_status = models.CharField(
+        max_length=20, choices=LEGAL_STATUS_CHOICES, default='unknown',
+        help_text='Whether the provision is currently in force. Only "In force" or '
+                  '"In force, as amended" sources are presented as current law.',
+    )
+    is_sample = models.BooleanField(
+        default=False,
+        help_text='Placeholder/demo text. Never presented to users as verified law.',
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_review')
 
     # The actual text content
@@ -82,6 +110,44 @@ class LegalSource(models.Model):
     @property
     def is_production_ready(self):
         return self.status == 'approved' and self.is_indexed
+
+    def currency_assessment(self, max_age_days=None):
+        """
+        Decide whether this source may be presented to users as current law.
+        Returns (is_current_verified: bool, warnings: list[str]).
+        A source counts as current verified law only if it is approved, not sample text,
+        confirmed in force, and was verified within LEGAL_SOURCE_MAX_AGE_DAYS.
+        """
+        from django.utils import timezone
+        if max_age_days is None:
+            max_age_days = getattr(settings, 'LEGAL_SOURCE_MAX_AGE_DAYS', 365)
+
+        warnings = []
+        if self.is_sample:
+            warnings.append('Sample placeholder text, not verified law.')
+        if self.status != 'approved':
+            warnings.append(f'Not approved for use (status: {self.get_status_display()}).')
+        if self.legal_status == 'repealed':
+            warnings.append('Recorded as repealed.')
+        elif self.legal_status == 'partially_repealed':
+            warnings.append('Partially repealed. Check the specific provision is still in force.')
+        elif self.legal_status == 'unknown':
+            warnings.append('Whether this law is currently in force has not been confirmed.')
+        if not self.last_verified_at:
+            warnings.append('Has never been verified against an official source.')
+        elif (timezone.now() - self.last_verified_at).days > max_age_days:
+            warnings.append(
+                f'Last verified {self.last_verified_at.date().isoformat()}; '
+                f'needs re-checking against the official source.'
+            )
+        is_current = (
+            not self.is_sample
+            and self.status == 'approved'
+            and self.legal_status in ('in_force', 'amended')
+            and bool(self.last_verified_at)
+            and (timezone.now() - self.last_verified_at).days <= max_age_days
+        )
+        return is_current, warnings
 
 
 class LegalProvision(models.Model):
