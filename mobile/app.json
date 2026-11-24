@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#5B2D8E"
+      "backgroundColor": "#922F7C"
     },
     "ios": {
       "supportsTablet": false,
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#5B2D8E"
+        "backgroundColor": "#922F7C"
       },
       "package": "org.legalbridge.informal",
       "permissions": [

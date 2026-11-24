@@ -5,7 +5,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
@@ -18,7 +18,7 @@ const ACTIONS = [
     id: 'upload',
     route: '/document/upload?category=market_vendor',
     icon: 'cloud-upload' as const,
-    color: Colors.secondaryBurntOrange,
+    color: Colors.primary,
     titleKey: 'vendor_upload' as const,
     desc_en: 'Upload allocation slips, receipts, eviction notices',
     desc_lg: 'Isa empapula zo',
@@ -27,7 +27,7 @@ const ACTIONS = [
     id: 'eviction',
     route: '/vendor/eviction',
     icon: 'exit' as const,
-    color: Colors.warningMutedCoral,
+    color: Colors.secondary,
     titleKey: 'vendor_eviction' as const,
     desc_en: 'Answer a few questions and get practical guidance',
     desc_lg: 'Noonya obuyambi ku ngufu y\'okufuluka',
@@ -36,7 +36,7 @@ const ACTIONS = [
     id: 'history',
     route: '/(tabs)/history',
     icon: 'folder-open' as const,
-    color: Colors.successLeafGreen,
+    color: Colors.textPrimary,
     titleKey: 'vendor_history' as const,
     desc_en: 'View documents you have already uploaded',
     desc_lg: 'Laba empapula z\'edda',
@@ -45,7 +45,7 @@ const ACTIONS = [
     id: 'rights',
     route: '/ask?category=market_vendor&preset=rights',
     icon: 'shield-checkmark' as const,
-    color: Colors.primaryDeepTeal,
+    color: Colors.accentStrong,
     titleKey: 'vendor_rights' as const,
     desc_en: 'Ask about market law and your rights',
     desc_lg: 'Buuza ku amateeka g\'akatale',
@@ -79,7 +79,7 @@ export default function VendorScreen() {
           accessibilityRole="button"
           accessibilityLabel={t(action.titleKey, language)}
         >
-          <View style={[styles.iconBox, { backgroundColor: action.color + '18' }]}>
+          <View style={[styles.iconBox, { backgroundColor: withAlpha(action.color, 0.1) }]}>
             <Ionicons name={action.icon} size={28} color={action.color} />
           </View>
           <View style={styles.actionText}>
@@ -93,7 +93,7 @@ export default function VendorScreen() {
       ))}
 
       <View style={styles.infoBanner}>
-        <Ionicons name="document-text" size={20} color={Colors.secondaryBurntOrange} />
+        <Ionicons name="document-text" size={20} color={Colors.accentStrong} />
         <Text style={styles.infoText}>
           {language === 'lg'
             ? 'Kubika empapula zonna ez\'akatale lyo: pepa ly\'okuweebwayo, resiti, n\'obubaka.'
@@ -107,10 +107,11 @@ export default function VendorScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.md },
   headerCard: {
-    backgroundColor: Colors.secondaryGold,
+    // Berry, matching the vendor card on Home. White text: 4.6:1.
+    backgroundColor: Colors.secondary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -127,11 +128,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: 'rgba(255,255,255,0.85)',
+    color: Colors.textOnPrimary,
     marginTop: 4,
   },
   actionCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.xs * 1.5,
   },
   infoBanner: {
-    backgroundColor: '#FDF3DC',
+    backgroundColor: Colors.accentTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.secondaryGoldDark,
+    color: Colors.accentText,
     lineHeight: FontSize.sm * 1.6,
   },
 });

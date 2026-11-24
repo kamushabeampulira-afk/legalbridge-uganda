@@ -20,28 +20,29 @@ const slides = [
     icon: 'document-text' as const,
     title: 'Understand Your Documents',
     body: 'Photograph or upload any official document — traffic notices, eviction letters, market slips — and get a plain-language explanation.',
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
   },
   {
     id: '2',
     icon: 'shield-checkmark' as const,
     title: 'Know Your Rights',
     body: 'Find out what Ugandan law says about your situation. LegalBridge references verified legal sources — no guessing.',
-    color: Colors.secondaryGold,
+    color: Colors.accent,
+    iconColor: Colors.textPrimary,
   },
   {
     id: '3',
     icon: 'footsteps' as const,
     title: 'Find Your Next Step',
     body: 'Get a practical checklist of things you can do, and connect with legal aid organisations and qualified lawyers.',
-    color: Colors.accentSoftBlueDark,
+    color: Colors.primaryPressed,
   },
   {
     id: '4',
     icon: 'mic' as const,
     title: 'Speak or Type',
     body: 'Ask questions by voice or text in English or Luganda. No internet? Dial our USSD service from any phone.',
-    color: Colors.primaryDeepPurpleLight,
+    color: Colors.secondary,
   },
 ];
 
@@ -96,7 +97,7 @@ export default function OnboardingScreen() {
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
             <View style={[styles.iconCircle, { backgroundColor: item.color }]}>
-              <Ionicons name={item.icon} size={56} color={Colors.textOnPrimary} />
+              <Ionicons name={item.icon} size={56} color={'iconColor' in item ? item.iconColor : Colors.textOnPrimary} />
             </View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.body}>{item.body}</Text>
@@ -132,7 +133,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -183,10 +184,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.borderMedium,
+    backgroundColor: Colors.borderStrong,
   },
   dotActive: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     width: 24,
   },
   buttonArea: {
@@ -198,6 +199,6 @@ const styles = StyleSheet.create({
   loginText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
   },
 });

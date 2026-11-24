@@ -45,7 +45,7 @@ export default function IndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   tagline: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.md,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     letterSpacing: 1,
   },
 });

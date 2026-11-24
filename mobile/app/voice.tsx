@@ -172,7 +172,7 @@ export default function VoiceScreen() {
       {/* Luganda warning */}
       {language === 'lg' && (
         <View style={styles.warningBox}>
-          <Ionicons name="warning" size={16} color={Colors.warningMutedCoral} />
+          <Ionicons name="warning" size={16} color={Colors.warning} />
           <Text style={styles.warningText}>{t('voice_luganda_warning', language)}</Text>
         </View>
       )}
@@ -224,7 +224,7 @@ export default function VoiceScreen() {
 
           {transcriptionWarning ? (
             <View style={styles.warningBox}>
-              <Ionicons name="warning" size={16} color={Colors.warningMutedCoral} />
+              <Ionicons name="warning" size={16} color={Colors.warning} />
               <Text style={styles.warningText}>{transcriptionWarning}</Text>
             </View>
           ) : null}
@@ -265,7 +265,7 @@ export default function VoiceScreen() {
             <Ionicons
               name={playingAudio ? 'stop-circle' : 'play-circle'}
               size={24}
-              color={Colors.secondaryBurntOrange}
+              color={Colors.secondary}
             />
             <Text style={styles.audioLabel}>
               {playingAudio ? t('voice_stop', language) : t('voice_playback', language)}
@@ -278,7 +278,7 @@ export default function VoiceScreen() {
             title="LegalBridge Answer"
             content={result.answer}
             iconName="shield-checkmark"
-            iconColor={Colors.primaryDeepTeal}
+            iconColor={Colors.primary}
           />
 
           {result.legal_sources?.length > 0 && (
@@ -293,7 +293,7 @@ export default function VoiceScreen() {
           <DisclaimerBanner message={result.disclaimer} />
 
           <TouchableOpacity style={styles.resetBtn} onPress={reset} activeOpacity={0.8}>
-            <Ionicons name="mic" size={18} color={Colors.primaryDeepTeal} />
+            <Ionicons name="mic" size={18} color={Colors.primary} />
             <Text style={styles.resetBtnText}>Ask Another Question</Text>
           </TouchableOpacity>
         </View>
@@ -305,11 +305,11 @@ export default function VoiceScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   header: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -317,11 +317,11 @@ const styles = StyleSheet.create({
     gap: Spacing.base,
   },
   headerTitle: { fontFamily: FontFamily.bold, fontSize: FontSize.lg, color: Colors.textOnPrimary },
-  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.accentSoftPeach, marginTop: 2 },
+  headerSub: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textOnPrimaryMuted, marginTop: 2 },
 
   warningBox: {
     flexDirection: 'row', gap: Spacing.sm, alignItems: 'flex-start',
-    backgroundColor: Colors.warningLight, borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.warningBg, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
   warningText: { flex: 1, fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: FontSize.xs * 1.6 },
 
@@ -332,10 +332,10 @@ const styles = StyleSheet.create({
   },
   micBtn: {
     width: 120, height: 120, borderRadius: 60,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  micBtnRecording: { backgroundColor: Colors.warningMutedCoral },
+  micBtnRecording: { backgroundColor: Colors.error },
   micLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
   typeInstead: {
     flexDirection: 'row', gap: Spacing.sm, alignItems: 'center',
@@ -346,15 +346,15 @@ const styles = StyleSheet.create({
   transcriptionSection: { gap: Spacing.base },
   sectionTitle: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textPrimary },
   transcriptionBox: {
-    backgroundColor: Colors.surfaceWhite, borderRadius: BorderRadius.lg,
-    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primaryDeepTeal,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.base, borderWidth: 1.5, borderColor: Colors.primary,
   },
   transcriptionText: {
     fontFamily: FontFamily.regular, fontSize: FontSize.base,
     color: Colors.textPrimary, lineHeight: FontSize.base * 1.6,
   },
   submitBtn: {
-    backgroundColor: Colors.primaryDeepTeal, borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primary, borderRadius: BorderRadius.lg,
     padding: Spacing.base, flexDirection: 'row', alignItems: 'center',
     justifyContent: 'center', gap: Spacing.sm,
   },
@@ -365,18 +365,18 @@ const styles = StyleSheet.create({
   answerSection: { gap: Spacing.sm },
   audioRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: '#FEF0E8', borderRadius: BorderRadius.md, padding: Spacing.base,
+    backgroundColor: Colors.secondaryTint, borderRadius: BorderRadius.md, padding: Spacing.base,
   },
-  audioLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryBurntOrange },
+  audioLabel: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.secondaryText },
 
-  sourcesBox: { backgroundColor: Colors.surfaceLight, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
+  sourcesBox: { backgroundColor: Colors.surfaceMuted, borderRadius: BorderRadius.md, padding: Spacing.base, gap: Spacing.xs },
   sourcesTitle: { fontFamily: FontFamily.semiBold, fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase' },
   sourceItem: { fontFamily: FontFamily.regular, fontSize: FontSize.xs, color: Colors.textSecondary },
 
   resetBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: Spacing.sm, backgroundColor: '#E8F4F7',
+    gap: Spacing.sm, backgroundColor: Colors.primaryTint,
     borderRadius: BorderRadius.lg, padding: Spacing.base,
   },
-  resetBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.primaryDeepTeal },
+  resetBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.primary },
 });

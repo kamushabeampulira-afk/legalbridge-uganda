@@ -9,28 +9,28 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { documentsApi } from '@/services/api';
-import { Colors } from '@/constants/Colors';
+import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 
-const DOC_TYPE_ICONS: Record<string, { icon: string; color: string }> = {
-  traffic_notice: { icon: '🚦', color: Colors.warningMutedCoral },
-  police_charge: { icon: '👮', color: Colors.errorRed },
-  eviction_notice: { icon: '🏚️', color: Colors.warningMutedCoral },
-  allocation_slip: { icon: '📋', color: Colors.successLeafGreen },
-  payment_receipt: { icon: '🧾', color: Colors.primaryDeepTeal },
-  court_summons: { icon: '⚖️', color: Colors.secondaryBurntOrange },
-  unknown: { icon: '📄', color: Colors.textMuted },
+const DOC_TYPE_ICONS: Record<string, { icon: string }> = {
+  traffic_notice: { icon: '🚦' },
+  police_charge: { icon: '👮' },
+  eviction_notice: { icon: '🏚️' },
+  allocation_slip: { icon: '📋' },
+  payment_receipt: { icon: '🧾' },
+  court_summons: { icon: '⚖️' },
+  unknown: { icon: '📄' },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  completed: { label: 'Ready', color: Colors.successLeafGreen },
-  processing: { label: 'Processing', color: Colors.primaryDeepTeal },
-  failed: { label: 'Failed', color: Colors.errorRed },
-  uploaded: { label: 'Uploaded', color: Colors.infoBlue },
+  completed: { label: 'Ready', color: Colors.success },
+  processing: { label: 'Processing', color: Colors.primary },
+  failed: { label: 'Failed', color: Colors.error },
+  uploaded: { label: 'Uploaded', color: Colors.info },
 };
 
 export default function HistoryScreen() {
@@ -102,7 +102,7 @@ export default function HistoryScreen() {
           <Text style={styles.docDate}>{date}</Text>
         </View>
         <View style={styles.docRight}>
-          <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
+          <View style={[styles.statusBadge, { backgroundColor: withAlpha(statusInfo.color, 0.12) }]}>
             <Text style={[styles.statusText, { color: statusInfo.color }]}>
               {statusInfo.label}
             </Text>
@@ -147,7 +147,7 @@ export default function HistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => { setRefreshing(true); loadDocuments(); }}
-            tintColor={Colors.primaryDeepTeal}
+            tintColor={Colors.primary}
           />
         }
         ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
@@ -157,11 +157,11 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  container: { flex: 1, backgroundColor: Colors.background },
   list: { padding: Spacing.base, paddingBottom: Spacing['3xl'] },
 
   docCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: Spacing['3xl'],
-    backgroundColor: Colors.backgroundOffWhite,
+    backgroundColor: Colors.background,
     gap: Spacing.base,
   },
   emptyIcon: { fontSize: 64 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   uploadBtn: {
     flexDirection: 'row',
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,

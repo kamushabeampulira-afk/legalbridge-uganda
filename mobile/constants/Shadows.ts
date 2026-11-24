@@ -7,23 +7,24 @@
  * Usage:  style={[styles.card, webShadow.sm]}
  */
 import { Platform, ViewStyle } from 'react-native';
+import { Colors, withAlpha } from './Colors';
 
 const nativeSm: ViewStyle = {
-  shadowColor: '#000',
+  shadowColor: Colors.shadow,
   shadowOffset: { width: 0, height: 1 },
   shadowOpacity: 0.08,
   shadowRadius: 3,
   elevation: 2,
 };
 const nativeMd: ViewStyle = {
-  shadowColor: '#000',
+  shadowColor: Colors.shadow,
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.12,
   shadowRadius: 6,
   elevation: 4,
 };
 const nativeLg: ViewStyle = {
-  shadowColor: '#000',
+  shadowColor: Colors.shadow,
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.16,
   shadowRadius: 12,
@@ -33,15 +34,15 @@ const nativeLg: ViewStyle = {
 // On web use CSS boxShadow; on native use the RN shadow props
 export const webShadow = {
   sm: Platform.select<ViewStyle>({
-    web: { boxShadow: '0 1px 3px rgba(0,0,0,0.10)' } as any,
+    web: { boxShadow: `0 1px 3px ${withAlpha(Colors.shadow, 0.12)}` } as any,
     default: nativeSm,
   })!,
   md: Platform.select<ViewStyle>({
-    web: { boxShadow: '0 2px 8px rgba(0,0,0,0.13)' } as any,
+    web: { boxShadow: `0 2px 8px ${withAlpha(Colors.shadow, 0.14)}` } as any,
     default: nativeMd,
   })!,
   lg: Platform.select<ViewStyle>({
-    web: { boxShadow: '0 4px 16px rgba(0,0,0,0.18)' } as any,
+    web: { boxShadow: `0 4px 16px ${withAlpha(Colors.shadow, 0.18)}` } as any,
     default: nativeLg,
   })!,
 };
