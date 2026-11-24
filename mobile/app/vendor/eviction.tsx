@@ -84,7 +84,7 @@ export default function VendorEvictionScreen() {
       });
       setResult(res);
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
     } finally {
       setLoading(false);
     }
@@ -95,13 +95,13 @@ export default function VendorEvictionScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.resultHeader}>
           <Text style={styles.resultEmoji}>🏪</Text>
-          <Text style={styles.resultTitle}>Your Guidance</Text>
+          <Text style={styles.resultTitle}>{t('guidance_resultTitle', language)}</Text>
         </View>
 
         {result.uncertainty_flag && <UncertaintyBanner />}
 
         <SectionCard
-          title="Guidance for Your Situation"
+          title={t('guidance_title', language)}
           content={result.guidance}
           iconName="shield-checkmark"
           iconColor={Colors.secondary}
@@ -122,7 +122,7 @@ export default function VendorEvictionScreen() {
         </TouchableOpacity>
 
         <DisclaimerBanner message={result.disclaimer} />
-        <Button label="Start Again" onPress={() => setResult(null)} variant="outline" />
+        <Button label={t('guidance_startAgain', language)} onPress={() => setResult(null)} variant="outline" />
       </ScrollView>
     );
   }
@@ -134,9 +134,7 @@ export default function VendorEvictionScreen() {
       <View style={styles.headerCard}>
         <Text style={styles.headerEmoji}>🏚️</Text>
         <Text style={styles.headerTitle}>{t('vendor_eviction', language)}</Text>
-        <Text style={styles.headerSub}>
-          Answer the questions below so LegalBridge can give you relevant information about your situation.
-        </Text>
+        <Text style={styles.headerSub}>{t('guidance_intro_vendor', language)}</Text>
       </View>
 
       <View style={styles.questionBlock}>
@@ -155,7 +153,7 @@ export default function VendorEvictionScreen() {
           style={styles.textInput}
           value={noticeIssuer}
           onChangeText={setNoticeIssuer}
-          placeholder="e.g. Market manager / Local council / Unknown"
+          placeholder={t('vendor_q3_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
@@ -168,7 +166,7 @@ export default function VendorEvictionScreen() {
           onChangeText={setReasonGiven}
           multiline
           numberOfLines={3}
-          placeholder="e.g. Unpaid fees / Market redevelopment / No reason given"
+          placeholder={t('vendor_q4_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />
@@ -180,20 +178,20 @@ export default function VendorEvictionScreen() {
           style={styles.textInput}
           value={deadline}
           onChangeText={setDeadline}
-          placeholder="e.g. 30 June 2024 / No deadline given"
+          placeholder={t('vendor_q5_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
         />
       </View>
 
       <View style={styles.questionBlock}>
-        <Text style={styles.questionLabel}>{t('optional', language)}: Any other details?</Text>
+        <Text style={styles.questionLabel}>{t('optional', language)}: {t('guidance_otherDetails', language)}</Text>
         <TextInput
           style={styles.textArea}
           value={additionalDetails}
           onChangeText={setAdditionalDetails}
           multiline
           numberOfLines={3}
-          placeholder="Any other information that may be relevant..."
+          placeholder={t('vendor_other_placeholder', language)}
           placeholderTextColor={Colors.textMuted}
           textAlignVertical="top"
         />

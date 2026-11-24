@@ -7,10 +7,11 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
+import { t } from '@/i18n/translations';
 
 export default function LanguageScreen() {
   const router = useRouter();
-  const { setLanguage } = useAppStore();
+  const { language, setLanguage } = useAppStore();
 
   const select = (lang: 'en' | 'lg') => {
     setLanguage(lang);
@@ -21,8 +22,8 @@ export default function LanguageScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.logo}>⚖️</Text>
-        <Text style={styles.title}>Choose Your Language</Text>
-        <Text style={styles.subtitle}>Londa Olulimi Lwo</Text>
+        <Text style={styles.title}>{t('selectLanguage', language)}</Text>
+        <Text style={styles.subtitle}>{t('selectLanguage', 'lg')}</Text>
       </View>
 
       <View style={styles.options}>
@@ -30,12 +31,12 @@ export default function LanguageScreen() {
           style={[styles.option, webShadow.md]}
           onPress={() => select('en')}
           activeOpacity={0.8}
-          accessibilityLabel="Select English"
+          accessibilityLabel={t('language_select_en_a11y', language)}
         >
           <Text style={styles.flag}>🇬🇧</Text>
           <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>English</Text>
-            <Text style={styles.optionSub}>Continue in English</Text>
+            <Text style={styles.optionTitle}>{t('english', language)}</Text>
+            <Text style={styles.optionSub}>{t('language_continue_en', language)}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
         </TouchableOpacity>
@@ -44,20 +45,20 @@ export default function LanguageScreen() {
           style={[styles.option, webShadow.md]}
           onPress={() => select('lg')}
           activeOpacity={0.8}
-          accessibilityLabel="Londa Oluganda"
+          accessibilityLabel={t('language_select_lg_a11y', language)}
         >
           <Text style={styles.flag}>🇺🇬</Text>
           <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>Luganda</Text>
-            <Text style={styles.optionSub}>Endeera mu Luganda</Text>
+            <Text style={styles.optionTitle}>{t('luganda', language)}</Text>
+            <Text style={styles.optionSub}>{t('language_continue_lg', language)}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.note}>
-        You can change your language at any time in Settings.{'\n'}
-        Osobola okyusa olulimi enkanya mu Nteekateeka.
+        {t('language_note', language)}{'\n'}
+        {t('language_note', 'lg')}
       </Text>
     </View>
   );

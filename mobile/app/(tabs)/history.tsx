@@ -26,11 +26,13 @@ const DOC_TYPE_ICONS: Record<string, { icon: string }> = {
   unknown: { icon: '📄' },
 };
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  completed: { label: 'Ready', color: Colors.success },
-  processing: { label: 'Processing', color: Colors.primary },
-  failed: { label: 'Failed', color: Colors.error },
-  uploaded: { label: 'Uploaded', color: Colors.info },
+type StatusKey = 'status_ready' | 'status_processing' | 'status_failed' | 'status_uploaded' | 'status_unknown';
+
+const STATUS_LABELS: Record<string, { labelKey: StatusKey; color: string }> = {
+  completed: { labelKey: 'status_ready', color: Colors.success },
+  processing: { labelKey: 'status_processing', color: Colors.primary },
+  failed: { labelKey: 'status_failed', color: Colors.error },
+  uploaded: { labelKey: 'status_uploaded', color: Colors.info },
 };
 
 export default function HistoryScreen() {
@@ -68,7 +70,7 @@ export default function HistoryScreen() {
               await documentsApi.delete(docId);
               setDocuments((prev) => prev.filter((d) => d.id !== docId));
             } catch {
-              Alert.alert('Error', t('error_generic', language));
+              Alert.alert(t('alert_error', language), t('error_generic', language));
             }
           },
         },
@@ -78,7 +80,7 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }: { item: any }) => {
     const typeInfo = DOC_TYPE_ICONS[item.doc_type] ?? DOC_TYPE_ICONS.unknown;
-    const statusInfo = STATUS_LABELS[item.status] ?? { label: item.status, color: Colors.textMuted };
+    const statusInfo = STATUS_LABELS[item.status] ?? { labelKey: 'status_unknown' as StatusKey, color: Colors.textMuted };
     const date = new Date(item.created_at).toLocaleDateString('en-UG', {
       day: 'numeric', month: 'short', year: 'numeric',
     });
@@ -94,23 +96,23 @@ export default function HistoryScreen() {
         </View>
         <View style={styles.docInfo}>
           <Text style={styles.docName} numberOfLines={1}>
-            {item.original_filename || 'Document'}
+            {item.original_filename || t('document_defaultTitle', language)}
           </Text>
           <Text style={styles.docType}>
-            {item.doc_type?.replace(/_/g, ' ') ?? 'Unknown type'}
+            {item.doc_type?.replace(/_/g, ' ') ?? t('history_unknownType', language)}
           </Text>
           <Text style={styles.docDate}>{date}</Text>
         </View>
         <View style={styles.docRight}>
           <View style={[styles.statusBadge, { backgroundColor: withAlpha(statusInfo.color, 0.12) }]}>
             <Text style={[styles.statusText, { color: statusInfo.color }]}>
-              {statusInfo.label}
+              {t(statusInfo.labelKey, language)}
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
             style={styles.deleteBtn}
-            accessibilityLabel="Delete document"
+            accessibilityLabel={t('history_delete', language)}
           >
             <Ionicons name="trash-outline" size={18} color={Colors.textMuted} />
           </TouchableOpacity>

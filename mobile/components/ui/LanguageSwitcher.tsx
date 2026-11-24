@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Colors } from '@/constants/Colors';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
+import { t } from '@/i18n/translations';
 
 /**
  * Compact language toggle — shows current language and taps to switch.
@@ -19,7 +20,7 @@ export default function LanguageSwitcher() {
       style={styles.container}
       onPress={toggle}
       activeOpacity={0.8}
-      accessibilityLabel={`Current language: ${language === 'en' ? 'English' : 'Luganda'}. Tap to switch.`}
+      accessibilityLabel={t('language_switcher_a11y', language)}
       accessibilityRole="button"
     >
       <Text style={styles.flag}>{language === 'en' ? '🇬🇧' : '🇺🇬'}</Text>

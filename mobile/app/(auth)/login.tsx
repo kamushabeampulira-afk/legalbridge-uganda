@@ -22,8 +22,8 @@ export default function LoginScreen() {
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!phone.trim()) e.phone = 'Phone number is required.';
-    if (!password) e.password = 'Password is required.';
+    if (!phone.trim()) e.phone = t('validation_phoneRequired', language);
+    if (!password) e.password = t('validation_passwordRequired', language);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -54,7 +54,7 @@ export default function LoginScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>⚖️</Text>
-          <Text style={styles.appName}>LegalBridge</Text>
+          <Text style={styles.appName}>{t('appName', language)}</Text>
           <Text style={styles.tagline}>{t('tagline', language)}</Text>
         </View>
 

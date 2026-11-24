@@ -77,7 +77,7 @@ export default function VoiceScreen() {
     try {
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Microphone access is required for voice questions.');
+        Alert.alert(t('alert_permissionNeeded', language), t('voice_microphonePermission', language));
         return;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -88,7 +88,7 @@ export default function VoiceScreen() {
       setState('recording');
       startPulse();
     } catch (e) {
-      Alert.alert('Recording failed', 'Could not start recording. Please try typing your question.');
+      Alert.alert(t('alert_recordingFailed', language), t('voice_recordingRetry', language));
     }
   };
 
@@ -168,12 +168,12 @@ export default function VoiceScreen() {
         });
       } else {
         Alert.alert(
-          'Voice unavailable',
-          audioRes.warning ?? 'Voice synthesis is not available. Please read the text version.'
+          t('alert_voiceUnavailable', language),
+          audioRes.warning ?? t('voice_synthesisUnavailable', language)
         );
       }
     } catch {
-      Alert.alert('Voice unavailable', 'Voice synthesis is not available. Please read the text version.');
+      Alert.alert(t('alert_voiceUnavailable', language), t('voice_synthesisUnavailable', language));
     }
   };
 
@@ -185,7 +185,7 @@ export default function VoiceScreen() {
 
   const submitTranscription = async () => {
     if (!transcription.trim()) {
-      Alert.alert('No text', t('voice_fallback', language));
+      Alert.alert(t('alert_noText', language), t('voice_fallback', language));
       return;
     }
     setState('processing');
@@ -203,7 +203,7 @@ export default function VoiceScreen() {
         await playAnswer(res.answer);
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? t('error_generic', language));
+      Alert.alert(t('alert_error', language), err.message ?? t('error_generic', language));
       setState('transcribed');
     }
   };
@@ -249,7 +249,7 @@ export default function VoiceScreen() {
         <Ionicons name="mic" size={28} color={Colors.textOnPrimary} />
         <View>
           <Text style={styles.headerTitle}>{t('voice_title', language)}</Text>
-          <Text style={styles.headerSub}>English & Luganda</Text>
+          <Text style={styles.headerSub}>{t('voice_languages', language)}</Text>
         </View>
       </View>
 
@@ -275,7 +275,9 @@ export default function VoiceScreen() {
               style={[styles.micBtn, state === 'recording' && styles.micBtnRecording, webShadow.lg]}
               onPress={state === 'recording' ? stopRecording : startRecording}
               activeOpacity={0.8}
-              accessibilityLabel={state === 'recording' ? 'Stop recording' : 'Start recording'}
+              accessibilityLabel={state === 'recording'
+                ? t('voice_stopRecording', language)
+                : t('voice_startRecording', language)}
             >
               <Ionicons
                 name={state === 'recording' ? 'stop' : 'mic'}
@@ -286,7 +288,9 @@ export default function VoiceScreen() {
           </Animated.View>
 
           <Text style={styles.micLabel}>
-            {state === 'recording' ? 'Tap to stop' : 'Tap to record'}
+            {state === 'recording'
+              ? t('voice_tapStop', language)
+              : t('voice_tapRecord', language)}
           </Text>
 
           {/* Fallback: type instead */}
@@ -296,7 +300,7 @@ export default function VoiceScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="create-outline" size={16} color={Colors.textMuted} />
-            <Text style={styles.typeInsteadText}>Type your question instead</Text>
+            <Text style={styles.typeInsteadText}>{t('voice_typeInstead', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -304,7 +308,7 @@ export default function VoiceScreen() {
       {/* Transcription review */}
       {state === 'transcribed' && (
         <View style={styles.transcriptionSection}>
-          <Text style={styles.sectionTitle}>Your question</Text>
+          <Text style={styles.sectionTitle}>{t('voice_yourQuestion', language)}</Text>
 
           {transcriptionWarning ? (
             <View style={styles.warningBox}>
@@ -326,18 +330,18 @@ export default function VoiceScreen() {
               />
               <TouchableOpacity style={styles.submitBtn} onPress={submitTranscription} activeOpacity={0.85}>
                 <Ionicons name="send" size={18} color={Colors.textOnPrimary} />
-                <Text style={styles.submitBtnText}>Submit Question</Text>
+                <Text style={styles.submitBtnText}>{t('voice_submitQuestion', language)}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <TouchableOpacity style={styles.submitBtn} onPress={() => router.push('/ask')} activeOpacity={0.85}>
               <Ionicons name="create" size={18} color={Colors.textOnPrimary} />
-              <Text style={styles.submitBtnText}>Type Question Instead</Text>
+              <Text style={styles.submitBtnText}>{t('voice_typeQuestion', language)}</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity style={styles.retryLink} onPress={reset}>
-            <Text style={styles.retryLinkText}>Record Again</Text>
+            <Text style={styles.retryLinkText}>{t('voice_recordAgain', language)}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -363,7 +367,7 @@ export default function VoiceScreen() {
           {result.uncertainty_flag && <UncertaintyBanner />}
 
           <SectionCard
-            title="LegalBridge Answer"
+            title={t('voice_answer', language)}
             content={result.answer}
             iconName="shield-checkmark"
             iconColor={Colors.primary}
@@ -382,7 +386,7 @@ export default function VoiceScreen() {
 
           <TouchableOpacity style={styles.resetBtn} onPress={reset} activeOpacity={0.8}>
             <Ionicons name="mic" size={18} color={Colors.primary} />
-            <Text style={styles.resetBtnText}>Ask Another Question</Text>
+            <Text style={styles.resetBtnText}>{t('voice_askAnother', language)}</Text>
           </TouchableOpacity>
         </View>
       )}

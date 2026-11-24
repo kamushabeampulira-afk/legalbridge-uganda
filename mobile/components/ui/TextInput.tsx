@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
+import { useAppStore } from '@/store/useAppStore';
+import { t } from '@/i18n/translations';
 
 interface LBTextInputProps extends TextInputProps {
   label?: string;
@@ -31,6 +33,7 @@ export default function TextInput({
   isRequired = false,
   ...props
 }: LBTextInputProps) {
+  const language = useAppStore((s) => s.language);
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -56,7 +59,7 @@ export default function TextInput({
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeButton}
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            accessibilityLabel={t(showPassword ? 'password_hide' : 'password_show', language)}
           >
             <Ionicons
               name={showPassword ? 'eye-off' : 'eye'}

@@ -29,7 +29,7 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     Alert.alert(
       t('profile_logout', language),
-      language === 'lg' ? 'Ofuna okufuluma?' : 'Are you sure you want to log out?',
+      t('profile_confirmLogout', language),
       [
         { text: t('cancel', language), style: 'cancel' },
         {
@@ -59,7 +59,7 @@ export default function ProfileScreen() {
               await logout();
               router.replace('/(auth)/login');
             } catch {
-              Alert.alert('Error', t('error_generic', language));
+              Alert.alert(t('alert_error', language), t('error_generic', language));
             } finally {
               setDeleting(false);
             }
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
           </Text>
         </View>
         <View>
-          <Text style={styles.userName}>{user?.full_name || 'LegalBridge User'}</Text>
+          <Text style={styles.userName}>{user?.full_name || t('profile_defaultName', language)}</Text>
           <Text style={styles.userPhone}>{user?.phone_number}</Text>
           <Text style={styles.userType}>
             {user?.user_type?.replace(/_/g, ' ') ?? 'User'}
@@ -121,7 +121,7 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>{t('profile_language', language)}</Text>
         <SettingRow
           icon="language"
-          title={language === 'en' ? 'English' : 'Luganda'}
+          title={t(language === 'en' ? 'english' : 'luganda', language)}
           right={
             <Switch
               value={language === 'lg'}
@@ -134,10 +134,10 @@ export default function ProfileScreen() {
       </View>
 
       <View style={[styles.section, webShadow.sm]}>
-        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={styles.sectionTitle}>{t('profile_account', language)}</Text>
         <SettingRow
           icon="person-outline"
-          title="Edit Profile"
+          title={t('profile_editProfile', language)}
           onPress={() => {/* TODO: edit profile screen */}}
         />
         <SettingRow
@@ -180,10 +180,8 @@ export default function ProfileScreen() {
         />
       </View>
 
-      <Text style={styles.version}>LegalBridge Informal v1.0.0 · Hack4Justice 2026</Text>
-      <Text style={styles.disclaimer}>
-        LegalBridge provides legal information, not legal advice.
-      </Text>
+      <Text style={styles.version}>{t('profile_versionText', language)}</Text>
+      <Text style={styles.disclaimer}>{t('disclaimer', language)}</Text>
     </ScrollView>
   );
 }
