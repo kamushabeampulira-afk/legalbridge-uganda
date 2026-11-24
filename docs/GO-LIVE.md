@@ -3,6 +3,13 @@
 Everything in the repository is done and merged to `main`. These are the only
 steps that require your accounts, keys, and confirmation.
 
+## Current demo (live)
+
+- API: <https://legalbridge-api-free.onrender.com>
+- Health check: <https://legalbridge-api-free.onrender.com/healthz> → `ok`
+- Blueprint: `legalbridge-demo` using `render.free.yaml` (commit `6d0fec4`)
+- `mobile/.env` is already set locally to the API URL above and is gitignored.
+
 ## 1. Keys to create first
 
 | # | Tap / open | What to copy |
@@ -41,13 +48,13 @@ steps that require your accounts, keys, and confirmation.
 
 ## 3. Verify the API
 
-Render gives you a URL like `https://legalbridge-demo.onrender.com`.
+The deployed host is `https://legalbridge-api-free.onrender.com`.
 
 | Tap / open | Expected |
 |------------|----------|
-| `https://<your-host>/healthz` | Plain text `ok` |
-| `https://<your-host>/admin/` | Django admin login page |
-| `POST https://<your-host>/api/auth/token/` with a test user | JWT access token |
+| `https://legalbridge-api-free.onrender.com/healthz` | Plain text `ok` |
+| `https://legalbridge-api-free.onrender.com/admin/` | Django admin login page |
+| `POST https://legalbridge-api-free.onrender.com/api/auth/token/` with a test user | JWT access token |
 
 If `/healthz` shows `db unavailable`, check the Render logs and the Postgres
 connection in the service **Environment** tab.
@@ -57,7 +64,7 @@ connection in the service **Environment** tab.
 Create `mobile/.env` locally (do **not** commit it):
 
 ```env
-EXPO_PUBLIC_API_URL=https://<your-host>/api
+EXPO_PUBLIC_API_URL=https://legalbridge-api-free.onrender.com/api
 ```
 
 Then rebuild/run Expo. Verify in the app:
@@ -72,7 +79,7 @@ Then rebuild/run Expo. Verify in the app:
 In the Africa's Talking dashboard, set the callback URL to:
 
 ```text
-https://<your-host>/api/ussd/webhook/
+https://legalbridge-api-free.onrender.com/api/ussd/webhook/
 ```
 
 Verify in the Africa's Talking simulator:
