@@ -5,7 +5,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
@@ -18,7 +18,7 @@ const ACTIONS = [
     id: 'upload',
     route: '/document/upload?category=boda_boda',
     icon: 'cloud-upload' as const,
-    color: Colors.primaryDeepTeal,
+    color: Colors.primary,
     titleKey: 'boda_upload' as const,
     desc_en: 'Photograph or upload a traffic notice',
     desc_lg: 'Isa obubaka bw\'ekkubo',
@@ -27,7 +27,7 @@ const ACTIONS = [
     id: 'stopped',
     route: '/boda/stopped',
     icon: 'hand-left' as const,
-    color: Colors.warningMutedCoral,
+    color: Colors.secondary,
     titleKey: 'boda_stopped' as const,
     desc_en: 'Answer a few questions and get guidance',
     desc_lg: 'Noonya obuyambi ng\'okuggwa',
@@ -36,7 +36,7 @@ const ACTIONS = [
     id: 'history',
     route: '/(tabs)/history',
     icon: 'folder-open' as const,
-    color: Colors.successLeafGreen,
+    color: Colors.textPrimary,
     titleKey: 'boda_history' as const,
     desc_en: 'View documents you have already uploaded',
     desc_lg: 'Laba empapula z\'edda',
@@ -45,7 +45,7 @@ const ACTIONS = [
     id: 'rights',
     route: '/ask?category=boda_boda&preset=rights',
     icon: 'shield-checkmark' as const,
-    color: Colors.secondaryBurntOrange,
+    color: Colors.accentStrong,
     titleKey: 'boda_rights' as const,
     desc_en: 'Ask about traffic law and your rights',
     desc_lg: 'Buuza ku amateeka g\'ekkubo',
@@ -81,7 +81,7 @@ export default function BodaScreen() {
           accessibilityRole="button"
           accessibilityLabel={t(action.titleKey, language)}
         >
-          <View style={[styles.iconBox, { backgroundColor: action.color + '18' }]}>
+          <View style={[styles.iconBox, { backgroundColor: withAlpha(action.color, 0.1) }]}>
             <Ionicons name={action.icon} size={28} color={action.color} />
           </View>
           <View style={styles.actionText}>
@@ -96,7 +96,7 @@ export default function BodaScreen() {
 
       {/* Key info banner */}
       <View style={styles.infoBanner}>
-        <Ionicons name="information-circle" size={20} color={Colors.primaryDeepTeal} />
+        <Ionicons name="information-circle" size={20} color={Colors.primary} />
         <Text style={styles.infoText}>
           {language === 'lg'
             ? 'Obuzibu obw\'ekkubo? Noonya obuyambi obuva eri looya awungeddwa.'
@@ -110,11 +110,11 @@ export default function BodaScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.md },
 
   headerCard: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     flexDirection: 'row',
@@ -131,12 +131,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     marginTop: 4,
   },
 
   actionCard: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
 
   infoBanner: {
-    backgroundColor: '#EDE8F5',
+    backgroundColor: Colors.primaryTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     flexDirection: 'row',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.primaryDeepPurple,
+    color: Colors.primary,
     lineHeight: FontSize.sm * 1.6,
   },
 });

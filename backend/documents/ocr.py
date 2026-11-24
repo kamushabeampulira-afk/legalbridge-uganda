@@ -238,40 +238,8 @@ def _extract_references(text: str) -> list:
 
 def classify_document_type(text: str) -> str:
     """
-    Heuristic document classifier based on keyword presence.
-    Returns a doc_type string matching Document.DOC_TYPE_CHOICES.
+    Return the doc_type code for the text. Kept for backwards compatibility;
+    the classifier lives in documents.classification (see classify_document).
     """
-    text_lower = text.lower()
-
-    traffic_keywords = [
-        'traffic', 'vehicle', 'road', 'speed', 'driving', 'licence',
-        'number plate', 'boda', 'motorcycle', 'road safety', 'police',
-        'traffic officer', 'impound', 'fine', 'penalty'
-    ]
-    eviction_keywords = [
-        'evict', 'vacate', 'quit', 'leave the premises', 'notice to quit',
-        'stall', 'market', 'vendor', 'tenant', 'landlord'
-    ]
-    allocation_keywords = [
-        'allocation', 'allot', 'assigned', 'stall number', 'market stall',
-        'hereby allocated', 'trading space'
-    ]
-    receipt_keywords = [
-        'receipt', 'payment received', 'paid', 'amount paid', 'official receipt'
-    ]
-    summons_keywords = [
-        'summons', 'appear before', 'court', 'magistrate', 'hearing date'
-    ]
-
-    scores = {
-        'traffic_notice': sum(1 for k in traffic_keywords if k in text_lower),
-        'eviction_notice': sum(1 for k in eviction_keywords if k in text_lower),
-        'allocation_slip': sum(1 for k in allocation_keywords if k in text_lower),
-        'payment_receipt': sum(1 for k in receipt_keywords if k in text_lower),
-        'court_summons': sum(1 for k in summons_keywords if k in text_lower),
-    }
-
-    best = max(scores, key=scores.get)
-    if scores[best] == 0:
-        return 'unknown'
-    return best
+    from .classification import classify_document_type as _classify
+    return _classify(text)

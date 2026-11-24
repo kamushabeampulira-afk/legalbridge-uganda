@@ -12,11 +12,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primaryDeepPurple,
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarStyle: {
-          backgroundColor: Colors.surfaceWhite,
-          borderTopColor: Colors.borderLight,
+          backgroundColor: Colors.surface,
+          borderTopColor: Colors.border,
           borderTopWidth: 1,
           height: 64,
           paddingBottom: 8,
@@ -26,7 +26,7 @@ export default function TabLayout() {
           fontFamily: FontFamily.medium,
           fontSize: 11,
         },
-        headerStyle: { backgroundColor: Colors.primaryDeepPurple },
+        headerStyle: { backgroundColor: Colors.primary },
         headerTintColor: Colors.textOnPrimary,
         headerTitleStyle: { fontFamily: FontFamily.semiBold, fontSize: 17 },
         headerRight: () => <LanguageSwitcher />,

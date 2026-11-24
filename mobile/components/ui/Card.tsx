@@ -26,12 +26,13 @@ export default function Card({ children, style, variant = 'default', padding = '
 }
 
 const styles = StyleSheet.create({
-  base: { borderRadius: BorderRadius.lg, backgroundColor: Colors.surfaceWhite },
+  base: { borderRadius: BorderRadius.lg, backgroundColor: Colors.surface },
   default: {},
   elevated: {},
-  outlined: { borderWidth: 1.5, borderColor: Colors.borderLight },
-  teal: { backgroundColor: Colors.primaryDeepTeal },
-  peach: { backgroundColor: Colors.accentSoftPeach },
-  success: { backgroundColor: Colors.successLight, borderLeftWidth: 4, borderLeftColor: Colors.successLeafGreen },
-  warning: { backgroundColor: Colors.warningLight, borderLeftWidth: 4, borderLeftColor: Colors.warningMutedCoral },
+  outlined: { borderWidth: 1.5, borderColor: Colors.border },
+  // Variant names kept for compatibility: 'teal' = brand primary, 'peach' = soft gold accent surface
+  teal: { backgroundColor: Colors.primary },
+  peach: { backgroundColor: Colors.accentTint, borderWidth: 1, borderColor: Colors.borderAccent },
+  success: { backgroundColor: Colors.successBg, borderLeftWidth: 4, borderLeftColor: Colors.success },
+  warning: { backgroundColor: Colors.warningBg, borderLeftWidth: 4, borderLeftColor: Colors.warningBorder },
 });

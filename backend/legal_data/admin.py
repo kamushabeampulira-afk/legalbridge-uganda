@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from .models import LegalSource, LegalProvision, LegalQuery
 from .vector_store import index_legal_source, remove_source_from_index
@@ -7,28 +7,39 @@ from .vector_store import index_legal_source, remove_source_from_index
 @admin.register(LegalSource)
 class LegalSourceAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'category', 'subject', 'status',
-        'is_indexed', 'last_verified_at', 'publication_date',
+        'title', 'instrument_number', 'subject', 'status', 'legal_status', 'is_sample',
+        'is_indexed', 'last_verified_at',
     ]
-    list_filter = ['category', 'subject', 'status', 'is_indexed']
-    search_fields = ['title', 'short_title', 'issuing_authority']
+    list_filter = ['category', 'subject', 'status', 'legal_status', 'is_sample', 'is_indexed']
+    search_fields = ['title', 'short_title', 'instrument_number', 'issuing_authority']
     readonly_fields = ['is_indexed', 'indexed_at', 'chroma_doc_ids', 'created_at', 'updated_at']
     actions = ['approve_and_index', 'reindex', 'remove_from_index']
 
     @admin.action(description='Approve and index selected sources')
     def approve_and_index(self, request, queryset):
+        not_confirmed = []
         for source in queryset:
             source.status = 'approved'
             source.reviewed_by = request.user
             source.last_verified_at = timezone.now()
             source.save()
+            remove_source_from_index(str(source.id))
             ids = index_legal_source(source)
             if ids:
                 source.is_indexed = True
                 source.indexed_at = timezone.now()
                 source.chroma_doc_ids = ids
                 source.save()
+            if not source.currency_assessment()[0]:
+                not_confirmed.append(source.short_title or source.title)
         self.message_user(request, f'{queryset.count()} source(s) approved and indexed.')
+        if not_confirmed:
+            self.message_user(
+                request,
+                'Not presented as current law until marked "In force" and not sample text: '
+                + ', '.join(not_confirmed),
+                level=messages.WARNING,
+            )
 
     @admin.action(description='Re-index selected sources')
     def reindex(self, request, queryset):

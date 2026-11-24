@@ -48,17 +48,17 @@ const yesNoStyles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.surfaceWhite,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
   },
-  selected: { borderColor: Colors.primaryDeepTeal, backgroundColor: '#E8F4F7' },
+  selected: { borderColor: Colors.primary, backgroundColor: Colors.primaryTint },
   label: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
     color: Colors.textMuted,
   },
-  labelSelected: { color: Colors.primaryDeepTeal },
+  labelSelected: { color: Colors.primary },
 });
 
 export default function BodaStoppedScreen() {
@@ -114,7 +114,7 @@ export default function BodaStoppedScreen() {
           title="Guidance for Your Situation"
           content={result.guidance}
           iconName="shield-checkmark"
-          iconColor={Colors.primaryDeepTeal}
+          iconColor={Colors.primary}
         />
 
         {result.legal_sources?.length > 0 && (
@@ -132,7 +132,7 @@ export default function BodaStoppedScreen() {
           style={styles.helpBtn}
           onPress={() => router.push('/legal-help')}
         >
-          <Ionicons name="people" size={18} color={Colors.secondaryBurntOrange} />
+          <Ionicons name="people" size={18} color={Colors.accentStrong} />
           <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
         </TouchableOpacity>
 
@@ -231,11 +231,11 @@ export default function BodaStoppedScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: Colors.backgroundOffWhite },
+  scroll: { flex: 1, backgroundColor: Colors.background },
   container: { padding: Spacing.base, paddingBottom: Spacing['3xl'], gap: Spacing.base },
 
   headerCard: {
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     gap: Spacing.sm,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   headerSub: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     lineHeight: FontSize.sm * 1.6,
   },
 
@@ -260,10 +260,10 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   textInput: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular,
@@ -272,10 +272,10 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   textArea: {
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.md,
     fontFamily: FontFamily.regular,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   sourcesBox: {
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
     gap: Spacing.xs,
@@ -317,13 +317,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: '#FEF0E8',
+    backgroundColor: Colors.accentTint,
     borderRadius: BorderRadius.md,
     padding: Spacing.base,
   },
   helpText: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.sm,
-    color: Colors.secondaryBurntOrange,
+    color: Colors.accentText,
   },
 });

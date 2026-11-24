@@ -1,0 +1,147 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  .lb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0 24px; }
+  .lb-card { border: 1px solid var(--hairline-color); border-radius: 6px; padding: 14px 16px; background: var(--body-bg); }
+  .lb-card h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--body-quiet-color); }
+  .lb-big { font-size: 18px; font-weight: 600; margin: 4px 0 8px; }
+  .lb-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .lb-pass { background: #dff0d8; color: #2b6a2b; }
+  .lb-warn { background: #fcf3d9; color: #7a5a00; }
+  .lb-fail { background: #f6dcdc; color: #9b1c1c; }
+  .lb-skipped { background: #e9ecef; color: #495057; }
+  .lb-muted { color: var(--body-quiet-color); font-size: 12px; }
+  .lb-checks td, .lb-checks th { padding: 4px 8px; }
+  .lb-actions form { display: inline-block; margin: 0 8px 8px 0; }
+  .lb-section { margin-top: 28px; }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
+  AI service status
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  {% if can_run %}
+  <div class="lb-actions">
+    <form method="post" action="{% url 'admin:ai_engine_aihealthcheck_run' %}">{% csrf_token %}
+      <input type="hidden" name="action" value="connection">
+      <input type="submit" class="default" value="Test OpenAI connection">
+    </form>
+    <form method="post" action="{% url 'admin:ai_engine_aihealthcheck_run' %}">{% csrf_token %}
+      <input type="hidden" name="action" value="components">
+      <input type="submit" value="Run component checks (A–D)">
+    </form>
+    <form method="post" action="{% url 'admin:ai_engine_aihealthcheck_run' %}">{% csrf_token %}
+      <input type="hidden" name="action" value="end_to_end">
+      <input type="submit" value="Run end-to-end explanation test (uses 1 AI request)">
+    </form>
+  </div>
+  <p class="lb-muted">The connection test sends one tiny request (about 10 tokens). Component checks A–D also send
+    that one request; B–D use no AI. The end-to-end test runs the full explanation pipeline on a fictional sample document.</p>
+  {% endif %}
+
+  <div class="lb-grid">
+    <div class="lb-card">
+      <h3>OpenAI connection</h3>
+      {% with s=overview.openai.status %}
+      <span class="lb-pill {% if s == 'operational' %}lb-pass{% elif s == 'not_tested' %}lb-skipped{% else %}lb-fail{% endif %}">
+        {{ overview.openai.status_label }}</span>
+      {% endwith %}
+      <p>{{ overview.openai.summary|default:"Run the connection test to check the real API." }}</p>
+      <p class="lb-muted">Model: <strong>{{ overview.model|default:"not set" }}</strong> ·
+        API key {% if overview.api_key_configured %}configured{% else %}<strong>not configured</strong>{% endif %}</p>
+      <p class="lb-muted">Last tested: {{ overview.openai.last_tested_at|default:"never" }}</p>
+    </div>
+
+    <div class="lb-card">
+      <h3>Document analysis service</h3>
+      {% with s=overview.document_analysis.status %}
+      <span class="lb-pill {% if s == 'operational' %}lb-pass{% elif s == 'operational_with_warnings' %}lb-warn{% elif s == 'not_confirmed' %}lb-skipped{% else %}lb-fail{% endif %}">
+        {{ overview.document_analysis.label }}</span>
+      {% endwith %}
+      <p>{{ overview.document_analysis.note }}</p>
+    </div>
+
+    <div class="lb-card">
+      <h3>History</h3>
+      <p class="lb-muted">Last successful connection test:<br><strong>{{ overview.openai.last_successful_test_at|default:"none yet" }}</strong></p>
+      <p class="lb-muted">Last failed connection test:<br><strong>{{ overview.openai.last_failed_test_at|default:"none" }}</strong>
+        {% if overview.openai.last_failed_test_category %}({{ overview.openai.last_failed_test_category }}){% endif %}</p>
+    </div>
+
+    <div class="lb-card">
+      <h3>Real requests (last 7 days)</h3>
+      <div class="lb-big">{{ overview.requests_7_days.total }} requests, {{ overview.requests_7_days.failed }} failed</div>
+      <p class="lb-muted">Average response time:
+        <strong>{% if overview.requests_7_days.average_response_ms %}{{ overview.requests_7_days.average_response_ms }} ms{% else %}no successful requests{% endif %}</strong></p>
+      <p class="lb-muted">Last failed request:
+        {% if overview.last_failed_request %}<strong>{{ overview.last_failed_request.at }}</strong>,
+          {{ overview.last_failed_request.purpose }}: {{ overview.last_failed_request.category }}
+        {% else %}none{% endif %}</p>
+      <p class="lb-muted"><a href="{% url 'admin:ai_engine_airequestlog_changelist' %}">Open request log</a></p>
+    </div>
+  </div>
+
+  {% if overview.openai.checks %}
+  <div class="lb-section">
+    <h2>Latest connection test, step by step</h2>
+    <table class="lb-checks">
+      <tr><th>API key present</th><td>{% with v=overview.openai.checks.key_present %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+      <tr><th>Key accepted by OpenAI</th><td>{% with v=overview.openai.checks.key_accepted %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+      <tr><th>Configured model accessible</th><td>{% with v=overview.openai.checks.model_accessible %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+      <tr><th>Test request succeeded</th><td>{% with v=overview.openai.checks.test_request_succeeded %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+      <tr><th>Response valid</th><td>{% with v=overview.openai.checks.response_valid %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+      <tr><th>Within time limit ({{ overview.openai.checks.time_limit_ms }} ms)</th><td>{% with v=overview.openai.checks.within_time_limit %}{% if v is True %}✓ yes{% elif v is False %}✗ no{% else %}– not reached{% endif %}{% endwith %}</td></tr>
+    </table>
+  </div>
+  {% endif %}
+
+  <div class="lb-section">
+    <h2>Pipeline components, tested separately</h2>
+    <table>
+      <thead><tr><th>Component</th><th>Status</th><th>Result</th><th>Time</th><th>Last run</th></tr></thead>
+      <tbody>
+      {% for kind, c in overview.components.items %}
+        <tr>
+          <td>{{ c.label }}</td>
+          <td><span class="lb-pill lb-{{ c.status }}">{{ c.status|capfirst }}</span></td>
+          <td>{{ c.summary }}</td>
+          <td>{% if c.latency_ms is not None %}{{ c.latency_ms }} ms{% endif %}</td>
+          <td class="lb-muted">{{ c.at|default:"never" }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="lb-section">
+    <h2>Recent checks</h2>
+    <table>
+      <thead><tr><th>When</th><th>Check</th><th>Status</th><th>AI status</th><th>Summary</th><th>Run by</th></tr></thead>
+      <tbody>
+      {% for h in history %}
+        <tr>
+          <td class="lb-muted"><a href="{% url 'admin:ai_engine_aihealthcheck_change' h.pk %}">{{ h.created_at }}</a></td>
+          <td>{{ h.get_kind_display }}</td>
+          <td><span class="lb-pill lb-{{ h.component_status }}">{{ h.get_component_status_display }}</span></td>
+          <td>{{ h.get_ai_status_display }}</td>
+          <td>{{ h.summary }}</td>
+          <td class="lb-muted">{{ h.triggered_by|default:"system" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No checks have been run yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

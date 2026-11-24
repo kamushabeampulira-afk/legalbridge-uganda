@@ -45,7 +45,7 @@ export default function Button({
 
   const shadowStyle: ViewStyle = Platform.OS !== 'web'
     ? {
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
@@ -73,7 +73,7 @@ export default function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' || variant === 'ghost' ? Colors.primaryDeepTeal : Colors.textOnPrimary}
+          color={variant === 'outline' || variant === 'ghost' ? Colors.primary : Colors.textOnPrimary}
           size="small"
         />
       ) : (
@@ -106,22 +106,23 @@ const styles = StyleSheet.create({
   icon: { marginRight: Spacing.sm },
 
   // Variants
-  primary: { backgroundColor: Colors.primaryDeepPurple },
-  secondary: { backgroundColor: Colors.secondaryGold },
+  primary: { backgroundColor: Colors.primary },
+  // Berry purple with white text (4.6:1). Gold is not used for buttons: white on gold is 2.4:1.
+  secondary: { backgroundColor: Colors.secondary },
   outline: {
     backgroundColor: Colors.transparent,
     borderWidth: 2,
-    borderColor: Colors.primaryDeepPurple,
+    borderColor: Colors.primary,
   },
   ghost: { backgroundColor: Colors.transparent },
-  danger: { backgroundColor: Colors.errorRed },
+  danger: { backgroundColor: Colors.error },
 
   // Text colour per variant
   text: { fontFamily: FontFamily.semiBold, letterSpacing: 0.2 },
   text_primary: { color: Colors.textOnPrimary },
-  text_secondary: { color: Colors.textOnSecondary },
-  text_outline: { color: Colors.primaryDeepPurple },
-  text_ghost: { color: Colors.primaryDeepPurple },
+  text_secondary: { color: Colors.textOnPrimary },
+  text_outline: { color: Colors.primary },
+  text_ghost: { color: Colors.primary },
   text_danger: { color: Colors.textOnPrimary },
 
   // Sizes

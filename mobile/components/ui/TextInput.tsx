@@ -80,19 +80,19 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
-  required: { color: Colors.errorRed },
+  required: { color: Colors.error },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surfaceMuted,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.border,
     minHeight: 52,
     paddingHorizontal: Spacing.base,
   },
-  focused: { borderColor: Colors.primaryDeepPurple, backgroundColor: Colors.surfaceWhite },
-  errorBorder: { borderColor: Colors.errorRed },
+  focused: { borderColor: Colors.primary, backgroundColor: Colors.surface },
+  errorBorder: { borderColor: Colors.error },
   input: {
     flex: 1,
     fontFamily: FontFamily.regular,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   error: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.errorRed,
+    color: Colors.error,
     marginTop: Spacing.xs,
   },
   hint: {

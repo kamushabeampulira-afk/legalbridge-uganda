@@ -159,11 +159,28 @@ export const userApi = {
   },
 };
 
+// ── File uploads ──────────────────────────────────────────────────────────────
+// React Native's FormData accepts a { uri, name, type } object, but a browser's
+// FormData would stringify it to "[object Object]". On web, read the picked
+// file's blob:/data: URI into a real Blob instead.
+async function appendFile(formData: FormData, field: string, uri: string, name: string, type: string) {
+  if (isWeb) {
+    const blob = await (await fetch(uri)).blob();
+    formData.append(field, new File([blob], name, { type: blob.type || type }));
+  } else {
+    formData.append(field, { uri, name, type } as any);
+  }
+}
+
 // ── Documents ─────────────────────────────────────────────────────────────────
 export const documentsApi = {
   upload: async (fileUri: string, fileName: string, mimeType: string, userCategory: string, language: string) => {
     const formData = new FormData();
-    formData.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
+    try {
+      await appendFile(formData, 'file', fileUri, fileName, mimeType);
+    } catch {
+      throw new Error('Could not read the selected file. Please choose it again.');
+    }
     formData.append('user_category', userCategory);
     formData.append('language', language);
     try {

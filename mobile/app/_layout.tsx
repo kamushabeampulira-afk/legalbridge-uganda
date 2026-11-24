@@ -39,13 +39,13 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="light" backgroundColor={Colors.primaryDeepPurple} />
+      <StatusBar style="light" backgroundColor={Colors.primary} />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: Colors.primaryDeepPurple },
+          headerStyle: { backgroundColor: Colors.primary },
           headerTintColor: Colors.textOnPrimary,
           headerTitleStyle: { fontFamily: 'Inter_600SemiBold', fontSize: 17 },
-          contentStyle: { backgroundColor: Colors.backgroundOffWhite },
+          contentStyle: { backgroundColor: Colors.background },
           headerBackTitle: '',
         }}
       >

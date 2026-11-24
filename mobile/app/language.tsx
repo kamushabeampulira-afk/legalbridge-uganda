@@ -66,7 +66,7 @@ export default function LanguageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primaryDeepPurple,
+    backgroundColor: Colors.primary,
     padding: Spacing.xl,
     justifyContent: 'center',
   },
@@ -81,14 +81,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.md,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     marginTop: Spacing.xs,
   },
   options: { gap: Spacing.base },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceWhite,
+    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     padding: Spacing.lg,
     gap: Spacing.base,
@@ -109,10 +109,9 @@ const styles = StyleSheet.create({
   note: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
-    color: Colors.accentSoftPeach,
+    color: Colors.textOnPrimaryMuted,
     textAlign: 'center',
     marginTop: Spacing['2xl'],
     lineHeight: FontSize.xs * 1.8,
-    opacity: 0.8,
   },
 });
