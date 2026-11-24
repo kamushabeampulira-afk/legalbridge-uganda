@@ -6,11 +6,19 @@ import uuid
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
+from .phone import normalize_phone
+
 
 class UserManager(BaseUserManager):
+    def get_by_natural_key(self, phone_number):
+        # Used by authenticate() for JWT and admin login: accept any format
+        # the user types (0701..., +256 701..., 256701...).
+        return self.get(**{self.model.USERNAME_FIELD: normalize_phone(phone_number)})
+
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
             raise ValueError('Phone number is required')
+        phone_number = normalize_phone(phone_number)
         user = self.model(phone_number=phone_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)

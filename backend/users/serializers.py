@@ -2,11 +2,15 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Organisation, OrganisationMember
+from .phone import normalize_phone
 
 User = get_user_model()
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Declared explicitly so the uniqueness check runs on the normalised number
+    # (the auto-generated UniqueValidator would compare the raw input).
+    phone_number = serializers.CharField(max_length=20)
     password = serializers.CharField(write_only=True, min_length=6)
     password_confirm = serializers.CharField(write_only=True)
 
@@ -17,6 +21,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'full_name', 'user_type', 'preferred_language',
             'consented_to_processing',
         ]
+
+    def validate_phone_number(self, value):
+        phone = normalize_phone(value)
+        if User.objects.filter(phone_number=phone).exists():
+            raise serializers.ValidationError('An account with this phone number already exists.')
+        return phone
 
     def validate(self, data):
         if data['password'] != data['password_confirm']:
