@@ -5,10 +5,15 @@ steps that require your accounts, keys, and confirmation.
 
 ## Current demo (live)
 
+- **App for presentation:** <https://legalbridge-app-free.onrender.com>
 - API: <https://legalbridge-api-free.onrender.com>
 - Health check: <https://legalbridge-api-free.onrender.com/healthz> → `ok`
-- Blueprint: `legalbridge-demo` using `render.free.yaml` (commit `6d0fec4`)
+- Blueprint: `legalbridge-demo` using `render.free.yaml` (commit `563f2fb`)
 - `mobile/.env` is already set locally to the API URL above and is gitignored.
+
+The presentation link is a real Expo web export of the app. Browser limitations
+apply: USSD uses a `tel:` link and voice uses the browser speech fallback, so
+use the phone/Expo build for the full native recording and USSD demo.
 
 ## 1. Keys to create first
 
