@@ -26,6 +26,20 @@ const en = {
   stack_legalHelp: 'Find Legal Help',
   stack_legalAid: 'Free Legal Aid',
   stack_ask: 'Ask LegalBridge',
+  stack_rights: 'Know Your Rights',
+
+  // Know Your Rights guides
+  rights_tab_boda: 'Boda Boda',
+  rights_tab_vendor: 'Market vendors',
+  rights_whatLaw: 'What the law says',
+  rights_plain: 'In plain language',
+  rights_steps: 'What to do',
+  rights_source: 'Source',
+  rights_openSource: 'Open official document',
+  rights_documents: 'Official documents',
+  rights_note: 'Note',
+  rights_ask: 'Ask a question',
+  rights_footer: 'Based on published Ugandan law. This is legal information, not legal advice.',
 
   // Onboarding
   onboarding_title_1: 'Understand Your Documents',
@@ -189,7 +203,7 @@ const en = {
   boda_upload_desc: 'Photograph or upload a traffic notice',
   boda_stopped_desc: 'Answer a few questions and get guidance',
   boda_history_desc: 'View documents you have already uploaded',
-  boda_rights_desc: 'Ask about traffic law and your rights',
+  boda_rights_desc: 'Your rights under Ugandan traffic law, in plain language',
   boda_info: 'Facing a traffic issue? Always request a written notice with a reference number.',
   yes: 'Yes',
   no: 'No',
@@ -210,7 +224,7 @@ const en = {
   vendor_upload_desc: 'Upload allocation slips, receipts, eviction notices',
   vendor_eviction_desc: 'Answer a few questions and get practical guidance',
   vendor_history_desc: 'View documents you have already uploaded',
-  vendor_rights_desc: 'Ask about market law and your rights',
+  vendor_rights_desc: 'Your rights under the Markets Act 2023, in plain language',
   vendor_info: 'Keep all your market documents safe: allocation slip, payment receipts, and any notices.',
 
   // Guided flows
@@ -377,6 +391,19 @@ const lg: typeof en = {
   stack_legalHelp: 'Noonya Obuyambi bw\'Amateeka',
   stack_legalAid: 'Obuyambi bwa Bwereere',
   stack_ask: 'Buuza LegalBridge',
+  stack_rights: 'Manya Eddembe Lyo',
+
+  rights_tab_boda: 'Boda Boda',
+  rights_tab_vendor: 'Abasuubuzi',
+  rights_whatLaw: 'Eky’amateeka kye kigamba',
+  rights_plain: 'Mu lulimi olwangu',
+  rights_steps: 'Eky’okola',
+  rights_source: 'Ensibuko',
+  rights_openSource: 'Yagaza empapula ey’esigika',
+  rights_documents: 'Empapula ez’esigika',
+  rights_note: 'Ekimanyiddwa',
+  rights_ask: 'Buuza ekibuuzo',
+  rights_footer: 'Kisinziira ku mateeka ga Uganda agafulumizibwa. Kino kya bulimba bw’amateeka, si buqunzi.',
 
   onboarding_title_1: 'Tegeera Empapula Zo',
   onboarding_body_1: 'Kuba oba isa empapula yonna eyesigika — obubaka bw\'ekkubo, ebarua z\'okufuluka, empapula z\'akatale — ofune obunnyonnyola obwangu.',
@@ -531,7 +558,7 @@ const lg: typeof en = {
   boda_upload_desc: 'Isa obubaka bw\'ekkubo',
   boda_stopped_desc: 'Noonya obuyambi ng\'okuggwa',
   boda_history_desc: 'Laba empapula z\'edda',
-  boda_rights_desc: 'Buuza ku amateeka g\'ekkubo',
+  boda_rights_desc: 'Eddembe lyo mu mateeka g\'ekkubo, mu lulimi olwangu',
   boda_info: 'Obuzibu obw\'ekkubo? Noonya obuyambi obuva eri looya awungeddwa.',
   yes: 'Yee',
   no: 'Nedda',
@@ -551,7 +578,7 @@ const lg: typeof en = {
   vendor_upload_desc: 'Isa empapula zo',
   vendor_eviction_desc: 'Noonya obuyambi ku ngufu y\'okufuluka',
   vendor_history_desc: 'Laba empapula z\'edda',
-  vendor_rights_desc: 'Buuza ku amateeka g\'akatale',
+  vendor_rights_desc: 'Eddembe lyo mu Markets Act 2023, mu lulimi olwangu',
   vendor_info: 'Kubika empapula zonna ez\'akatale lyo: pepa ly\'okuweebwayo, resiti, n\'obubaka.',
 
   guidance_resultTitle: 'Obuyambi Bwo',

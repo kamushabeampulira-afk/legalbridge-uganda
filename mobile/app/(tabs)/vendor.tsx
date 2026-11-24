@@ -40,7 +40,7 @@ const ACTIONS = [
   },
   {
     id: 'rights',
-    route: '/ask?category=market_vendor&preset=rights',
+    route: '/rights?category=market_vendor',
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'vendor_rights' as const,

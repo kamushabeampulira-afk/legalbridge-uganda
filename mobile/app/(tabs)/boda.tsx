@@ -40,7 +40,7 @@ const ACTIONS = [
   },
   {
     id: 'rights',
-    route: '/ask?category=boda_boda&preset=rights',
+    route: '/rights?category=boda_boda',
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'boda_rights' as const,
