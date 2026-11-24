@@ -391,6 +391,19 @@ export default function VoiceScreen() {
         </View>
       )}
 
+      {/* Free legal aid connection */}
+      <TouchableOpacity
+        style={styles.legalAidButton}
+        onPress={() => router.push('/legal-aid')}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t('voice_freeLegalAid', language)}
+      >
+        <Ionicons name="people-outline" size={20} color={Colors.primary} />
+        <Text style={styles.legalAidButtonText}>{t('voice_freeLegalAid', language)}</Text>
+        <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+      </TouchableOpacity>
+
       <DisclaimerBanner />
     </ScrollView>
   );
@@ -463,6 +476,21 @@ const styles = StyleSheet.create({
   submitBtnText: { fontFamily: FontFamily.semiBold, fontSize: FontSize.base, color: Colors.textOnPrimary },
   retryLink: { alignItems: 'center', padding: Spacing.sm },
   retryLinkText: { fontFamily: FontFamily.medium, fontSize: FontSize.sm, color: Colors.textMuted },
+
+  legalAidButton: {
+    backgroundColor: Colors.primaryTint,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  legalAidButtonText: {
+    flex: 1,
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+  },
 
   answerSection: { gap: Spacing.sm },
   audioRow: {

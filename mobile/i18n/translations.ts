@@ -16,6 +16,7 @@ const en = {
   stack_vendorEviction: 'Eviction Guidance',
   stack_voice: 'Speak to LegalBridge',
   stack_legalHelp: 'Find Legal Help',
+  stack_legalAid: 'Free Legal Aid',
   stack_ask: 'Ask LegalBridge',
 
   // Onboarding
@@ -46,6 +47,7 @@ const en = {
   home_upload: 'Upload a Document',
   home_voice: 'Speak to LegalBridge',
   home_findHelp: 'Find Legal Help',
+  home_freeLegalAid: 'Free Legal Aid',
   home_ussd: 'No internet? Dial',
   home_hello: 'Hello,',
   home_chooseSituation: 'Choose your situation',
@@ -222,6 +224,7 @@ const en = {
   voice_recordAgain: 'Record Again',
   voice_answer: 'LegalBridge Answer',
   voice_askAnother: 'Ask Another Question',
+  voice_freeLegalAid: 'Connect to Legal Aid',
 
   // Legal Help Directory
   legalHelp_title: 'Find Legal Help',
@@ -245,6 +248,23 @@ const en = {
   legalHelp_laspnet_description: 'Network of legal aid providers across Uganda.',
   legalHelp_laspnet_eligibility: 'Low-income individuals. Eligibility varies by member organisation.',
   legalHelp_laspnet_consult: 'Contact to find the nearest legal aid provider in your district.',
+
+  // Legal aid connection
+  legalAidConnect_title: 'Connect to Free Legal Aid',
+  legalAidConnect_subtitle: 'Choose your district to find the nearest free legal aid office.',
+  legalAidConnect_chooseDistrict: 'Choose your district',
+  legalAidConnect_areaOffice: 'Nearest legal aid office',
+  legalAidConnect_serves: 'Serves:',
+  legalAidConnect_noOffice: 'No verified area office number for this district yet. Use the extra help below.',
+  legalAidConnect_extraHelp: 'Extra help',
+  legalAidConnect_extraHint: 'If the office line is busy or unreachable, try these contacts.',
+  legalAidConnect_officerLabel: 'Legal officer',
+  legalAidConnect_callDoug: 'Call Counsel Doug',
+  legalAidConnect_tollFree: 'Toll-free legal aid line',
+  legalAidConnect_callTollFree: 'Call toll-free',
+  legalAidConnect_note: 'Free guidance. For court cases, ask for a qualified lawyer.',
+  legalAidConnect_searchDistrict: 'Search district...',
+  legalAidConnect_noDistricts: 'No districts found.',
 
   // History
   history_title: 'My Documents',
@@ -327,6 +347,7 @@ const lg: typeof en = {
   stack_vendorEviction: 'Obuyambi ku Kugyibwa mu Katale',
   stack_voice: 'Yogera ne LegalBridge',
   stack_legalHelp: 'Noonya Obuyambi bw\'Amateeka',
+  stack_legalAid: 'Obuyambi bwa Bwereere',
   stack_ask: 'Buuza LegalBridge',
 
   onboarding_title_1: 'Tegeera Empapula Zo',
@@ -354,6 +375,7 @@ const lg: typeof en = {
   home_upload: 'Isa Empapula',
   home_voice: 'Yogera ne LegalBridge',
   home_findHelp: 'Noonya Obuyambi',
+  home_freeLegalAid: 'Obuyambi bwa Bwereere',
   home_ussd: 'Tolina intaneti? Kuba',
   home_hello: 'Kiribwe,',
   home_chooseSituation: 'Londa Embeera Yo',
@@ -520,6 +542,7 @@ const lg: typeof en = {
   voice_recordAgain: 'Wandiika Nate',
   voice_answer: 'Okusubiza kwa LegalBridge',
   voice_askAnother: 'Buuza Ekibuuzo Ekirala',
+  voice_freeLegalAid: 'Kwatana n\'Obuyambi',
 
   legalHelp_title: 'Noonya Obuyambi bw\'Amateeka',
   legalHelp_subtitle: 'Amakampuni g\'obuyambi n\'abaali b\'amateeka mu Uganda',
@@ -542,6 +565,22 @@ const lg: typeof en = {
   legalHelp_laspnet_description: 'Ekibiina ky\'abawagizi b\'obuyambi bw\'amateeka mu Uganda yonna.',
   legalHelp_laspnet_eligibility: 'Abantu abavudde mu bwetaavu; ekisa kikyuka okusinziira ku kibiina.',
   legalHelp_laspnet_consult: 'Kwatana okusanga omuwagizi w\'obuyambi bw\'amateeka ali kumpi naawe.',
+
+  legalAidConnect_title: 'Kwatana n\'Obuyambi bwa Bwereere',
+  legalAidConnect_subtitle: 'Londa disitulikiti yo okusanga ofiisi y\'obuyambi bw\'amateeka eri kumpi.',
+  legalAidConnect_chooseDistrict: 'Londa Disitulikiti Yo',
+  legalAidConnect_areaOffice: 'Ofiisi y\'obuyambi eri kumpi',
+  legalAidConnect_serves: 'Ekwata ku:',
+  legalAidConnect_noOffice: 'Tewali namba ya ofiisi etuukiriddwa ku disitulikiti eno. Kozesa obuyambi obulala wamunsi.',
+  legalAidConnect_extraHelp: 'Obuyambi obulala',
+  legalAidConnect_extraHint: 'Singa ennamba y\'ofiisi tesobola kukubwa, kuba ennamba zino.',
+  legalAidConnect_officerLabel: 'Omuyambi w\'amateeka',
+  legalAidConnect_callDoug: 'Kuba Counsel Doug',
+  legalAidConnect_tollFree: 'Ennamba y\'obuyambi etasalibwa',
+  legalAidConnect_callTollFree: 'Kuba etasalibwa',
+  legalAidConnect_note: 'Obuyambi bwa bwereere. Ku misango gy\'ekkooti, buuza looya awungeddwa.',
+  legalAidConnect_searchDistrict: 'Noonya disitulikiti...',
+  legalAidConnect_noDistricts: 'Tewali disitulikiti ezisangiddwa.',
 
   history_title: 'Empapula Zange',
   history_empty: 'Tono esiddwa mpapula.',

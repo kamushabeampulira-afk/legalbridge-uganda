@@ -68,6 +68,13 @@ const QUICK_ACTIONS = [
     color: Colors.textPrimary,
     titleKey: 'home_findHelp' as const,
   },
+  {
+    id: 'legal-aid',
+    route: '/legal-aid' as const,
+    icon: 'shield-checkmark' as const,
+    color: Colors.secondary,
+    titleKey: 'home_freeLegalAid' as const,
+  },
 ];
 
 export default function HomeScreen() {
