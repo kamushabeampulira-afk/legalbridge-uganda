@@ -37,6 +37,7 @@ USER_MESSAGES = {
 }
 
 _KEY_PATTERN = re.compile(r'(sk|gsk|xai|key|proj|org)[-_][A-Za-z0-9_\-*]{6,}', re.IGNORECASE)
+_GOOGLE_KEY_PATTERN = re.compile(r'AIza[0-9A-Za-z_\-]{20,}')
 
 
 class AIServiceUnavailable(Exception):
@@ -54,6 +55,7 @@ def sanitize(text) -> str:
     if not text:
         return ''
     text = _KEY_PATTERN.sub(lambda m: m.group(1) + '-***', str(text))
+    text = _GOOGLE_KEY_PATTERN.sub('AIza-***', text)
     return text[:400]
 
 
@@ -69,9 +71,20 @@ def get_client(timeout: float | None = None, max_retries: int | None = None):
     from openai import OpenAI
     return OpenAI(
         api_key=settings.OPENAI_API_KEY,
+        base_url=_setting('OPENAI_BASE_URL', '') or None,  # None: OpenAI's own API
         timeout=timeout if timeout is not None else _setting('OPENAI_TIMEOUT_SECONDS', 60),
         max_retries=max_retries if max_retries is not None else _setting('OPENAI_MAX_RETRIES', 1),
     )
+
+
+def _completion_options(max_tokens: int) -> dict:
+    """Output limit plus optional provider settings for thinking models (see settings.py)."""
+    options = {'max_tokens': max_tokens + max(0, int(_setting('OPENAI_EXTRA_MAX_TOKENS', 0) or 0))}
+    effort = _setting('OPENAI_REASONING_EFFORT', '')
+    if effort:
+        # Sent as a raw body field: the pinned openai SDK predates the reasoning_effort argument.
+        options['extra_body'] = {'reasoning_effort': effort}
+    return options
 
 
 def classify_error(exc: Exception) -> tuple[str, str]:
@@ -102,6 +115,10 @@ def classify_error(exc: Exception) -> tuple[str, str]:
         return 'auth_failed', message
     if isinstance(exc, openai.BadRequestError) and (code == 'model_not_found' or 'model' in code):
         return 'model_unavailable', message
+    if isinstance(exc, openai.APIStatusError) and 'api key' in lowered and any(
+            w in lowered for w in ('not valid', 'invalid', 'expired')):
+        # Google Gemini reports a bad key as HTTP 400 "API key not valid"
+        return 'auth_failed', message
     if isinstance(exc, openai.APIStatusError):
         return 'unknown_error', f'HTTP {getattr(exc, "status_code", "?")}: {message}'
     return 'unknown_error', sanitize(f'{type(exc).__name__}: {exc}')
@@ -143,8 +160,8 @@ def chat_completion(system_prompt: str, user_message: str, purpose: str,
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user', 'content': user_message},
             ],
-            max_tokens=max_tokens,
             temperature=temperature,
+            **_completion_options(max_tokens),
         )
     except Exception as exc:
         latency = int((time.monotonic() - start) * 1000)
@@ -231,8 +248,8 @@ def run_connection_check(triggered_by=None):
         response = client.chat.completions.create(
             model=model,
             messages=[{'role': 'user', 'content': 'Reply with exactly the word OK.'}],
-            max_tokens=5,
             temperature=0,
+            **_completion_options(5),
         )
     except Exception as exc:
         latency = int((time.monotonic() - start) * 1000)

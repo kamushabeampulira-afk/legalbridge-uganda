@@ -1,5 +1,6 @@
 /**
- * Bilingual "Know Your Rights" guides for boda boda riders and market vendors.
+ * "Know Your Rights" guides for boda boda riders and market vendors, written in
+ * English and Luganda, with other languages from i18n/content/<code>.json.
  *
  * Every statement below is taken from a published Ugandan Act, regulation or
  * byelaw. The citation is shown in the app so users can check the source.
@@ -10,6 +11,7 @@
  */
 
 import type { Language } from '@/i18n/translations';
+import { translateContent } from '@/i18n/content';
 
 export interface LocalizedText {
   en: string;
@@ -548,9 +550,13 @@ export function getRightsGuide(category?: string | string[] | null): RightsGuide
 }
 
 /**
- * Guides are authored in English and Luganda only. For any other app language
- * we return the English text rather than inventing a translation of the law.
+ * Guides are authored in English and Luganda. Other languages use the
+ * translations in i18n/content/<code>.json, keyed by the English text; any
+ * text without a translation is shown in English. Official titles of Acts
+ * are deliberately left untranslated.
  */
 export function localized(text: LocalizedText, language: Language): string {
-  return language === 'lg' ? text.lg : text.en;
+  if (language === 'lg') return text.lg;
+  if (language === 'en') return text.en;
+  return translateContent(text.en, language) ?? text.en;
 }

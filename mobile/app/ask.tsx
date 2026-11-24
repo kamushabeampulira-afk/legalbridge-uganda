@@ -13,28 +13,18 @@ import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore, type Language } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { useAppStore } from '@/store/useAppStore';
+import { t, type TranslationKey } from '@/i18n/translations';
 import Button from '@/components/ui/Button';
 import SectionCard from '@/components/ui/SectionCard';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
-/** Presets fall back to English when a translation is not available yet. */
-const PRESET_QUESTIONS: Record<string, Partial<Record<Language, string>>[]> = {
-  boda_boda: [
-    { en: 'What documents must I carry when riding my boda boda?', lg: 'Empapula ki ezinaabikibwa ng\'nkuba boda boda?' },
-    { en: 'What should I do when stopped by a traffic officer?', lg: 'Nkole ki poliisi ng\'yansinzya ku kkubo?' },
-    { en: 'What are the official payment procedures for traffic fines?', lg: 'Enkola ki y\'okusasula emisango gy\'ekkubo?' },
-    { en: 'Is an officer allowed to take my motorcycle?', lg: 'Omusirikale asobola okutwala boda yange?' },
-  ],
-  market_vendor: [
-    { en: 'What rights do I have as a market vendor?', lg: 'Eddembe ki ly\'olina nga omusuubuzi wa akatale?' },
-    { en: 'Can I be evicted from my stall without written notice?', lg: 'Basobola okuggya ku essimbi lyange nga batandiikidde?' },
-    { en: 'What should an allocation slip include?', lg: 'Pepa ly\'okuweebwayo linaabikibwa ki?' },
-    { en: 'What can I do if I receive an eviction notice?', lg: 'Nkole ki ng\'nkuwa obubaka bw\'okufulumizibwa?' },
-  ],
+/** Preset questions; the text for each language is in i18n/locales. */
+const PRESET_QUESTIONS: Record<string, TranslationKey[]> = {
+  boda_boda: ['ask_preset_boda_1', 'ask_preset_boda_2', 'ask_preset_boda_3', 'ask_preset_boda_4'],
+  market_vendor: ['ask_preset_vendor_1', 'ask_preset_vendor_2', 'ask_preset_vendor_3', 'ask_preset_vendor_4'],
 };
 
 export default function AskScreen() {
@@ -44,8 +34,7 @@ export default function AskScreen() {
 
   const userCategory = params.category ?? 'general';
   const presets = PRESET_QUESTIONS[userCategory] ?? [];
-  const presetText = (preset: Partial<Record<Language, string>>) =>
-    preset[language] ?? preset.en ?? '';
+  const presetText = (preset: TranslationKey) => t(preset, language);
 
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
@@ -167,7 +156,7 @@ export default function AskScreen() {
               <Text style={styles.helpText}>{t('legalHelp_title', language)}</Text>
             </TouchableOpacity>
 
-            <DisclaimerBanner message={result.disclaimer} />
+            <DisclaimerBanner />
 
             <Button
               label={t('voice_askAnother', language)}

@@ -34,6 +34,9 @@ def ok_response(text='OK'):
 def ai_settings(settings):
     settings.OPENAI_API_KEY = FAKE_KEY
     settings.OPENAI_MODEL = 'gpt-4o'
+    settings.OPENAI_BASE_URL = ''
+    settings.OPENAI_REASONING_EFFORT = ''
+    settings.OPENAI_EXTRA_MAX_TOKENS = 0
     settings.AI_DEMO_MODE = False
     return settings
 
@@ -201,6 +204,68 @@ def test_chat_completion_success_logs_latency_without_content(ai_settings):
     log = AIRequestLog.objects.get()
     assert log.success is True and log.latency_ms is not None
     assert not any('secret' in str(getattr(log, f.name)) for f in AIRequestLog._meta.fields)
+
+
+# ── Other OpenAI-compatible providers (e.g. Google Gemini) ───────────────────
+
+GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/'
+GOOGLE_KEY = 'AIzaSyAbcdefghijklmnopqrstuvwxyz0123456'
+
+
+@pytest.mark.parametrize('base_url,expected', [('', None), (GEMINI_URL, GEMINI_URL)])
+def test_get_client_uses_configured_base_url(ai_settings, base_url, expected):
+    from ai_engine.openai_service import get_client
+    ai_settings.OPENAI_BASE_URL = base_url
+    with patch('openai.OpenAI') as client_cls:
+        get_client()
+    assert client_cls.call_args.kwargs['base_url'] == expected
+
+
+@pytest.mark.django_db
+def test_thinking_model_options_are_sent(ai_settings):
+    ai_settings.OPENAI_REASONING_EFFORT = 'low'
+    ai_settings.OPENAI_EXTRA_MAX_TOKENS = 2000
+    client = MagicMock()
+    client.chat.completions.create.return_value = ok_response('OK')
+    with patch('ai_engine.openai_service.get_client', return_value=client):
+        chat_completion('sys', 'user', purpose='legal_question', max_tokens=1500)
+        chat_kwargs = client.chat.completions.create.call_args.kwargs
+        run_connection_check()
+        check_kwargs = client.chat.completions.create.call_args.kwargs
+    assert chat_kwargs['max_tokens'] == 3500 and chat_kwargs['extra_body'] == {'reasoning_effort': 'low'}
+    assert check_kwargs['max_tokens'] == 2005 and check_kwargs['extra_body'] == {'reasoning_effort': 'low'}
+
+
+@pytest.mark.django_db
+def test_no_thinking_options_by_default(ai_settings):
+    client = MagicMock()
+    client.chat.completions.create.return_value = ok_response('OK')
+    with patch('ai_engine.openai_service.get_client', return_value=client):
+        chat_completion('sys', 'user', purpose='legal_question')
+    kwargs = client.chat.completions.create.call_args.kwargs
+    assert kwargs['max_tokens'] == 1500 and 'extra_body' not in kwargs
+
+
+def test_list_models_command(ai_settings):
+    from io import StringIO
+    from django.core.management import call_command
+    client = MagicMock()
+    client.models.list.return_value = [MagicMock(id='models/gemini-b-flash'), MagicMock(id='models/gemini-a-pro')]
+    out = StringIO()
+    with patch('ai_engine.openai_service.get_client', return_value=client):
+        call_command('check_ai_services', '--list-models', stdout=out)
+    text = out.getvalue()
+    assert text.index('gemini-a-pro') < text.index('gemini-b-flash')
+    assert 'models/' not in text and '2 model(s)' in text
+    client.chat.completions.create.assert_not_called()
+
+
+def test_google_invalid_key_is_auth_failed_and_masked():
+    exc = status_error(openai.BadRequestError, 400, None,
+                       f'API key not valid. Please pass a valid API key. ({GOOGLE_KEY})')
+    category, detail = classify_error(exc)
+    assert category == 'auth_failed'
+    assert GOOGLE_KEY not in detail
 
 
 # ── Overview: a passing connection test alone does not mean documents work ──

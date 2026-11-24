@@ -190,6 +190,15 @@ USE_TZ = True
 # ---------------------------------------------------------
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4o')
+# Leave empty to use OpenAI. Set it to use another OpenAI-compatible provider with that
+# provider's key and model, e.g. Google Gemini (free tier):
+#   https://generativelanguage.googleapis.com/v1beta/openai/
+OPENAI_BASE_URL = env('OPENAI_BASE_URL', default='')
+# Optional "reasoning_effort" for models that think before answering (e.g. "low"). Empty: not sent.
+OPENAI_REASONING_EFFORT = env('OPENAI_REASONING_EFFORT', default='')
+# Extra output tokens added to every request, so a thinking model's reasoning cannot use up
+# the whole answer limit and return empty text. 0 for models that do not think (e.g. gpt-4o).
+OPENAI_EXTRA_MAX_TOKENS = env.int('OPENAI_EXTRA_MAX_TOKENS', default=0)
 OPENAI_TIMEOUT_SECONDS = env.float('OPENAI_TIMEOUT_SECONDS', default=60)
 OPENAI_MAX_RETRIES = env.int('OPENAI_MAX_RETRIES', default=1)
 OPENAI_HEALTHCHECK_TIMEOUT_SECONDS = env.float('OPENAI_HEALTHCHECK_TIMEOUT_SECONDS', default=20)
@@ -232,6 +241,37 @@ ELEVENLABS_VOICE_NYN = _clean_env('ELEVENLABS_VOICE_NYN')
 ELEVENLABS_VOICE_ACH = _clean_env('ELEVENLABS_VOICE_ACH')
 ELEVENLABS_VOICE_LGG = _clean_env('ELEVENLABS_VOICE_LGG')
 STT_PROVIDER = _clean_env('STT_PROVIDER', 'openai_whisper')
+# Key for OpenAI voice (Whisper speech-to-text, OpenAI text-to-speech). Defaults to OPENAI_API_KEY
+# only when that is an OpenAI key; with another provider in OPENAI_BASE_URL it must be set separately.
+VOICE_OPENAI_API_KEY = env('VOICE_OPENAI_API_KEY', default='' if OPENAI_BASE_URL else OPENAI_API_KEY)
+# Whisper can also run on an OpenAI-compatible provider, e.g. Groq (free tier):
+#   VOICE_OPENAI_BASE_URL=https://api.groq.com/openai/v1  and  STT_WHISPER_MODEL=whisper-large-v3
+VOICE_OPENAI_BASE_URL = _clean_env('VOICE_OPENAI_BASE_URL')
+STT_WHISPER_MODEL = _clean_env('STT_WHISPER_MODEL', 'whisper-1')
+# Text-to-speech with TTS_PROVIDER=openai (OpenAI, or an OpenAI-compatible provider via
+# VOICE_OPENAI_BASE_URL). Groq example: model canopylabs/orpheus-v1-english, voice hannah
+# (also autumn, diana, austin, daniel, troy), format wav, languages en, max chars 1100.
+TTS_OPENAI_MODEL = _clean_env('TTS_OPENAI_MODEL', 'tts-1')
+TTS_OPENAI_VOICE = _clean_env('TTS_OPENAI_VOICE', 'alloy')
+TTS_OPENAI_FORMAT = _clean_env('TTS_OPENAI_FORMAT', 'mp3')
+# Comma-separated app language codes the voice can speak; empty = all. Text in other
+# languages is not read with a voice that cannot pronounce it.
+TTS_OPENAI_LANGUAGES = _clean_env('TTS_OPENAI_LANGUAGES')
+# Longest text sent for speech (all providers); longer text is cut at a sentence end.
+TTS_MAX_CHARS = env.int('TTS_MAX_CHARS', default=4096)
+# Sunbird AI (Uganda): free speech-to-text and text-to-speech in English and Luganda.
+# Used when STT_PROVIDER=sunbird and/or TTS_PROVIDER=sunbird. Register at
+# https://api.sunbird.ai/register, then copy the token from https://api.sunbird.ai/keys
+SUNBIRD_API_TOKEN = _clean_env('SUNBIRD_API_TOKEN')
+SUNBIRD_API_URL = _clean_env('SUNBIRD_API_URL', 'https://api.sunbird.ai')
+SUNBIRD_TIMEOUT_SECONDS = env.float('SUNBIRD_TIMEOUT_SECONDS', default=120)
+# Voice names; empty uses Sunbird's default (English: Grace, Luganda: Namuli)
+SUNBIRD_TTS_VOICE_EN = _clean_env('SUNBIRD_TTS_VOICE_EN')
+SUNBIRD_TTS_VOICE_LG = _clean_env('SUNBIRD_TTS_VOICE_LG')
+
+# Full path to tesseract(.exe) when it is not on PATH. Empty: use PATH, or on Windows the
+# standard install folder C:\Program Files\Tesseract-OCR if present.
+TESSERACT_CMD = _clean_env('TESSERACT_CMD')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

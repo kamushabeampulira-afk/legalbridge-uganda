@@ -1,5 +1,5 @@
 """
-python manage.py check_ai_services [--connection-only] [--end-to-end]
+python manage.py check_ai_services [--connection-only] [--end-to-end] [--list-models]
 
 Tests each part of the document-analysis pipeline separately:
   A. OpenAI connection   B. OCR   C. Legal retrieval   D. Classification
@@ -21,8 +21,12 @@ class Command(BaseCommand):
         parser.add_argument('--connection-only', action='store_true', help='Only test the OpenAI connection.')
         parser.add_argument('--end-to-end', action='store_true',
                             help='Also generate one explanation end to end (uses one AI request).')
+        parser.add_argument('--list-models', action='store_true',
+                            help='List the models the configured key can use (no AI request is made).')
 
     def handle(self, *args, **options):
+        if options['list_models']:
+            return self.list_models()
         if options['connection_only']:
             results = [run_connection_check()]
         else:
@@ -42,3 +46,18 @@ class Command(BaseCommand):
 
         overview = diagnostics.service_overview()['document_analysis']
         self.stdout.write(f"\nDocument analysis service: {overview['label']}. {overview['note']}")
+
+    def list_models(self):
+        from ai_engine.openai_service import classify_error, get_client, is_configured
+        if not is_configured():
+            self.stdout.write(self.style.ERROR('OPENAI_API_KEY is not set in backend/.env.'))
+            return
+        try:
+            ids = sorted(m.id.removeprefix('models/') for m in get_client(timeout=20, max_retries=0).models.list())
+        except Exception as exc:
+            category, detail = classify_error(exc)
+            self.stdout.write(self.style.ERROR(f'Could not list models ({category}): {detail}'))
+            return
+        for model_id in ids:
+            self.stdout.write(model_id)
+        self.stdout.write(f'\n{len(ids)} model(s). Put the one you want in OPENAI_MODEL in backend/.env.')
