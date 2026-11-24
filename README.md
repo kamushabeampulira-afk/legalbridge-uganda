@@ -167,9 +167,10 @@ review them before release, especially legal wording.
 
 ## Deployment
 
-The Django API can be deployed to Render with `render.yaml`. See
-`docs/RENDER.md` for the Blueprint steps, environment variables and mobile/USSD
-configuration. Do not commit `.env` files or API keys.
+The Django API can be deployed to Render with `render.yaml` (production) or
+`render.free.yaml` (free demo). See `docs/GO-LIVE.md` for the click-by-click
+checklist and `docs/RENDER.md` for full configuration details. Do not commit
+`.env` files or API keys.
 
 ---
 
