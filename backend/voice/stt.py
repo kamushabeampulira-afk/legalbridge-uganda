@@ -63,6 +63,10 @@ def _transcribe_whisper(audio_file, language: str) -> dict:
         }
         if whisper_lang:
             kwargs['language'] = whisper_lang
+        elif language == 'lg':
+            # Whisper has no ISO code for Luganda (the API rejects 'lg').
+            # A prompt biases it toward Luganda instead of hallucinating English.
+            kwargs['prompt'] = 'Yogera mu Luganda: '
 
         transcript = client.audio.transcriptions.create(**kwargs)
         return {
