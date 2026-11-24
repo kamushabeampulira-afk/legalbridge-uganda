@@ -67,9 +67,10 @@ Create `mobile/.env` locally (do **not** commit it):
 EXPO_PUBLIC_API_URL=https://legalbridge-api-free.onrender.com/api
 ```
 
-Then rebuild/run Expo. Verify in the app:
+Then rebuild/run Expo. The hosted database starts empty, so register a fresh
+demo account in the app; the local test accounts were not copied. Verify:
 
-- Login with a demo account.
+- Register/login with that demo account.
 - Open **Know My Rights** as a rider and as a vendor.
 - Switch language between **English** and **Luganda**.
 - Record a fresh demo voice note (not compressed WhatsApp audio).
