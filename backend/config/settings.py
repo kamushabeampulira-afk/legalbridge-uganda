@@ -208,11 +208,16 @@ AT_ENVIRONMENT = env('AT_ENVIRONMENT', default='sandbox')
 # ---------------------------------------------------------
 # Voice / TTS / STT
 # ---------------------------------------------------------
-TTS_PROVIDER = env('TTS_PROVIDER', default='openai')
-ELEVENLABS_API_KEY = env('ELEVENLABS_API_KEY', default='')
-ELEVENLABS_VOICE_EN = env('ELEVENLABS_VOICE_EN', default='')
-ELEVENLABS_VOICE_LG = env('ELEVENLABS_VOICE_LG', default='')
-STT_PROVIDER = env('STT_PROVIDER', default='openai_whisper')
+# django-environ does not strip inline comments in .env values, so strip them here.
+def _clean_env(name, default=''):
+    return env(name, default=default).split('#', 1)[0].strip()
+
+
+TTS_PROVIDER = _clean_env('TTS_PROVIDER', 'openai')
+ELEVENLABS_API_KEY = _clean_env('ELEVENLABS_API_KEY')
+ELEVENLABS_VOICE_EN = _clean_env('ELEVENLABS_VOICE_EN')
+ELEVENLABS_VOICE_LG = _clean_env('ELEVENLABS_VOICE_LG')
+STT_PROVIDER = _clean_env('STT_PROVIDER', 'openai_whisper')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
