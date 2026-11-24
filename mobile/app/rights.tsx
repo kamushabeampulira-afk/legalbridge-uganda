@@ -13,7 +13,7 @@ import { Colors, withAlpha } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type Language } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 import {
   getRightsGuide,
@@ -24,7 +24,7 @@ import {
 } from '@/constants/LegalRights';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 
-function RightCard({ right, language }: { right: LegalRight; language: 'en' | 'lg' }) {
+function RightCard({ right, language }: { right: LegalRight; language: Language }) {
   const openSource = () => {
     Linking.openURL(right.source.url).catch(() => undefined);
   };

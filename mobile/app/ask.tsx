@@ -13,7 +13,7 @@ import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type Language } from '@/store/useAppStore';
 import { t } from '@/i18n/translations';
 import Button from '@/components/ui/Button';
 import SectionCard from '@/components/ui/SectionCard';
@@ -21,7 +21,8 @@ import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
-const PRESET_QUESTIONS: Record<string, { en: string; lg: string }[]> = {
+/** Presets fall back to English when a translation is not available yet. */
+const PRESET_QUESTIONS: Record<string, Partial<Record<Language, string>>[]> = {
   boda_boda: [
     { en: 'What documents must I carry when riding my boda boda?', lg: 'Empapula ki ezinaabikibwa ng\'nkuba boda boda?' },
     { en: 'What should I do when stopped by a traffic officer?', lg: 'Nkole ki poliisi ng\'yansinzya ku kkubo?' },
@@ -43,6 +44,8 @@ export default function AskScreen() {
 
   const userCategory = params.category ?? 'general';
   const presets = PRESET_QUESTIONS[userCategory] ?? [];
+  const presetText = (preset: Partial<Record<Language, string>>) =>
+    preset[language] ?? preset.en ?? '';
 
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
@@ -183,13 +186,13 @@ export default function AskScreen() {
                 key={i}
                 style={styles.presetCard}
                 onPress={() => {
-                  const q = language === 'lg' ? p.lg : p.en;
+                  const q = presetText(p);
                   setQuestion(q);
                   handleAsk(q);
                 }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.presetText}>{language === 'lg' ? p.lg : p.en}</Text>
+                <Text style={styles.presetText}>{presetText(p)}</Text>
                 <Ionicons name="arrow-forward-circle" size={20} color={Colors.primary} />
               </TouchableOpacity>
             ))}

@@ -15,26 +15,27 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { t, type Language } from '@/i18n/translations';
+import { getLanguageMeta } from '@/i18n/languages';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
 import SectionCard from '@/components/ui/SectionCard';
 import LoadingOverlay from '@/components/ui/LoadingOverlay';
 
 // ── Browser-native TTS (web only, no API key or voice ID required) ───────────
-function speakWithBrowser(text: string, lang: 'en' | 'lg'): boolean {
+function speakWithBrowser(text: string, lang: Language): boolean {
   if (Platform.OS !== 'web') return false;
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
   window.speechSynthesis.cancel();
   const utter = new (window as any).SpeechSynthesisUtterance(text);
   const voices = window.speechSynthesis.getVoices();
-  // Prefer a Luganda voice; Swahili is the closest common fallback on browsers.
-  const preferred = lang === 'lg'
-    ? voices.find((v: any) => v.lang.toLowerCase().startsWith('lg'))
-      ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('sw'))
-    : voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
+  const meta = getLanguageMeta(lang);
+  const prefix = meta.bcp47.split('-')[0].toLowerCase();
+  // Prefer the selected language; fall back to English when no voice exists.
+  const preferred = voices.find((v: any) => v.lang.toLowerCase().startsWith(prefix))
+    ?? voices.find((v: any) => v.lang.toLowerCase().startsWith('en'));
   if (preferred) utter.voice = preferred;
-  utter.lang = lang === 'lg' ? 'lg-LG' : 'en-GB';
+  utter.lang = meta.bcp47;
   utter.rate = 0.88;
   utter.pitch = 1.0;
   window.speechSynthesis.speak(utter);
@@ -249,15 +250,15 @@ export default function VoiceScreen() {
         <Ionicons name="mic" size={28} color={Colors.textOnPrimary} />
         <View>
           <Text style={styles.headerTitle}>{t('voice_title', language)}</Text>
-          <Text style={styles.headerSub}>{t('voice_languages', language)}</Text>
+          <Text style={styles.headerSub}>{getLanguageMeta(language).nativeName}</Text>
         </View>
       </View>
 
-      {/* Luganda warning */}
-      {language === 'lg' && (
+      {/* Speech accuracy warning for languages without reliable STT support */}
+      {!getLanguageMeta(language).voiceReliable && (
         <View style={styles.warningBox}>
           <Ionicons name="warning" size={16} color={Colors.warning} />
-          <Text style={styles.warningText}>{t('voice_luganda_warning', language)}</Text>
+          <Text style={styles.warningText}>{t('voice_accuracy_warning', language)}</Text>
         </View>
       )}
 
@@ -394,7 +395,7 @@ export default function VoiceScreen() {
       {/* Free legal aid connection */}
       <TouchableOpacity
         style={styles.legalAidButton}
-        onPress={() => router.push('/legal-aid')}
+        onPress={() => router.push('/legal-aid' as any)}
         activeOpacity={0.85}
         accessibilityRole="button"
         accessibilityLabel={t('voice_freeLegalAid', language)}

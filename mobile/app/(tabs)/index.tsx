@@ -24,8 +24,7 @@ const PRIMARY_PATHS = [
     color: Colors.primary,
     emoji: '🏍️',
     titleKey: 'home_boda' as const,
-    desc_en: 'Traffic notices, rights & legal info',
-    desc_lg: 'Obubaka bw\'ekkubo n\'amateeka',
+    descKey: 'home_boda_desc' as const,
   },
   {
     id: 'vendor',
@@ -34,8 +33,7 @@ const PRIMARY_PATHS = [
     color: Colors.secondary,
     emoji: '🏪',
     titleKey: 'home_vendor' as const,
-    desc_en: 'Allocation slips, eviction notices & rights',
-    desc_lg: 'Pepa ly\'okuweebwayo n\'amateeka',
+    descKey: 'home_vendor_desc' as const,
   },
 ];
 
@@ -116,9 +114,7 @@ export default function HomeScreen() {
           >
             <Text style={styles.primaryEmoji}>{p.emoji}</Text>
             <Text style={styles.primaryTitle}>{t(p.titleKey, language)}</Text>
-            <Text style={styles.primaryDesc}>
-              {language === 'lg' ? p.desc_lg : p.desc_en}
-            </Text>
+            <Text style={styles.primaryDesc}>{t(p.descKey, language)}</Text>
             <View style={styles.primaryArrow}>
               <Ionicons name="arrow-forward" size={18} color={Colors.textOnPrimary} />
             </View>
@@ -133,7 +129,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             key={a.id}
             style={[styles.actionCard, webShadow.sm]}
-            onPress={() => router.push(a.route)}
+            onPress={() => router.push(a.route as any)}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={t(a.titleKey, language)}

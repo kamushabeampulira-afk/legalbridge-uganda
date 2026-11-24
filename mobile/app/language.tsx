@@ -1,65 +1,64 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type Language } from '@/store/useAppStore';
+import { LANGUAGES } from '@/i18n/languages';
 import { t } from '@/i18n/translations';
 
 export default function LanguageScreen() {
   const router = useRouter();
   const { language, setLanguage } = useAppStore();
 
-  const select = (lang: 'en' | 'lg') => {
+  const select = (lang: Language) => {
     setLanguage(lang);
     router.replace('/(auth)/login');
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.logo}>⚖️</Text>
-        <Text style={styles.title}>{t('selectLanguage', language)}</Text>
-        <Text style={styles.subtitle}>{t('selectLanguage', 'lg')}</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>⚖️</Text>
+          <Text style={styles.title}>{t('selectLanguage', language)}</Text>
+          <Text style={styles.subtitle}>Choose the language you prefer</Text>
+        </View>
 
-      <View style={styles.options}>
-        <TouchableOpacity
-          style={[styles.option, webShadow.md]}
-          onPress={() => select('en')}
-          activeOpacity={0.8}
-          accessibilityLabel={t('language_select_en_a11y', language)}
-        >
-          <Text style={styles.flag}>🇬🇧</Text>
-          <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>{t('english', language)}</Text>
-            <Text style={styles.optionSub}>{t('language_continue_en', language)}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
-        </TouchableOpacity>
+        <View style={styles.options}>
+          {LANGUAGES.map((item) => (
+            <TouchableOpacity
+              key={item.code}
+              style={[
+                styles.option,
+                item.code === language && styles.optionSelected,
+                webShadow.md,
+              ]}
+              onPress={() => select(item.code)}
+              activeOpacity={0.8}
+              accessibilityLabel={`Select ${item.label}`}
+            >
+              <Text style={styles.flag}>{item.emoji}</Text>
+              <View style={styles.optionText}>
+                <Text style={styles.optionTitle}>{item.nativeName}</Text>
+                <Text style={styles.optionSub}>{item.label}</Text>
+              </View>
+              {item.code === language ? (
+                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
+              ) : (
+                <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
 
-        <TouchableOpacity
-          style={[styles.option, webShadow.md]}
-          onPress={() => select('lg')}
-          activeOpacity={0.8}
-          accessibilityLabel={t('language_select_lg_a11y', language)}
-        >
-          <Text style={styles.flag}>🇺🇬</Text>
-          <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>{t('luganda', language)}</Text>
-            <Text style={styles.optionSub}>{t('language_continue_lg', language)}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.note}>
-        {t('language_note', language)}{'\n'}
-        {t('language_note', 'lg')}
-      </Text>
+        <Text style={styles.note}>
+          {t('changeLanguage', language)} → {t('profile_title', language)}
+        </Text>
+      </ScrollView>
     </View>
   );
 }
@@ -68,7 +67,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primary,
+  },
+  content: {
     padding: Spacing.xl,
+    flexGrow: 1,
     justifyContent: 'center',
   },
   header: { alignItems: 'center', marginBottom: Spacing['3xl'] },
@@ -84,17 +86,21 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     color: Colors.textOnPrimaryMuted,
     marginTop: Spacing.xs,
+    textAlign: 'center',
   },
-  options: { gap: Spacing.base },
+  options: { gap: Spacing.sm },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
-    padding: Spacing.lg,
+    padding: Spacing.md,
     gap: Spacing.base,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
-  flag: { fontSize: 32 },
+  optionSelected: { borderColor: Colors.accent },
+  flag: { fontSize: 28 },
   optionText: { flex: 1 },
   optionTitle: {
     fontFamily: FontFamily.bold,

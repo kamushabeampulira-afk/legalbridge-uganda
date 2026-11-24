@@ -9,7 +9,7 @@
  * Links open the same documents at their official publisher.
  */
 
-export type Language = 'en' | 'lg';
+import type { Language } from '@/i18n/translations';
 
 export interface LocalizedText {
   en: string;
@@ -547,6 +547,10 @@ export function getRightsGuide(category?: string | string[] | null): RightsGuide
   return value === 'market_vendor' ? vendorGuide : bodaGuide;
 }
 
+/**
+ * Guides are authored in English and Luganda only. For any other app language
+ * we return the English text rather than inventing a translation of the law.
+ */
 export function localized(text: LocalizedText, language: Language): string {
   return language === 'lg' ? text.lg : text.en;
 }

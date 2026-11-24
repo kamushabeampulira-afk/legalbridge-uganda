@@ -17,7 +17,7 @@ from .prompts import (
     LEGAL_QUESTION_PROMPT,
     BODA_STOPPED_PROMPT,
     EVICTION_GUIDANCE_PROMPT,
-    UNCERTAINTY_RESPONSE,
+    uncertainty_response,
 )
 
 logger = logging.getLogger('legalbridge')
@@ -64,7 +64,7 @@ def _call_openai(system_prompt: str, user_message: str, language: str = 'en',
 
 # ── Legal context ─────────────────────────────────────────────────────────────
 
-def _format_retrieved_context(chunks: list) -> tuple[str, list, bool]:
+def _format_retrieved_context(chunks: list, language: str = 'en') -> tuple[str, list, bool]:
     """
     Format retrieved chunks into a prompt-ready string with citation labels.
     Returns (formatted_context, sources_list, has_relevant_sources).
@@ -72,7 +72,7 @@ def _format_retrieved_context(chunks: list) -> tuple[str, list, bool]:
     """
     chunks = [c for c in (chunks or []) if c.get('distance', 0) < MAX_RELEVANT_DISTANCE]
     if not chunks:
-        return UNCERTAINTY_RESPONSE, [], False
+        return uncertainty_response(language), [], False
 
     context_parts = []
     sources = []
@@ -326,7 +326,6 @@ def generate_document_explanation(document, language: str = 'en'):
     )
     sections = result['sections']
     has_current = result['has_current_verified_sources']
-
     analysis, _ = DocumentAnalysis.objects.update_or_create(
         document=document,
         defaults={
@@ -356,14 +355,14 @@ def answer_legal_question(question: str, user_category: str, language: str, user
 
     subject = _infer_subject_from_question(question, user_category)
     chunks = retrieve_relevant_chunks(question, subject_filter=subject, n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
     has_current = _has_current_verified(sources)
 
     user_category_label = USER_CATEGORY_LABELS.get(user_category, 'person')
     system = SYSTEM_PROMPT.format(language=language)
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
     else:
         prompt = LEGAL_QUESTION_PROMPT.format(
             user_category_label=user_category_label,
@@ -400,7 +399,7 @@ def answer_boda_stopped(data: dict, language: str = 'en', user=None) -> dict:
     """Guided response for boda riders stopped by an officer. Raises AIServiceUnavailable."""
     query = f"traffic violation boda boda police stop Uganda rights {data.get('told_about', '')}"
     chunks = retrieve_relevant_chunks(query, subjects=['traffic', 'police'], n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
     has_current = _has_current_verified(sources)
 
     system = SYSTEM_PROMPT.format(language=language)
@@ -414,7 +413,7 @@ def answer_boda_stopped(data: dict, language: str = 'en', user=None) -> dict:
     )
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
     else:
         response_text = chat_completion(system, prompt, purpose='boda_stopped')
 
@@ -431,7 +430,7 @@ def answer_eviction_guidance(data: dict, language: str = 'en', user=None) -> dic
     """Guided response for market vendor facing eviction. Raises AIServiceUnavailable."""
     query = f"eviction market vendor stall Uganda rights {data.get('reason_given', '')}"
     chunks = retrieve_relevant_chunks(query, subjects=['markets', 'local_gov', 'land'], n_results=5)
-    retrieved_context, sources, has_sources = _format_retrieved_context(chunks)
+    retrieved_context, sources, has_sources = _format_retrieved_context(chunks, language=language)
     has_current = _has_current_verified(sources)
 
     system = SYSTEM_PROMPT.format(language=language)
@@ -446,7 +445,7 @@ def answer_eviction_guidance(data: dict, language: str = 'en', user=None) -> dic
     )
 
     if not has_sources:
-        response_text = UNCERTAINTY_RESPONSE
+        response_text = uncertainty_response(language)
     else:
         response_text = chat_completion(system, prompt, purpose='eviction_guidance')
 

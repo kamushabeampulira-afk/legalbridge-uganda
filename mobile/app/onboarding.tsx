@@ -11,12 +11,12 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import Button from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { t, type Language } from '@/i18n/translations';
 
 const { width } = Dimensions.get('window');
 const ONBOARDING_KEY = 'lb_onboarding_done';
 
-const getSlides = (language: 'en' | 'lg') => [
+const getSlides = (language: Language) => [
   {
     id: '1',
     icon: 'document-text' as const,

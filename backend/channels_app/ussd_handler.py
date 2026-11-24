@@ -5,7 +5,9 @@ Session state stored in Django cache (configure Redis for production).
 """
 import logging
 from django.core.cache import cache
-from .ussd_menus import MENUS
+from config.languages import LANGUAGE_CODES, normalize_language
+
+from .ussd_menus import MENUS, LANGUAGE_OPTIONS
 
 logger = logging.getLogger('legalbridge')
 
@@ -32,6 +34,11 @@ def _clear_session(session_id: str):
     cache.delete(_session_key(session_id))
 
 
+def get_session_language(session_id: str) -> str:
+    """Return the language currently selected for a USSD session."""
+    return normalize_language(_get_session(session_id).get('language'))
+
+
 def handle_ussd_request(
     session_id: str,
     service_code: str,
@@ -45,7 +52,7 @@ def handle_ussd_request(
     try:
         state = _get_session(session_id)
         current_menu_key = state.get('menu', 'main')
-        language = state.get('language', 'en')
+        language = normalize_language(state.get('language'))
 
         # text is the full input string accumulated across the session
         # e.g. '' = fresh session, '1' = first choice, '1*2' = second choice
@@ -59,30 +66,9 @@ def handle_ussd_request(
             _save_session(session_id, state)
             return _render_menu('main', language)
 
-        # Handle language change
-        if user_input == '__set_lang_en__' or current_menu_key == 'change_language' and user_input == '1':
-            state['language'] = 'en'
-            state['menu'] = 'main'
-            _save_session(session_id, state)
-            return _render_menu('main', 'en')
-
-        if user_input == '__set_lang_lg__' or current_menu_key == 'change_language' and user_input == '2':
-            state['language'] = 'lg'
-            state['menu'] = 'main'
-            _save_session(session_id, state)
-            return _render_menu('main', 'lg')
-
-        # Look up the menu definition
-        menu = MENUS.get(current_menu_key)
-        if not menu:
-            logger.warning(f'Unknown menu key: {current_menu_key}')
-            _clear_session(session_id)
-            return _error_response(language)
-
-        options = menu.get('options', {})
-
         if user_input == '0':
-            # Back — pop history
+            # Back — pop history. Checked before language selection so 0 also
+            # works on the language menu.
             history = state.get('history', [])
             if history:
                 prev_menu = history.pop()
@@ -94,6 +80,31 @@ def handle_ussd_request(
                 state['menu'] = 'main'
                 _save_session(session_id, state)
                 return _render_menu('main', language)
+
+        # Handle language change. The menu sends a digit; older sessions may
+        # send a __set_lang_<code>__ sentinel directly.
+        selected_language = None
+        if current_menu_key == 'change_language':
+            selected_language = LANGUAGE_OPTIONS.get(user_input)
+        if selected_language is None and user_input.startswith('__set_lang_'):
+            code = user_input[len('__set_lang_'):-2]
+            if code in LANGUAGE_CODES:
+                selected_language = code
+
+        if selected_language:
+            state['language'] = selected_language
+            state['menu'] = 'main'
+            _save_session(session_id, state)
+            return _render_menu('main', selected_language)
+
+        # Look up the menu definition
+        menu = MENUS.get(current_menu_key)
+        if not menu:
+            logger.warning(f'Unknown menu key: {current_menu_key}')
+            _clear_session(session_id)
+            return _error_response(language)
+
+        options = menu.get('options', {})
 
         if user_input not in options:
             # Invalid selection
@@ -122,18 +133,30 @@ def _render_menu(menu_key: str, language: str) -> str:
     return menu.get(language) or menu.get('en', "END Menu not available.")
 
 
+ERROR_NOTICES = {
+    'en': "END An error occurred. Please try again or use the LegalBridge app.",
+    'lg': "END Waliwo okusooka. Gezaako nate oba kozesa app ya LegalBridge.",
+    'nyn': "END Waliwo ekisooka. Gezaako nate oba kozesa app ya LegalBridge.",
+    'ach': "END An error occurred. Please try again or use the LegalBridge app.",
+    'lgg': "END An error occurred. Please try again or use the LegalBridge app.",
+}
+
+INVALID_NOTICES = {
+    'en': "Invalid selection. Please choose from the options below.\n\n",
+    'lg': "Londa ennyukuta eziri wansi.\n\n",
+    'nyn': "Londa ennyukuta eziri wansi.\n\n",
+    'ach': "Ywal enamba eri wansi.\n\n",
+    'lgg': "Londa enamba eri wansi.\n\n",
+}
+
+
 def _error_response(language: str) -> str:
-    if language == 'lg':
-        return "END Waliwo okusooka. Gezaako nate oba kozesa app ya LegalBridge."
-    return "END An error occurred. Please try again or use the LegalBridge app."
+    return ERROR_NOTICES.get(language, ERROR_NOTICES['en'])
 
 
 def _invalid_selection(menu_key: str, language: str) -> str:
     base = _render_menu(menu_key, language)
-    # Prepend invalid input notice
-    notice_en = "Invalid selection. Please choose from the options below.\n\n"
-    notice_lg = "Londa ennyukuta eziri wansi.\n\n"
-    notice = notice_lg if language == 'lg' else notice_en
+    notice = INVALID_NOTICES.get(language, INVALID_NOTICES['en'])
     # Keep CON/END prefix but insert notice after it
     if base.startswith('CON '):
         return 'CON ' + notice + base[4:]

@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from config.languages import LANGUAGE_CODES, validated_language
 
 from .models import Document, DocumentAnalysis
 from .serializers import (
@@ -99,11 +100,18 @@ def analyze_document(request, pk):
     if doc.status not in ('completed', 'uploaded'):
         return Response({'error': f'Document is not ready for analysis (status: {doc.status}).'}, status=400)
 
+    language, language_valid = validated_language(request.data.get('language', doc.language))
+    if not language_valid:
+        return Response(
+            {'error': f'Unsupported language. Use one of: {", ".join(LANGUAGE_CODES)}.'},
+            status=400,
+        )
+
     # Import here to avoid circular imports
     from ai_engine.engine import generate_document_explanation
     from ai_engine.openai_service import AIServiceUnavailable
     try:
-        analysis = generate_document_explanation(doc, language=request.data.get('language', doc.language))
+        analysis = generate_document_explanation(doc, language=language)
         from .serializers import DocumentAnalysisSerializer
         return Response(DocumentAnalysisSerializer(analysis).data, status=200)
     except AIServiceUnavailable as e:

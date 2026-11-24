@@ -171,6 +171,9 @@ ngrok http 8000
 1. Get key: https://elevenlabs.io
 2. Find voice IDs in your ElevenLabs dashboard
 3. Add to `.env`: `ELEVENLABS_API_KEY=...`
+4. Optionally set a voice ID per language: `ELEVENLABS_VOICE_EN`,
+   `ELEVENLABS_VOICE_LG`, `ELEVENLABS_VOICE_NYN`,
+   `ELEVENLABS_VOICE_ACH`, `ELEVENLABS_VOICE_LGG`
 
 ---
 

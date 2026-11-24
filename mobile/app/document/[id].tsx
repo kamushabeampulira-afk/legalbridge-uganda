@@ -17,7 +17,8 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { useAppStore } from '@/store/useAppStore';
-import { t } from '@/i18n/translations';
+import { normalizeLanguage, t } from '@/i18n/translations';
+import { getLanguageMeta } from '@/i18n/languages';
 import SectionCard from '@/components/ui/SectionCard';
 import DisclaimerBanner from '@/components/ui/DisclaimerBanner';
 import UncertaintyBanner from '@/components/ui/UncertaintyBanner';
@@ -29,7 +30,7 @@ function speakWithBrowser(text: string, lang: string = 'en'): boolean {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
   window.speechSynthesis.cancel();
   const utter = new (window as any).SpeechSynthesisUtterance(text);
-  utter.lang = lang === 'lg' ? 'sw' : 'en-GB';
+  utter.lang = getLanguageMeta(normalizeLanguage(lang)).bcp47;
   utter.rate = 0.88;
   utter.pitch = 1.0;
   window.speechSynthesis.speak(utter);

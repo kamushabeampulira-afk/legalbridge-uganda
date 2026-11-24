@@ -2,7 +2,22 @@
 LegalBridge — USSD menu tree.
 Text must stay within USSD character limits (~182 chars per screen).
 Session state is tracked in memory (use Redis/DB for production).
+
+Menus not yet translated into a local language fall back to English via
+_render_menu(). Add a key with the language code to translate a menu.
 """
+
+# Africa's Talking sends only digits, so the language menu uses option
+# numbers. Keep this map in sync with the 'change_language' menu below.
+LANGUAGE_OPTIONS = {
+    '1': 'en',
+    '2': 'lg',
+    '3': 'nyn',  # Runyankore
+    '4': 'ach',  # Acholi
+    '5': 'lgg',  # Lugbara
+}
+
+LANGUAGE_OPTION_BY_CODE = {code: option for option, code in LANGUAGE_OPTIONS.items()}
 
 # ---------------------------------------------------------------------------
 # Menu definitions
@@ -31,6 +46,32 @@ MENUS = {
             "3. Manya Eddembe Lyo\n"
             "4. Noonya Obuyambi bw'Amateeka\n"
             "5. Kyusa Olulimi"
+        ),
+        'nyn': (
+            "CON Mukaribuni ku LegalBridge\n"
+            "Obwenkanya Bwaho\n\n"
+            "1. Omuvuzi wa Boda Boda\n"
+            "2. Omusuubuzi wa Akatale\n"
+            "3. Manya Ekitiibwa Kyawe\n"
+            "4. Noonya Obuyambi bw'Amateeka\n"
+            "5. Hindura Orurimi"
+        ),
+        'ach': (
+            "CON Welcome to LegalBridge\n\n"
+            "1. Boda Boda Rider\n"
+            "2. Market Vendor\n"
+            "3. Know Your Rights\n"
+            "4. Find Legal Help\n"
+            "5. Ywal Leb"
+        ),
+        'lgg': (
+            "CON LegalBridge Ati\n"
+            "Obubaka obw'amateeka\n\n"
+            "1. Omuvuzi wa Boda\n"
+            "2. Omusuubuzi wa Akatale\n"
+            "3. Manya eddembe lyawe\n"
+            "4. Noonya obuyambi\n"
+            "5. Hinduka Olulimi"
         ),
         'options': {
             '1': 'boda_main',
@@ -437,18 +478,56 @@ MENUS = {
     # ── Language ─────────────────────────────────────────────────────────────
     'change_language': {
         'en': (
-            "CON Select Language / Londa Olulimi\n\n"
+            "CON Choose Language\n\n"
             "1. English\n"
-            "2. Luganda"
+            "2. Luganda\n"
+            "3. Runyankore\n"
+            "4. Acholi\n"
+            "5. Lugbara\n"
+            "0. Back"
         ),
         'lg': (
-            "CON Select Language / Londa Olulimi\n\n"
-            "1. English\n"
-            "2. Luganda"
+            "CON Londa Olulimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Lugbarati\n"
+            "0. Back"
+        ),
+        'nyn': (
+            "CON Londa Orurimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Olugbara\n"
+            "0. Back"
+        ),
+        'ach': (
+            "CON Ywal Leb\n\n"
+            "1. Leb Engereza\n"
+            "2. Leb Luganda\n"
+            "3. Leb Runyankore\n"
+            "4. Leb Acoli\n"
+            "5. Leb Lugbara\n"
+            "0. Back"
+        ),
+        'lgg': (
+            "CON Londa Olulimi\n\n"
+            "1. Olungereza\n"
+            "2. Oluganda\n"
+            "3. Orunyankore\n"
+            "4. Leb Acoli\n"
+            "5. Lugbarati\n"
+            "0. Back"
         ),
         'options': {
             '1': '__set_lang_en__',
             '2': '__set_lang_lg__',
+            '3': '__set_lang_nyn__',
+            '4': '__set_lang_ach__',
+            '5': '__set_lang_lgg__',
         }
     },
 }

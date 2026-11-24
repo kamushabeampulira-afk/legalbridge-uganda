@@ -20,8 +20,7 @@ const ACTIONS = [
     icon: 'cloud-upload' as const,
     color: Colors.primary,
     titleKey: 'boda_upload' as const,
-    desc_en: 'Photograph or upload a traffic notice',
-    desc_lg: 'Isa obubaka bw\'ekkubo',
+    descKey: 'boda_upload_desc' as const,
   },
   {
     id: 'stopped',
@@ -29,8 +28,7 @@ const ACTIONS = [
     icon: 'hand-left' as const,
     color: Colors.secondary,
     titleKey: 'boda_stopped' as const,
-    desc_en: 'Answer a few questions and get guidance',
-    desc_lg: 'Noonya obuyambi ng\'okuggwa',
+    descKey: 'boda_stopped_desc' as const,
   },
   {
     id: 'history',
@@ -38,8 +36,7 @@ const ACTIONS = [
     icon: 'folder-open' as const,
     color: Colors.textPrimary,
     titleKey: 'boda_history' as const,
-    desc_en: 'View documents you have already uploaded',
-    desc_lg: 'Laba empapula z\'edda',
+    descKey: 'boda_history_desc' as const,
   },
   {
     id: 'rights',
@@ -47,8 +44,7 @@ const ACTIONS = [
     icon: 'shield-checkmark' as const,
     color: Colors.accentStrong,
     titleKey: 'boda_rights' as const,
-    desc_en: 'Your rights under Ugandan traffic law, in plain language',
-    desc_lg: 'Eddembe lyo mu mateeka g\'ekkubo, mu lulimi olwangu',
+    descKey: 'boda_rights_desc' as const,
   },
 ];
 
@@ -86,9 +82,7 @@ export default function BodaScreen() {
           </View>
           <View style={styles.actionText}>
             <Text style={styles.actionTitle}>{t(action.titleKey, language)}</Text>
-            <Text style={styles.actionDesc}>
-              {language === 'lg' ? action.desc_lg : action.desc_en}
-            </Text>
+            <Text style={styles.actionDesc}>{t(action.descKey, language)}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
         </TouchableOpacity>
@@ -97,11 +91,7 @@ export default function BodaScreen() {
       {/* Key info banner */}
       <View style={styles.infoBanner}>
         <Ionicons name="information-circle" size={20} color={Colors.primary} />
-        <Text style={styles.infoText}>
-          {language === 'lg'
-            ? 'Obuzibu obw\'ekkubo? Noonya obuyambi obuva eri looya awungeddwa.'
-            : 'Facing a traffic issue? Always request a written notice with a reference number.'}
-        </Text>
+        <Text style={styles.infoText}>{t('boda_info', language)}</Text>
       </View>
 
       <DisclaimerBanner />

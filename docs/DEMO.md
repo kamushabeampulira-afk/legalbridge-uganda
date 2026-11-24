@@ -213,15 +213,15 @@ Show the system:
 - Works on any phone with no internet
 - Same legal knowledge base as the mobile app
 - For full document analysis → app is required
-- English and Luganda support
+- Five languages: English, Luganda, Runyankore, Acholi, Lugbara
 - Session state tracked throughout
 
 ---
 
 ## Handling Demo Questions
 
-**"Can it really understand Luganda?"**
-> Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a Luganda prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is still limited, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a Luganda voice is used when the device has one, otherwise the closest available voice. For a guaranteed Luganda voice, use a pre-recorded human prompt as fallback.
+**"Can it really understand Luganda, Runyankore, Acholi or Lugbara?"**
+> Voice recognition for local languages has known limitations. Whisper has no Luganda language code (the API rejects `language=lg`), so the backend sends a prompt hint instead of a language hint — without it, Whisper can hallucinate an unrelated English sentence. Accuracy is limited for all local languages, so the app flags this and lets the user **edit the transcript before submitting**. On web, answers are spoken with browser speech synthesis — no API key needed; a device voice is used when available, otherwise the closest available voice. Local-language support currently covers UI text and USSD menus; Runyankore, Acholi and Lugbara strings are first-pass drafts pending native-speaker review. For a guaranteed local-language voice, use a pre-recorded human prompt as fallback.
 
 **"What if the AI makes up a law?"**
 > The system uses RAG — it only cites provisions from documents we have manually approved and indexed. If no relevant source is found, it displays: "I cannot verify the applicable legal provision..." rather than inventing an answer.
