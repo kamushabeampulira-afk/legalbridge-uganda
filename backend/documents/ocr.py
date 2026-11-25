@@ -17,6 +17,9 @@ from typing import Optional
 logger = logging.getLogger('legalbridge')
 
 WINDOWS_TESSERACT = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# Longest image side sent to OCR. A phone photo of an A4 page at this size is about
+# 200 dpi, enough for printed text; larger photos are shrunk to keep OCR fast.
+MAX_OCR_IMAGE_SIDE = int(os.environ.get('OCR_MAX_IMAGE_SIDE', '2500'))
 
 
 def _configure_tesseract():
@@ -138,7 +141,7 @@ def _ocr_image_bytes(img_bytes: bytes, source: str = 'image') -> dict:
         from PIL import Image
         import numpy as np
 
-        image = Image.open(io.BytesIO(img_bytes)).convert('RGB')
+        image = limit_image_size(Image.open(io.BytesIO(img_bytes)).convert('RGB'))
 
         # Pre-processing: convert to numpy, greyscale, threshold
         try:
@@ -164,7 +167,8 @@ def _ocr_image_bytes(img_bytes: bytes, source: str = 'image') -> dict:
             )
             confidences = [int(c) for c in data['conf'] if str(c).lstrip('-').isdigit() and int(c) >= 0]
             avg_confidence = sum(confidences) / len(confidences) if confidences else 0
-            text = pytesseract.image_to_string(image, lang='eng')
+            # One OCR pass: the text comes from the same result as the confidence scores.
+            text = text_from_ocr_data(data)
 
             if avg_confidence < 50:
                 warnings.append(
@@ -194,6 +198,43 @@ def _ocr_image_bytes(img_bytes: bytes, source: str = 'image') -> dict:
             'warnings': [f'Image processing failed: {str(e)}'],
             'method': 'image_failed',
         }
+
+
+def limit_image_size(image, max_side: int = MAX_OCR_IMAGE_SIDE):
+    """Shrink very large photos before OCR.
+
+    OCR time grows with the number of pixels, and a 12-megapixel phone photo
+    is far larger than Tesseract needs to read printed text. On a slow server
+    this is the difference between seconds and minutes.
+    """
+    longest = max(image.size)
+    if longest <= max_side:
+        return image
+    from PIL import Image
+    scale = max_side / longest
+    size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
+    return image.resize(size, Image.Resampling.LANCZOS)
+
+
+def text_from_ocr_data(data: dict) -> str:
+    """Rebuild page text from Tesseract's word boxes: one line per text line,
+    and a blank line between paragraphs (like image_to_string)."""
+    lines = []
+    current_line = current_paragraph = None
+    for index, word in enumerate(data.get('text', [])):
+        word = (word or '').strip()
+        if not word:
+            continue
+        paragraph = (data['block_num'][index], data['par_num'][index])
+        line = paragraph + (data['line_num'][index],)
+        if line == current_line:
+            lines[-1] += ' ' + word
+            continue
+        if current_paragraph is not None and paragraph != current_paragraph:
+            lines.append('')
+        lines.append(word)
+        current_line, current_paragraph = line, paragraph
+    return '\n'.join(lines)
 
 
 # ------------------------------------------------------------------

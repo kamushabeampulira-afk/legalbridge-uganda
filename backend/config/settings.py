@@ -241,12 +241,13 @@ ELEVENLABS_VOICE_NYN = _clean_env('ELEVENLABS_VOICE_NYN')
 ELEVENLABS_VOICE_ACH = _clean_env('ELEVENLABS_VOICE_ACH')
 ELEVENLABS_VOICE_LGG = _clean_env('ELEVENLABS_VOICE_LGG')
 STT_PROVIDER = _clean_env('STT_PROVIDER', 'openai_whisper')
-# Key for OpenAI voice (Whisper speech-to-text, OpenAI text-to-speech). Defaults to OPENAI_API_KEY
-# only when that is an OpenAI key; with another provider in OPENAI_BASE_URL it must be set separately.
-VOICE_OPENAI_API_KEY = env('VOICE_OPENAI_API_KEY', default='' if OPENAI_BASE_URL else OPENAI_API_KEY)
 # Whisper can also run on an OpenAI-compatible provider, e.g. Groq (free tier):
 #   VOICE_OPENAI_BASE_URL=https://api.groq.com/openai/v1  and  STT_WHISPER_MODEL=whisper-large-v3
 VOICE_OPENAI_BASE_URL = _clean_env('VOICE_OPENAI_BASE_URL')
+# Key for OpenAI-compatible voice (speech-to-text and text-to-speech). Defaults to OPENAI_API_KEY
+# when voice and chat use the same provider (same base URL, e.g. both Groq); otherwise set it.
+VOICE_OPENAI_API_KEY = env('VOICE_OPENAI_API_KEY', default=(
+    OPENAI_API_KEY if VOICE_OPENAI_BASE_URL.rstrip('/') == OPENAI_BASE_URL.rstrip('/') else ''))
 STT_WHISPER_MODEL = _clean_env('STT_WHISPER_MODEL', 'whisper-1')
 # Text-to-speech with TTS_PROVIDER=openai (OpenAI, or an OpenAI-compatible provider via
 # VOICE_OPENAI_BASE_URL). Groq example: model canopylabs/orpheus-v1-english, voice hannah
@@ -265,6 +266,9 @@ TTS_MAX_CHARS = env.int('TTS_MAX_CHARS', default=4096)
 SUNBIRD_API_TOKEN = _clean_env('SUNBIRD_API_TOKEN')
 SUNBIRD_API_URL = _clean_env('SUNBIRD_API_URL', 'https://api.sunbird.ai')
 SUNBIRD_TIMEOUT_SECONDS = env.float('SUNBIRD_TIMEOUT_SECONDS', default=120)
+# App languages that always use Sunbird for speech, e.g. "lg". Sunbird is strong in Luganda but
+# slow (25-40 s per request), so English can stay on a faster provider such as Groq.
+SUNBIRD_VOICE_LANGUAGES = _clean_env('SUNBIRD_VOICE_LANGUAGES')
 # Voice names; empty uses Sunbird's default (English: Grace, Luganda: Namuli)
 SUNBIRD_TTS_VOICE_EN = _clean_env('SUNBIRD_TTS_VOICE_EN')
 SUNBIRD_TTS_VOICE_LG = _clean_env('SUNBIRD_TTS_VOICE_LG')

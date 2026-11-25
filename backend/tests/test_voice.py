@@ -258,3 +258,52 @@ def test_openai_compatible_tts_skips_languages_the_voice_cannot_speak(groq_tts, 
     with patch.object(tts, 'AUDIO_DIR', tmp_path), patch('openai.OpenAI') as client_cls:
         assert tts.synthesize_text('Oli otya', language='lg') is None
     client_cls.assert_not_called()
+
+
+# ── Per-language routing: Sunbird for Luganda, Groq for everything else ──────
+
+@pytest.fixture
+def mixed_voice(groq_tts):
+    groq_tts.STT_PROVIDER = 'openai_whisper'
+    groq_tts.STT_WHISPER_MODEL = 'whisper-large-v3'
+    groq_tts.SUNBIRD_VOICE_LANGUAGES = 'lg'
+    groq_tts.SUNBIRD_API_TOKEN = SUNBIRD_TOKEN
+    groq_tts.SUNBIRD_API_URL = 'https://api.sunbird.ai'
+    groq_tts.SUNBIRD_TTS_VOICE_LG = ''
+    return groq_tts
+
+
+def test_luganda_speech_goes_to_sunbird_and_english_to_groq(mixed_voice):
+    from voice.stt import transcribe_audio
+    whisper = MagicMock()
+    whisper.audio.transcriptions.create.return_value = MagicMock(text='Hello')
+    reply = http_response(json_data={'audio_transcription': 'Oli otya'})
+    with patch('requests.post', return_value=reply) as post, patch('openai.OpenAI', return_value=whisper):
+        assert transcribe_audio(audio_upload(), language='lg')['text'] == 'Oli otya'
+        assert transcribe_audio(audio_upload(), language='en')['text'] == 'Hello'
+
+    assert post.call_count == 1 and post.call_args.kwargs['data'] == {'language': 'lug'}
+    assert whisper.audio.transcriptions.create.call_count == 1
+
+
+def test_luganda_reading_goes_to_sunbird_and_english_to_groq(mixed_voice, tmp_path):
+    from voice import tts
+    client = MagicMock()
+    client.audio.speech.create.return_value.write_to_file.side_effect = \
+        lambda path: open(path, 'wb').write(b'RIFF-en')
+    wav = http_response(content=b'RIFF-lg', content_type='audio/wav')
+    with patch.object(tts, 'AUDIO_DIR', tmp_path), patch('requests.post', return_value=wav) as post, \
+            patch('openai.OpenAI', return_value=client):
+        assert tts.synthesize_text('Oli otya', language='lg').endswith('.wav')
+        assert tts.synthesize_text('Hello there.', language='en').endswith('.wav')
+
+    assert post.call_count == 1 and post.call_args.kwargs['json']['language'] == 'lug'
+    assert client.audio.speech.create.call_count == 1
+
+
+def test_sunbird_routing_needs_a_token(mixed_voice):
+    from voice.providers import provider_for
+    assert provider_for('lg', 'openai') == 'sunbird'
+    assert provider_for('en', 'openai') == 'openai'
+    mixed_voice.SUNBIRD_API_TOKEN = ''
+    assert provider_for('lg', 'openai') == 'openai'

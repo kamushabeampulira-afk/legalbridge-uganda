@@ -89,13 +89,36 @@ services:
       - key: AI_DEMO_MODE
         value: 'False'
 
-      # Sunbird offers free Luganda speech. Register at https://api.sunbird.ai/register
-      - key: TTS_PROVIDER
-        value: sunbird
+      # Speech: Groq for English (about 3 s to transcribe, 7-9 s to speak) and Sunbird
+      # only for Luganda (25-40 s per request, but far better Luganda). The Groq voice
+      # reuses OPENAI_API_KEY because both use the same base URL. Accept the Orpheus
+      # model terms once at https://console.groq.com/playground?model=canopylabs/orpheus-v1-english
       - key: STT_PROVIDER
-        value: sunbird
+        value: openai_whisper
+      - key: TTS_PROVIDER
+        value: openai
+      - key: SUNBIRD_VOICE_LANGUAGES
+        value: lg
+      - key: VOICE_OPENAI_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: STT_WHISPER_MODEL
+        value: whisper-large-v3
+      - key: TTS_OPENAI_MODEL
+        value: canopylabs/orpheus-v1-english
+      - key: TTS_OPENAI_VOICE
+        value: hannah
+      - key: TTS_OPENAI_FORMAT
+        value: wav
+      - key: TTS_OPENAI_LANGUAGES
+        value: en
+      - key: TTS_MAX_CHARS
+        value: '1100'
+      # Sunbird offers free Luganda speech. Register at https://api.sunbird.ai/register
       - key: SUNBIRD_API_TOKEN
         sync: false
+      # Load the legal search model at start-up instead of during the first question.
+      - key: WARM_UP_ON_START
+        value: 'true'
 
       - key: AT_USERNAME
         sync: false

@@ -13,6 +13,7 @@ import tempfile
 from django.conf import settings
 
 from config.languages import SUPPORTED_LANGUAGES
+from voice.providers import provider_for
 
 logger = logging.getLogger('legalbridge')
 
@@ -32,7 +33,7 @@ def transcribe_audio(audio_file, language: str = 'en') -> dict:
     language: one of config.languages.LANGUAGE_CODES
     Returns: { 'text': str, 'confidence': float|None, 'warning': str|None }
     """
-    provider = settings.STT_PROVIDER
+    provider = provider_for(language, settings.STT_PROVIDER)
 
     if provider == 'openai_whisper':
         return _transcribe_whisper(audio_file, language)

@@ -11,6 +11,8 @@ import uuid
 from pathlib import Path
 from django.conf import settings
 
+from voice.providers import provider_for
+
 logger = logging.getLogger('legalbridge')
 
 AUDIO_DIR = Path(settings.MEDIA_ROOT) / 'audio'
@@ -23,7 +25,7 @@ def synthesize_text(text: str, language: str = 'en') -> str | None:
     language: one of config.languages.LANGUAGE_CODES
     """
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
-    provider = settings.TTS_PROVIDER
+    provider = provider_for(language, settings.TTS_PROVIDER)
     text = speakable_text(text, getattr(settings, 'TTS_MAX_CHARS', 4096) or 4096)
     if not text:
         return None

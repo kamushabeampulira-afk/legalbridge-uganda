@@ -1,7 +1,11 @@
 """Tests: OCR text extraction and document classification."""
 import pytest
+from PIL import Image
+
 from documents.ocr import (
     classify_document_type,
+    limit_image_size,
+    text_from_ocr_data,
     extract_key_fields,
     _extract_dates,
     _extract_amounts,
@@ -96,3 +100,25 @@ def test_extract_key_fields_combined():
     assert isinstance(fields['dates'], list)
     assert isinstance(fields['amounts'], list)
     assert isinstance(fields['reference_numbers'], list)
+
+
+def test_large_photos_are_shrunk_keeping_their_shape():
+    photo = Image.new('RGB', (4000, 3000))
+    assert limit_image_size(photo, 2500).size == (2500, 1875)
+
+    portrait = Image.new('RGB', (3024, 4032))
+    assert limit_image_size(portrait, 2500).size == (1875, 2500)
+
+    screenshot = Image.new('RGB', (1366, 768))
+    assert limit_image_size(screenshot, 2500) is screenshot
+
+
+def test_text_is_rebuilt_from_word_boxes():
+    data = {
+        'text':      ['', 'NOTICE', 'OF', '', 'Pay', 'UGX', '50,000', 'by', 'Friday'],
+        'block_num': [1, 1, 1, 1, 2, 2, 2, 2, 2],
+        'par_num':   [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        'line_num':  [1, 1, 1, 2, 1, 1, 1, 2, 2],
+    }
+    assert text_from_ocr_data(data) == 'NOTICE OF\n\nPay UGX 50,000\nby Friday'
+    assert text_from_ocr_data({'text': []}) == ''

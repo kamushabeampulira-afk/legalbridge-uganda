@@ -60,10 +60,34 @@ To deploy the free demo:
    extracts once, rebuilds the ChromaDB index if empty, then starts Gunicorn.
 4. Verify `https://<your-free-host>/healthz` returns `ok`.
 
-The free Blueprint uses Groq's OpenAI-compatible endpoint for chat and Sunbird
-for Luganda speech, so it does not need a paid OpenAI or ElevenLabs account.
-Actual model availability is still controlled by those providers; see
-<https://console.groq.com/docs/models> for the current model list.
+The free Blueprint uses Groq's OpenAI-compatible endpoint for chat and English
+speech, and Sunbird for Luganda speech, so it does not need a paid OpenAI or
+ElevenLabs account. Actual model availability is still controlled by those
+providers; see <https://console.groq.com/docs/models> for the current model list.
+
+### Speed on the free plan
+
+Measured response times:
+
+| Step | Time |
+|------|------|
+| Speech to text, English (Groq Whisper) | about 3 s |
+| Speech to text, Luganda (Sunbird) | about 35 s |
+| Reading an answer aloud, English (Groq) | 7-9 s |
+| Reading an answer aloud, Luganda (Sunbird) | about 25 s |
+| Waking a sleeping service, then loading the legal search model | 1-2 min |
+
+`SUNBIRD_VOICE_LANGUAGES=lg` sends only Luganda to Sunbird; everything else
+uses Groq. `WARM_UP_ON_START=true` loads the search model while the server
+starts, not during the first question. Large photos are shrunk to
+`OCR_MAX_IMAGE_SIDE` pixels (default 2500) before OCR.
+
+The biggest remaining delay is the free service sleeping after 15 idle minutes.
+A free uptime monitor (for example UptimeRobot or cron-job.org) that requests
+`https://<your-free-host>/healthz` every 10 minutes keeps it awake. One service
+running all month uses about 744 of the workspace's 750 free instance hours, so
+this only works if it is the only free web service in the workspace. The 0.1 CPU
+also slows OCR and the first search; the Starter plan (0.5 CPU) is the paid fix.
 
 ## 1. Prepare the repository
 
