@@ -39,6 +39,28 @@ def get_session_language(session_id: str) -> str:
     return normalize_language(_get_session(session_id).get('language'))
 
 
+def remembered_language(phone_number: str) -> str:
+    """The language this phone used on its last call, so callers don't have to pick it again.
+
+    Every call is logged in USSDSession with the language it ended in (see views.py),
+    so a caller who chose Runyankore keeps Runyankore until they change it.
+    """
+    if not phone_number:
+        return 'en'
+    from .models import USSDSession
+    try:
+        language = (
+            USSDSession.objects.filter(phone_number=phone_number)
+            .order_by('-updated_at')
+            .values_list('language', flat=True)
+            .first()
+        )
+    except Exception as exc:  # a failed lookup must never block the menu
+        logger.warning(f'Could not look up USSD language for caller: {exc}')
+        return 'en'
+    return normalize_language(language) if language else 'en'
+
+
 def handle_ussd_request(
     session_id: str,
     service_code: str,
@@ -59,10 +81,12 @@ def handle_ussd_request(
         parts = [p.strip() for p in text.split('*') if p.strip()] if text else []
         user_input = parts[-1] if parts else ''
 
-        # Fresh session — always go to main
+        # Fresh session — always go to main, in the language this phone used last time
         if not text:
+            language = remembered_language(phone_number)
             state['menu'] = 'main'
             state['history'] = []
+            state['language'] = language
             _save_session(session_id, state)
             return _render_menu('main', language)
 
@@ -136,17 +160,17 @@ def _render_menu(menu_key: str, language: str) -> str:
 ERROR_NOTICES = {
     'en': "END An error occurred. Please try again or use the LegalBridge app.",
     'lg': "END Waliwo okusooka. Gezaako nate oba kozesa app ya LegalBridge.",
-    'nyn': "END Waliwo ekisooka. Gezaako nate oba kozesa app ya LegalBridge.",
-    'ach': "END An error occurred. Please try again or use the LegalBridge app.",
-    'lgg': "END An error occurred. Please try again or use the LegalBridge app.",
+    'nyn': "END Hariho enshobe ebaireho. Ninkushaba ogyezeho bundi nari okozese app ya LegalBridge.",
+    'ach': "END Bal mo otime. Tim ber item odoco onyo itii ki app me LegalBridge.",
+    'lgg': "END E'yo azini i 'ye ra. Kirikirisi mi o'bi dika kani ku mi ayu app LegalBridge niri'i",
 }
 
 INVALID_NOTICES = {
     'en': "Invalid selection. Please choose from the options below.\n\n",
     'lg': "Londa ennyukuta eziri wansi.\n\n",
-    'nyn': "Londa ennyukuta eziri wansi.\n\n",
-    'ach': "Ywal enamba eri wansi.\n\n",
-    'lgg': "Londa enamba eri wansi.\n\n",
+    'nyn': "Eki watoorana tikirimu. Ninkushaba otoorane ahansi aha.\n\n",
+    'ach': "Yer ni pe atir. Tim ber iyer ki i gin ma piny-ni.\n\n",
+    'lgg': "E'yo 'bani pe ri ma okpo yo. Kirikirisi mi pe engazu e'yo 'diyi ma alia elea.\n\n",
 }
 
 

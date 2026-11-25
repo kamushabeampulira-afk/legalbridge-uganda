@@ -192,9 +192,8 @@ https://legalbridge-api.onrender.com/api/ussd/webhook/
 ```
 
 Use `AT_ENVIRONMENT=sandbox` while testing, then switch to `production` and use
-the live shortcode before launch. The USSD rights menus are available at the
-same wording parity as the app (English/Luganda; other languages fall back to
-English rather than inventing legal text).
+the live shortcode before launch. The USSD menus are in all five app languages.
+Runyankore, Acholi and Lugbara are drafts that need native-speaker review.
 
 ## 7. Storage notes
 
