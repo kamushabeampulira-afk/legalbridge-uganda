@@ -321,4 +321,44 @@ export const subscriptionsApi = {
   },
 };
 
+// ── USSD simulator ───────────────────────────────────────────────────────────
+// Posts the same form fields Africa's Talking posts to the USSD webhook, so the
+// in-app simulator shows exactly what someone dialling from a basic phone sees.
+export type UssdReply = { text: string; ended: boolean };
+
+/** Split a webhook reply ("CON ..." keeps the session open, "END ..." closes it). */
+export function parseUssdReply(raw: string): UssdReply {
+  const reply = raw.trim();
+  if (reply.startsWith('CON')) return { text: reply.slice(3).trim(), ended: false };
+  if (reply.startsWith('END')) return { text: reply.slice(3).trim(), ended: true };
+  return { text: reply, ended: true };
+}
+
+export const ussdApi = {
+  /** `text` is every answer so far joined by '*', e.g. '' then '1' then '1*2'. */
+  send: async (
+    sessionId: string,
+    serviceCode: string,
+    phoneNumber: string,
+    text: string,
+  ): Promise<UssdReply> => {
+    const fields = { sessionId, serviceCode, phoneNumber, text };
+    const body = Object.entries(fields)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    try {
+      // Plain axios, no login token: the webhook is public, and a simple form
+      // post avoids an extra CORS preflight round trip.
+      const res = await axios.post(`${BASE_URL}/ussd/webhook/`, body, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        responseType: 'text',
+        timeout: 60000,
+      });
+      return parseUssdReply(String(res.data ?? ''));
+    } catch (e) {
+      throw new Error(extractErrorMessage(e));
+    }
+  },
+};
+
 export default apiClient;

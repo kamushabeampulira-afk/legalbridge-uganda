@@ -4,7 +4,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Linking,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ import { Spacing, BorderRadius } from '@/constants/Spacing';
 import { webShadow } from '@/constants/Shadows';
 import { FontFamily, FontSize } from '@/constants/Typography';
 import { t } from '@/i18n/translations';
+import { USSD_CODE } from '@/constants/Ussd';
 
 const PRIMARY_PATHS = [
   {
@@ -142,22 +143,24 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      {/* USSD banner */}
+      {/* USSD banner — opens the in-app simulator */}
       <TouchableOpacity
         style={[styles.ussdBanner, webShadow.sm]}
-        onPress={() => Linking.openURL('tel:*384*0#')}
+        onPress={() => router.push('/ussd')}
         activeOpacity={0.85}
-        accessibilityLabel={t('home_ussd_accessibility', language)}
+        accessibilityRole="button"
+        accessibilityLabel={`${t('ussd_title', language)}. ${t('home_ussd_try', language)}`}
       >
         <View style={styles.ussdLeft}>
           <Text style={styles.ussdIcon}>📱</Text>
-          <View>
+          <View style={styles.ussdText}>
             <Text style={styles.ussdTitle}>{t('ussd_title', language)}</Text>
             <Text style={styles.ussdBody}>{t('ussd_body', language)}</Text>
+            <Text style={styles.ussdTry}>{t('home_ussd_try', language)} →</Text>
           </View>
         </View>
         <View style={styles.ussdCode}>
-          <Text style={styles.ussdCodeText}>*384*0#</Text>
+          <Text style={styles.ussdCodeText}>{USSD_CODE}</Text>
         </View>
       </TouchableOpacity>
 
@@ -270,11 +273,18 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textOnPrimary,
   },
+  ussdText: { flex: 1 },
   ussdBody: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
     color: Colors.textOnPrimaryMuted,
     marginTop: 2,
+  },
+  ussdTry: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.xs,
+    color: Colors.textOnPrimary,
+    marginTop: Spacing.xs,
   },
   ussdCode: {
     // White chip with a gold edge: gold as a sparing accent, magenta text for contrast

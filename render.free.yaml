@@ -150,6 +150,10 @@ services:
         value: '20'
       - key: EXPO_PUBLIC_API_URL
         value: https://legalbridge-api-free.onrender.com/api
+      # USSD code shown in the app and its simulator. Change it to the channel
+      # Africa's Talking gives you (e.g. *384*4521#), then redeploy this site.
+      - key: EXPO_PUBLIC_USSD_CODE
+        value: '*384*0#'
 
 databases:
   - name: legalbridge-db-free

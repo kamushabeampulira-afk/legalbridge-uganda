@@ -172,7 +172,10 @@ Show the system:
 
 ## Demo 3: USSD (feature phone / no internet)
 
-**Setup**: Africa's Talking simulator at simulator.africastalking.com
+**Setup**: Africa's Talking simulator at simulator.africastalking.com, or the
+simulator built into the app: Home → **No Internet? Use USSD** → **Call**. The
+in-app simulator calls the same webhook, so the menus are identical and no
+Africa's Talking account is needed.
 
 ### Steps
 
